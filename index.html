@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Тумба под аквариум — визуализация, раскрой, сборка</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#f4f5f7; --card:#ffffff; --soft:#f8f9fb; --soft2:#f1f3f6;
+  --line:#e6e7ec; --line2:#d8dae1;
+  --tx:#17181c; --tx2:#5b616b; --tx3:#8b919b;
+  --acc:#4d6bfe; --acc-dk:#3a55df; --acc-soft:#eef1ff;
+  --ok:#0f9d63; --warn:#b0731a; --bad:#d23f3f;
+  --shadow:0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",monospace;
+}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--tx);background:var(--bg);
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1560px;margin:0 auto;padding:22px 26px 72px}
+
+/* ---------- шапка ---------- */
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
+  padding:16px 22px;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:44px;height:44px;flex:0 0 auto;border-radius:13px;background:linear-gradient(160deg,#eef1ff,#e3e8ff);border:1px solid #dfe4ff;display:grid;place-items:center}
+.hdr h1{margin:0;font-size:21px;font-weight:650;letter-spacing:-.01em}
+.hdr p{margin:1px 0 0;color:var(--tx3);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.tags{display:flex;gap:8px;flex-wrap:wrap}
+.tags span{font-size:11.5px;letter-spacing:.04em;color:var(--tx2);border:1px solid var(--line2);border-radius:999px;padding:6px 12px;background:var(--soft)}
+
+/* ---------- сетка ---------- */
+.grid{display:grid;grid-template-columns:342px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:1080px){.grid{grid-template-columns:1fr}.side{position:static!important}}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.card + .card{margin-top:16px}
+.ct{margin:0 0 14px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);font-weight:650;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ct .hint{text-transform:none;letter-spacing:0;font-weight:400;color:var(--tx3);font-size:12px}
+
+/* ---------- поля ---------- */
+.side{position:sticky;top:20px}
+.field{margin-bottom:12px}
+.field label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--tx2);margin-bottom:6px}
+.field label b{color:var(--tx3);font-weight:500;font-size:11.5px}
+.inp{display:flex;align-items:center;background:var(--soft);border:1px solid var(--line2);border-radius:12px;overflow:hidden;transition:border-color .15s,box-shadow .15s,background .15s}
+.inp:focus-within{background:#fff;border-color:var(--acc);box-shadow:0 0 0 3px rgba(77,107,254,.14)}
+.inp input{flex:1;min-width:0;background:none;border:0;color:var(--tx);font:600 17px/1 var(--mono);padding:11px 12px;outline:none;-moz-appearance:textfield}
+.inp input::-webkit-outer-spin-button,.inp input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.inp em{font-style:normal;font-size:11.5px;color:var(--tx3);padding-right:12px;letter-spacing:.05em}
+select{width:100%;appearance:none;background:var(--soft) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b919b' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+  border:1px solid var(--line2);border-radius:12px;color:var(--tx);font:600 14px/1 var(--mono);padding:12px 34px 12px 12px;outline:none;cursor:pointer}
+select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(77,107,254,.14);background-color:#fff}
+
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 2px}
+.presets button{background:var(--soft);border:1px solid var(--line2);color:var(--tx2);border-radius:9px;padding:5px 8px;font:500 11px/1.4 var(--mono);cursor:pointer;transition:.14s}
+.presets button:hover{border-color:var(--acc);color:var(--acc-dk);background:var(--acc-soft)}
+.note{margin:12px 0 0;font-size:12px;color:var(--tx3);line-height:1.5}
+
+.swatches{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sw{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line2);background:var(--soft);border-radius:12px;padding:9px 11px;cursor:pointer;font-size:13px;color:var(--tx2);transition:.15s}
+.sw i{width:18px;height:18px;border-radius:6px;border:1px solid rgba(0,0,0,.14);flex:0 0 auto}
+.sw[aria-pressed="true"]{border-color:var(--acc);background:var(--acc-soft);color:var(--tx);box-shadow:0 0 0 3px rgba(77,107,254,.1)}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:16px}
+@media (max-width:1400px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:0 1px 2px rgba(17,24,39,.03)}
+.kpi .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--tx3);margin-bottom:5px}
+.kpi .v{font:650 21px/1.15 var(--mono);letter-spacing:-.02em}
+.kpi .v small{font-size:12px;color:var(--tx2);font-weight:500;margin-left:3px;letter-spacing:0}
+.kpi .s{font-size:11px;color:var(--tx3);margin-top:3px}
+.kpi.acc{background:linear-gradient(180deg,#f6f8ff,#fff);border-color:#dbe2ff}
+.kpi.acc .v{color:var(--acc-dk)}
+
+/* ---------- просмотрщик ---------- */
+.viewer{padding:0;overflow:hidden}
+.vtabs{display:flex;gap:4px;padding:10px 12px 0;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--soft)}
+.vtabs button{background:none;border:1px solid transparent;border-bottom:0;color:var(--tx3);font:550 12.5px/1 inherit;padding:9px 14px 10px;border-radius:10px 10px 0 0;cursor:pointer;position:relative;top:1px}
+.vtabs button:hover{color:var(--tx)}
+.vtabs button.on{color:var(--acc-dk);background:#fff;border-color:var(--line);border-bottom-color:#fff;font-weight:650}
+.stage{padding:14px 14px 4px;background:
+  radial-gradient(800px 420px at 50% 8%, #ffffff 0%, #fbfbfd 65%),
+  linear-gradient(#fbfbfd,#f7f8fa)}
+.stage svg{display:block;width:100%;height:auto}
+.vcap{padding:10px 18px 16px;color:var(--tx2);font-size:12.5px;line-height:1.5;border-top:1px solid var(--line);margin-top:6px}
+.vcap b{color:var(--tx);font-weight:650}
+
+/* ---------- svg-подписи ---------- */
+.dim .dl{stroke:#b3b9c4;stroke-width:1}
+.dim .ext{stroke:#ccd1da;stroke-width:.8;stroke-dasharray:2 3}
+text.lbl{fill:#4d5560;font:550 12px/1 var(--mono);paint-order:stroke;stroke:#fbfbfd;stroke-width:4px;stroke-linejoin:round}
+text.lbl2{fill:#7a828d;font:500 11px/1 var(--mono);paint-order:stroke;stroke:#fbfbfd;stroke-width:4px;stroke-linejoin:round}
+text.ttl{fill:#2a2d33;font:650 13px/1 -apple-system,"Segoe UI",sans-serif;paint-order:stroke;stroke:#fbfbfd;stroke-width:4px}
+text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
+
+/* ---------- таблицы ---------- */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font:650 10.5px/1.4 -apple-system,"Segoe UI",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);padding:9px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.tbl td{padding:9px 10px;border-bottom:1px solid #eef0f3;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:#fafbfd}
+.tbl .num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .nm{display:flex;align-items:center;gap:9px}
+.tbl .sw{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
+.tbl .tot td{border-top:1px solid var(--line2);font-weight:650;background:var(--soft)}
+.tbl .mut{color:var(--tx3);font-size:12px}
+
+/* ---------- раскрой ---------- */
+.sheets{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px;margin-top:16px}
+.sheet{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:10px}
+.sheet h4{margin:0 0 6px;font:650 11px/1.4 -apple-system,"Segoe UI",sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--tx3);display:flex;justify-content:space-between}
+.sheet h4 span{color:var(--acc-dk);letter-spacing:0;font-family:var(--mono);text-transform:none}
+.legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;font-size:11.5px;color:var(--tx3)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* ---------- сборка ---------- */
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{position:relative;padding:0 0 18px 46px;border-left:1px solid var(--line2);margin-left:15px}
+.steps li:last-child{border-left-color:transparent;padding-bottom:0}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:-15px;top:0;width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid #d5dbfa;color:var(--acc-dk);font:650 12px/28px var(--mono);text-align:center;box-shadow:0 1px 2px rgba(17,24,39,.05)}
+.steps h5{margin:3px 0 4px;font-size:14px;font-weight:650}
+.steps p{margin:0;color:var(--tx2);font-size:13px;line-height:1.55}
+.steps p b{color:var(--tx);font-weight:650}
+
+/* ---------- мелочи ---------- */
+.chk{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.chk div{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.chk dt{font-size:11px;color:var(--tx3);letter-spacing:.02em}
+.chk dd{margin:3px 0 0;font:650 15px/1.2 var(--mono)}
+.chk dd small{font-weight:400;color:var(--tx2);font-size:11.5px}
+.badge-ok{color:var(--ok)}
+.badge-warn{color:var(--warn)}
+.badge-bad{color:var(--bad)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:#fff;border:1px solid var(--line2);color:var(--tx2);border-radius:10px;padding:8px 13px;font:550 12px/1.2 inherit;cursor:pointer;transition:.14s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--acc);color:var(--acc-dk);background:var(--acc-soft)}
+.ftr{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);color:var(--tx3);font-size:12px;line-height:1.6;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.warnbox{border:1px solid #f0dfb8;background:#fffaf0;color:#8a6420;border-radius:12px;padding:11px 13px;font-size:12.5px;line-height:1.5;margin-top:12px}
+.warnbox b{color:#6f4f14}
+@media print{body{background:#fff}.side,.vtabs,.btnrow{display:none}.card,.hdr{box-shadow:none;border-color:#ddd}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hdr">
+    <div class="brand">
+      <div class="logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4d6bfe" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 8.5 12 4l9 4.5-9 4.5-9-4.5Z"/><path d="M3 8.5V16l9 4.5 9-4.5V8.5"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Тумба под аквариум</h1>
+        <p>размеры · раскрой · сборка</p>
+      </div>
+    </div>
+    <div class="tags">
+      <span>фанера 18 мм</span><span id="tagSheet">лист 2440 × 1220</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside class="side">
+      <section class="card">
+        <h2 class="ct">Аквариум</h2>
+        <div class="field">
+          <label for="inL">Длина <b>мм</b></label>
+          <div class="inp"><input id="inL" type="number" value="1200" min="300" max="4200" step="10"><em>мм</em></div>
+        </div>
+        <div class="field">
+          <label for="inD">Глубина <b>мм</b></label>
+          <div class="inp"><input id="inD" type="number" value="500" min="250" max="1200" step="10"><em>мм</em></div>
+        </div>
+        <div class="field" style="margin-bottom:4px">
+          <label for="inH">Высота <b>мм</b></label>
+          <div class="inp"><input id="inH" type="number" value="500" min="200" max="1200" step="10"><em>мм</em></div>
+        </div>
+        <div class="presets" id="presets"></div>
+        <p class="note">Вес: 1 кг на литр воды + 10 %.</p>
+      </section>
+
+      <section class="card">
+        <h2 class="ct">Тумба</h2>
+        <div class="field">
+          <label for="inHS">Высота <b>мм</b></label>
+          <select id="inHS">
+            <option value="750">750</option>
+            <option value="800">800</option>
+            <option value="850">850</option>
+            <option value="900" selected>900</option>
+            <option value="950">950</option>
+            <option value="1000">1000</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="inSheet">Лист <b>мм</b></label>
+          <select id="inSheet">
+            <option value="2440,1220" selected>2440 × 1220</option>
+            <option value="2500,1250">2500 × 1250</option>
+            <option value="1525,1525">1525 × 1525</option>
+            <option value="3000,1500">3000 × 1500</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:2px">
+          <label>Цвет</label>
+          <div class="swatches" id="colors">
+            <button class="sw" data-c="beige" aria-pressed="true"><i style="background:#dcbc90"></i>Бежевый</button>
+            <button class="sw" data-c="black" aria-pressed="false"><i style="background:#33363b"></i>Чёрный</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="sideSpec"></section>
+    </aside>
+
+    <main class="main">
+      <div class="kpis" id="kpis"></div>
+      <section class="card viewer">
+        <div class="vtabs" id="vtabs"></div>
+        <div class="stage" id="stage"></div>
+        <div class="vcap" id="vcap"></div>
+      </section>
+      <section class="card" id="calcCard"></section>
+      <section class="card" id="cutCard"></section>
+      <section class="card" id="asmCard"></section>
+    </main>
+  </div>
+
+  <footer class="ftr">
+    <span>Фанера 18 мм · двойная крышка · опоры НО-10 · дверцы без ручек</span>
+    <span>Размеры в мм · пропил 4 мм</span>
+  </footer>
+</div>
+
+<script>
+'use strict';
+/* =========================================================
+   КОНСТАНТЫ КОНСТРУКЦИИ
+   ========================================================= */
+const K = {
+  T: 18,            // фанера
+  LEG: 10,          // скрытые опоры НО-10 (высота 10, Ø50), не рисуются
+  TGAP: 5,          // теневой зазор между крышками
+  DGAP: 1,          // зазор дверцы по кругу
+  LIP: 6,           // свес накладной крышки над аквариумом по периметру
+  GAP: 3,           // зазор дверец
+  KERF: 4,
+  E: 6000, DEFL: 3, SIG: 8, RHO: 680, G: 9.81,
+  SPAN_MAX: 620, RANGE: [400, 600]
+};
+
+const $ = s => document.querySelector(s);
+const nf = new Intl.NumberFormat('ru-RU');
+const nf1 = new Intl.NumberFormat('ru-RU', {minimumFractionDigits:1, maximumFractionDigits:1});
+const f0 = v => nf.format(Math.round(v));
+const f1 = v => nf1.format(v);
+const clamp = (v,a,b) => Math.min(b, Math.max(a,v));
+const pl = (n, one, few, many) => {
+  const a = Math.abs(n) % 100, b = a % 10;
+  if(a > 10 && a < 20) return many;
+  if(b > 1 && b < 5) return few;
+  if(b === 1) return one;
+  return many;
+};
+
+/* =========================================================
+   ПОДБОР СЕКЦИЙ
+   ========================================================= */
+function chooseSections(Lc, spanMax){
+  const R = K.RANGE;
+  let best = null;
+  for(let n = 1; n <= 9; n++){
+    for(const t of [18, 36]){
+      const clear = (Lc - 2*K.T - (n-1)*t) / n;
+      if(clear < 240 || clear > 780) continue;
+      let p = 0;
+      if(clear > spanMax + 0.5) p += 500 + (clear - spanMax)*4;
+      if(clear > R[1] + 2) p += (clear - R[1]) * 5;
+      if(clear < R[0] - 2) p += (R[0] - clear) * 5;
+      p += n * 60;
+      p += Math.abs(clear - 500) * 0.2;
+      if(t > 18) p += 10;
+      if(!best || p < best.p) best = {n, t, clear, p};
+    }
+  }
+  return best;
+}
+
+/* =========================================================
+   МОДЕЛЬ
+   ========================================================= */
+function build(L, D, Ht, H, SW, SH){
+  L = Math.round(L); D = Math.round(D); Ht = Math.round(Ht); H = Math.round(H);
+  SW = SW || 2440; SH = SH || 1220;
+
+  const liters  = L * D * Ht / 1e6;
+  const wWater  = liters;
+  const wDesign = liters * 1.1;
+  const q       = wDesign * K.G / L;   // Н/мм
+
+  /* проверка накладной крышки на прогиб */
+  const spanFor = T => {
+    const I  = D * Math.pow(T,3) / 12;
+    const Z  = D * T * T / 6;
+    const sd = Math.pow(K.DEFL * 384 * K.E * I / (5*q), 0.25);
+    const ss = Math.sqrt(8 * K.SIG * Z / q);
+    return Math.min(sd, ss, K.SPAN_MAX);
+  };
+  const span = spanFor(K.T);
+  const topOK = span >= K.RANGE[0];
+
+  /* габариты корпуса */
+  const Lc = L;                     // корпус по длине = длина аквариума
+  const C  = D - K.T;               // глубина корпуса (без дверцы)
+  const sel   = chooseSections(Lc, span);
+  const n     = sel.n, t = sel.t, clear = sel.clear;
+
+  const zBot    = K.LEG;                    // низ ящика (стоит на скрытых опорах)
+  const zBotTop = zBot + K.T;               // верх дна
+  const zOut    = H - K.T;                  // низ накладной крышки
+  const zU      = zOut - K.TGAP;            // верх боковин = верх вкладной крышки
+  const zIn0    = zU - K.T;                 // низ вкладной крышки
+  const Hu      = zU - zBotTop;             // высота боковин
+  const Hpart   = Hu - K.T;                 // стойки короче на толщину вкладной
+  const inD     = C - K.T;                  // глубина внутри (минус дверца и задняя)
+  const inH     = zIn0 - zBotTop;           // просвет по высоте
+  const shelfZ0 = zBotTop + Math.round((inH - K.T)/2);
+  const shelfZ1 = shelfZ0 + K.T;
+  const pinZ    = shelfZ0 - 2.5;
+  const doorZ0  = K.LEG + K.DGAP;           // 1 мм над низом ящика (10 мм опоры)
+  const doorZ1  = zU - K.DGAP;              // 1 мм до верха корпуса
+  const doorH   = doorZ1 - doorZ0;          // = H - 10 - 18 - 5 - 2
+  const doorPitch = Lc / n;                 // шаг дверей по длине аквариума
+  const doorW   = doorPitch - 2*K.DGAP;     // минус 2 мм
+
+  /* стойки и секции */
+  const uprights = [{x0:0, x1:K.T, kind:'side'}];
+  const bays = [];
+  let x = K.T;
+  bays.push({x0:x, x1:x+clear, i:0});
+  for(let i=1;i<n;i++){
+    uprights.push({x0:x+clear, x1:x+clear+t, kind: t>18 ? 'double' : 'part'});
+    x = x + clear + t;
+    bays.push({x0:x, x1:x+clear, i});
+  }
+  uprights.push({x0:x+clear, x1:x+clear+K.T, kind:'side'});
+
+  /* дверцы: шаг = длина / количество, зазор 1 мм по кругу */
+  const doors = [];
+  for(let i=0;i<n;i++){
+    const x0 = i*doorPitch + K.DGAP;
+    doors.push({x0, x1:x0+doorW, hinge: i%2===0 ? 'L' : 'R'});
+  }
+
+  /* ножки — скрытые опоры, в модели не рисуются */
+  const feet = [];
+  uprights.forEach(u => {
+    const cx = (u.x0+u.x1)/2;
+    feet.push({x:cx, y:K.T+60});
+    feet.push({x:cx, y:D-60});
+  });
+
+  /* детали */
+  const parts = [];
+  let pid = 0;
+  const add = (name,w,h,qty,role,note='') => parts.push({id:++pid, name, w:Math.round(w), h:Math.round(h), qty, role, note});
+
+  const useL = SW - 2*K.KERF;
+  const topW = L;
+  const topD = D;
+  const topK   = topW > useL ? Math.ceil(topW/useL) : 1;
+  const innerW = Lc - 2*K.T;
+  const innerK = innerW > useL ? Math.ceil(innerW/useL) : 1;
+
+  add('Дно', Lc, C, 1, 'bottom', 'стойки стоят на нём');
+  add('Боковина', Hu, C, 2, 'side');
+  add('Стойка', Hpart, C-K.T, (n-1)*(t>18?2:1), 'part', t>18 ? 'сдвоенная 36 мм' : '');
+  add('Задняя стенка', Lc-2*K.T, Hu, 1, 'back', 'вкладная, −36 от дна');
+  add('Крышка вкладная', innerW/innerK, C-K.T, innerK, 'intop', innerK>1?'из частей':'в каркасе');
+  add('Крышка накладная', topW/topK, topD, topK, 'top', topK>1?`из ${topK} частей`:'');
+  add('Полка съёмная', clear-4, C-K.T-30, n, 'shelf', 'на полкодержателях');
+  add('Дверца', doorW, doorH, n, 'door');
+  if(topK > 1) add('Накладка стыка крышки', 250, topD-40, topK-1, 'splice', 'снизу, на клей');
+
+  /* площадь, вес, листы */
+  const partsList = parts.filter(p => p.qty > 0);
+  partsList.forEach((p,i) => { p.id = i + 1; });
+  const idOf = {};
+  partsList.forEach(p => { if(idOf[p.role] === undefined) idOf[p.role] = p.id; });
+  const footNo = partsList.length + 1;
+  const area   = partsList.reduce((s,p) => s + p.w*p.h*p.qty, 0) / 1e6;
+  const standW = area * (K.T/1000) * K.RHO;
+  const feetN  = feet.length;
+  const perFoot = (wDesign + standW) / feetN;
+
+  const pieces = [];
+  partsList.forEach(p => { for(let i=0;i<p.qty;i++) pieces.push({id:p.id, name:p.name, w:p.w, h:p.h}); });
+  const sheets = pack(pieces, SW, SH, K.KERF);
+
+  const I  = D * Math.pow(K.T,3) / 12;
+  const Z  = D * K.T * K.T / 6;
+  const defl = 5*q*Math.pow(clear,4) / (384*K.E*I);
+  const sig  = q*clear*clear / (8*Z);
+
+  return {
+    L, D, Ht, H, SW, SH, liters, wWater, wDesign, q, span, topOK,
+    Lc, C, n, t, clear, Hu, Hpart, inD, inH, zBot, zBotTop, zU, zIn0, zOut, zTop: H,
+    shelfZ0, shelfZ1, pinZ, doorZ0, doorZ1, doorH, doorW, topW, topD, innerW,
+    uprights, bays, doors, feet, feetN, parts: partsList, idOf, footNo,
+    area, standW, perFoot, sheets, topK, innerK,
+    I, Z, defl, sig,
+    totalW: wDesign + standW,
+    spanOK: clear <= span + 0.5
+  };
+}
+
+/* =========================================================
+   РАСКРОЙ
+   ========================================================= */
+function pack(pieces, SW, SH, kerf){
+  const cmps = [
+    (a,b)=> Math.max(b.w,b.h)-Math.max(a.w,a.h) || b.w*b.h-a.w*a.h,
+    (a,b)=> b.w*b.h-a.w*a.h || Math.max(b.w,b.h)-Math.max(a.w,a.h),
+    (a,b)=> b.h-a.h || b.w-a.w,
+    (a,b)=> b.w-a.w || b.h-a.h,
+    (a,b)=> a.w*a.h - b.w*b.h,
+    (a,b)=> Math.max(a.w,a.h)-Math.max(b.w,b.h)
+  ];
+  let best = null;
+  const bal = res => {
+    /* больше крупных полезных обрезков — лучше */
+    let s = 0;
+    res.forEach(sh => {
+      let mx = 0;
+      sh.free.forEach(r => { mx = Math.max(mx, r.w*r.h); });
+      s += mx;
+    });
+    return s;
+  };
+  const consider = res => {
+    res = compact(res, kerf);
+    if(!best || res.length < best.length ||
+       (res.length === best.length && bal(res) > bal(best))) best = res;
+  };
+  for(const cmp of cmps){
+    for(const mode of [0,1]) consider(packOnce(pieces.slice().sort(cmp), SW, SH, kerf, mode));
+  }
+  /* случайные перестановки — ищем вариант с меньшим числом листов */
+  let seed = 20260127;
+  const rnd = () => (seed = (seed*1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  for(let i=0;i<36;i++){
+    const list = pieces.slice();
+    for(let j=list.length-1;j>0;j--){
+      const k = Math.floor(rnd()*(j+1));
+      const t = list[j]; list[j] = list[k]; list[k] = t;
+    }
+    consider(packOnce(list, SW, SH, kerf, i%2));
+  }
+  return best;
+}
+
+/* пытаемся впихнуть детали последнего листа в предыдущие и убрать лист */
+function compact(sheets, kerf){
+  let guard = 0;
+  while(sheets.length > 1 && guard++ < 8){
+    const lastIdx = sheets.length - 1;
+    const items = sheets[lastIdx].items.slice();
+    const snap = sheets.slice(0, lastIdx).map(sh => ({
+      free: sh.free.map(r=>({...r})),
+      items: sh.items.slice()
+    }));
+    let all = true;
+    for(const it of items){
+      let ok = false;
+      for(let i=0;i<lastIdx && !ok;i++){
+        ok = place(sheets[i], {id:it.id, name:it.name, w:it.w, h:it.h}, kerf, 0);
+      }
+      if(!ok){ all = false; break; }
+    }
+    if(all){ sheets.pop(); continue; }
+    for(let i=0;i<lastIdx;i++){ sheets[i].free = snap[i].free; sheets[i].items = snap[i].items; }
+    break;
+  }
+  return sheets;
+}
+
+function packOnce(list, SW, SH, kerf, mode){  const sheets = [];
+  for(const p of list){
+    let done = false;
+    for(const sh of sheets){ if(place(sh, p, kerf, mode)){ done = true; break; } }
+    if(!done){
+      const sh = {free:[{x:0,y:0,w:SW,h:SH}], items:[]};
+      if(!place(sh, p, kerf, mode)) sh.oversize = true;
+      sheets.push(sh);
+    }
+  }
+  return sheets;
+}
+
+function place(sh, p, kerf, mode){
+  let best = null;
+  for(let rot = 0; rot < 2; rot++){
+    const w = rot ? p.h : p.w, h = rot ? p.w : p.h;
+    if(rot===1 && p.w===p.h) continue;
+    for(let i=0;i<sh.free.length;i++){
+      const r = sh.free[i];
+      if(w <= r.w+0.01 && h <= r.h+0.01){
+        const short = Math.min(r.w-w, r.h-h);
+        const long  = Math.max(r.w-w, r.h-h);
+        const sc = mode === 0
+          ? short*10000 + long + (rot?3:0)
+          : (r.w-w)*(r.h-h)*10 + short*100 + (rot?3:0);
+        if(!best || sc < best.sc) best = {sc, i, w, h, rot};
+      }
+    }
+  }
+  if(!best) return false;
+  const r = sh.free[best.i];
+  const {w,h,rot} = best;
+  sh.items.push({id:p.id, name:p.name, x:r.x, y:r.y, w, h, rot});
+  sh.free.splice(best.i, 1);
+
+  const rw = r.w - w - kerf, rh = r.h - h - kerf;
+  if(rw >= rh){
+    if(rw > 0) sh.free.push({x:r.x+w+kerf, y:r.y, w:rw, h:r.h});
+    if(rh > 0) sh.free.push({x:r.x, y:r.y+h+kerf, w:w, h:rh});
+  } else {
+    if(rw > 0) sh.free.push({x:r.x+w+kerf, y:r.y, w:rw, h:h});
+    if(rh > 0) sh.free.push({x:r.x, y:r.y+h+kerf, w:r.w, h:rh});
+  }
+  return true;
+}
+/* =========================================================
+   РИСОВАНИЕ
+   ========================================================= */
+const PALETTE = {
+  beige: {
+    edge:'rgba(120,102,80,.34)', gap:'#8f8674', joint:'rgba(90,74,52,.45)',
+    top:   ['#eee4d4','#d7cab6','#f7f0e4'],
+    intop: ['#e6dbc8','#cfc2ac','#efe6d6'],
+    side:  ['#e0d5c2','#c8bba5','#ece2d1'],
+    part:  ['#dcd0bc','#c3b59d','#e8decc'],
+    bottom:['#d8ccb7','#c0b299','#e4dac8'],
+    back:  ['#bfb098','#a6967e','#cdbfa7'],
+    shelf: ['#f1e7d6','#dbcbb2','#faf2e4'],
+    door:  ['#e7dcca','#cfc2ab','#f0e7d7'],
+    plinth:['#cdc1ab','#b5a790','#d9ceb9'],
+    foot:  ['#9aa0a8','#7f858d','#b3b8bf']
+  },
+  black: {
+    edge:'rgba(255,255,255,.16)', gap:'#0f1012', joint:'rgba(255,255,255,.2)',
+    top:   ['#3d3f44','#2f3135','#484a50'],
+    intop: ['#36383c','#292b2e','#414348'],
+    side:  ['#323438','#25272a','#3c3e43'],
+    part:  ['#2f3134','#222427','#393b3f'],
+    bottom:['#2c2e31','#202225','#36383a'],
+    back:  ['#27292c','#1c1e21','#313337'],
+    shelf: ['#333539','#26282b','#3d3f44'],
+    door:  ['#37393e','#2a2c30','#41434a'],
+    plinth:['#232528','#191b1d','#2e3033'],
+    foot:  ['#b0b3b9','#94979d','#c6c9ce']
+  }
+};
+const PAL = ['#4d6bfe','#0fa37f','#e0883b','#a855c8','#d9547a','#2f9cb5','#8a9b2e','#c25e2e','#6f7fd8','#c9a227'];
+
+let CTR = [0,0];
+
+function fit2(pts, W, Hh, pad){
+  let u0=Infinity,u1=-Infinity,v0=Infinity,v1=-Infinity;
+  for(const [x,y] of pts){ u0=Math.min(u0,x); u1=Math.max(u1,x); v0=Math.min(v0,y); v1=Math.max(v1,y); }
+  const s = Math.min((W-2*pad)/Math.max(1,u1-u0), (Hh-2*pad)/Math.max(1,v1-v0));
+  const ox = (W - s*(u1-u0))/2 - s*u0;
+  const oy = (Hh - s*(v1-v0))/2 - s*v0;
+  return {s, f:(x,y)=>[x*s+ox, y*s+oy], W, H:Hh};
+}
+
+function dimEl(a, b, label, off){
+  const dx=b[0]-a[0], dy=b[1]-a[1];
+  const len=Math.hypot(dx,dy)||1;
+  let nx=-dy/len, ny=dx/len;
+  const mx=(a[0]+b[0])/2, my=(a[1]+b[1])/2;
+  if((mx-CTR[0])*nx + (my-CTR[1])*ny < 0){ nx=-nx; ny=-ny; }
+  const A=[a[0]+nx*off, a[1]+ny*off], B=[b[0]+nx*off, b[1]+ny*off];
+  return `<g class="dim">
+    <line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${A[0].toFixed(1)}" y2="${A[1].toFixed(1)}" class="ext"/>
+    <line x1="${b[0].toFixed(1)}" y1="${b[1].toFixed(1)}" x2="${B[0].toFixed(1)}" y2="${B[1].toFixed(1)}" class="ext"/>
+    <line x1="${A[0].toFixed(1)}" y1="${A[1].toFixed(1)}" x2="${B[0].toFixed(1)}" y2="${B[1].toFixed(1)}" class="dl"/>
+    <line x1="${(A[0]-nx*4).toFixed(1)}" y1="${(A[1]-ny*4).toFixed(1)}" x2="${(A[0]+nx*4).toFixed(1)}" y2="${(A[1]+ny*4).toFixed(1)}" class="dl"/>
+    <line x1="${(B[0]-nx*4).toFixed(1)}" y1="${(B[1]-ny*4).toFixed(1)}" x2="${(B[0]+nx*4).toFixed(1)}" y2="${(B[1]+ny*4).toFixed(1)}" class="dl"/>
+    <text x="${((A[0]+B[0])/2).toFixed(1)}" y="${((A[1]+B[1])/2).toFixed(1)}" class="lbl" text-anchor="middle" dominant-baseline="central">${label}</text>
+  </g>`;
+}
+
+function badge(p, num, dx, dy){
+  const [x,y]=p, bx=x+dx, by=y+dy;
+  return `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${bx.toFixed(1)}" y2="${by.toFixed(1)}" stroke="#4d6bfe" stroke-width="1" stroke-dasharray="3 2" opacity=".55"/>
+  <circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="12" fill="#fff" stroke="#4d6bfe" stroke-width="1.5"/>
+  <text x="${bx.toFixed(1)}" y="${by.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" fill="#3a55df" font-family="Segoe UI">${num}</text>`;
+}
+
+function poly(pts, fill, stroke, sw){
+  const d = 'M' + pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L') + 'Z';
+  return `<path d="${d}" fill="${fill}"${stroke?` stroke="${stroke}" stroke-width="${sw||1}" stroke-linejoin="round"`:''}/>`;
+}
+function edges12(P, x0,x1,y0,y1,z0,z1, col, sw){
+  const c=[[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]].map(p=>P(...p));
+  const E=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+  return E.map(([i,j])=>`<line x1="${c[i][0].toFixed(1)}" y1="${c[i][1].toFixed(1)}" x2="${c[j][0].toFixed(1)}" y2="${c[j][1].toFixed(1)}" stroke="${col}" stroke-width="${sw||1.3}" stroke-linecap="round"/>`).join('');
+}
+function svgWrap(W,H,body){
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,system-ui,sans-serif">${body}</svg>`;
+}
+
+/* ---------- изометрия ---------- */
+function drawIso(M, o){
+  const W=1000, Hh=880, C30=Math.cos(Math.PI/6);
+  const CL = PALETTE[o.color || 'beige'];
+  const pr = (x,y,z)=>{ const d=M.D-y; return [(x-d)*C30, (x+d)*0.5 - z]; };
+  const items=[];
+  const bx=(x0,x1,y0,y1,z0,z1,cs,layer,opt)=>{
+    const it=Object.assign({x0,x1,y0,y1,z0,z1,cs,layer:layer||50}, opt||{});
+    items.push(it); return it;
+  };
+
+  /* слои: 10 задняя · 20 дно · 30 стойки · 40 полки · 50 вкладная · 55 кромки стоек · 60 дверцы · 70 накладная */
+  bx(K.T, M.Lc-K.T, M.D-K.T, M.D, M.zBotTop, M.zU, CL.back, 10);
+  bx(0, M.Lc, K.T, M.D, M.zBot, M.zBotTop, CL.bottom, 20);
+  /* правая боковина — самая ближняя, её рисуем после полок */
+  M.uprights.forEach((u,idx)=>{
+    const isRight = idx === M.uprights.length-1;
+    const h = u.kind==='side' ? M.zU : M.zIn0;
+    bx(u.x0,u.x1,K.T,M.D,M.zBotTop,h,u.kind==='double'?CL.part:CL.side, isRight ? 55 : 30);
+  });
+  /* полки и вкладная крышка прижаты справа к стойке — правую грань не рисуем */
+  M.bays.forEach(b=>bx(b.x0+2,b.x1-2,K.T+30,M.D-K.T,M.shelfZ0,M.shelfZ1,CL.shelf,40,{noRight:true}));
+  bx(K.T, M.Lc-K.T, K.T, M.D-K.T, M.zIn0, M.zU, CL.intop, 50, {noRight:true});
+  /* передние кромки стоек поверх полок */
+  M.uprights.forEach((u,idx)=>{
+    if(idx === M.uprights.length-1) return;
+    const h = u.kind==='side' ? M.zU : M.zIn0;
+    bx(u.x0,u.x1,K.T,K.T+0.5,M.zBotTop,h,u.kind==='double'?CL.part:CL.side,45,{strip:true});
+  });
+
+  const ez = o.explode || 0;
+  if(o.doors) M.doors.forEach(d=>bx(d.x0,d.x1,0,K.T,M.doorZ0,M.doorZ1,CL.door,60));
+  bx(0, M.L, 0, M.D, M.zOut+ez, M.zTop+ez, CL.top, 70);
+
+  const pts=[];
+  items.forEach(it=>{
+    for(const X of [it.x0,it.x1]) for(const Y of [it.y0,it.y1]) for(const Z of [it.z0,it.z1]) pts.push(pr(X,Y,Z));
+  });
+  if(o.tank){
+    for(const X of [0,M.L]) for(const Y of [0,M.D]) for(const Z of [M.H,M.H+M.Ht]) pts.push(pr(X,Y,Z));
+  }
+  const fit = fit2(pts, W, Hh, 90);
+  const P = (x,y,z)=>{ const q=pr(x,y,z); return fit.f(q[0],q[1]); };
+  CTR = P(M.L/2, M.D/2, (M.H+M.Ht)/2);
+
+  /* порядок: сначала слой, внутри слоя — от дальнего к ближнему */
+  const key = it => it.x1 + (M.D - it.y0) + it.z1;
+  items.sort((a,b)=> (a.layer - b.layer) || (key(a) - key(b)));
+
+  let out='';
+  /* тень */
+  const sh = [P(0,M.D,0),P(M.Lc,M.D,0),P(M.Lc,0,0),P(0,0,0)];
+  out += `<g filter="url(#soft)" opacity=".16">${poly(sh.map(p=>[p[0]+6,p[1]+10]),'#2b3444')}</g>`;
+  out += `<defs><filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="12"/></filter></defs>`;
+
+  for(const it of items){
+    const {x0,x1,y0,y1,z0,z1,cs}=it;
+    const A=P(x0,y0,z0), B=P(x1,y0,z0), Cc=P(x1,y0,z1), Dd=P(x0,y0,z1);
+    const E=P(x1,y1,z0), F=P(x1,y1,z1), G=P(x0,y1,z1);
+    out += poly([A,B,Cc,Dd], cs[0], CL.edge, .7);
+    if(!it.strip && !it.noRight) out += poly([B,E,F,Cc], cs[1], CL.edge, .7);
+    if(!it.strip) out += poly([Dd,Cc,F,G], cs[2], CL.edge, .7);
+  }
+
+  if(o.tank){
+    const z0=M.H, z1=M.H+M.Ht, g=10, wh=Math.round(M.Ht*0.88), sub=50;
+    const A=(x,y,z)=>P(x,y,z);
+    out += poly([A(g,g,z0+g),A(M.L-g,g,z0+g),A(M.L-g,g,z0+g+wh),A(g,g,z0+g+wh)],'rgba(58,132,158,.46)');
+    out += poly([A(M.L-g,g,z0+g),A(M.L-g,M.D-g,z0+g),A(M.L-g,M.D-g,z0+g+wh),A(M.L-g,g,z0+g+wh)],'rgba(42,110,136,.52)');
+    out += poly([A(g,g,z0+g+wh),A(M.L-g,g,z0+g+wh),A(M.L-g,M.D-g,z0+g+wh),A(g,M.D-g,z0+g+wh)],'rgba(120,198,222,.40)');
+    /* грунт */
+    const S=P;
+    out += poly([S(g,g,z0+g),S(M.L-g,g,z0+g),S(M.L-g,g,z0+g+sub),S(g,g,z0+g+sub)],'#5c4b38');
+    out += poly([S(M.L-g,g,z0+g),S(M.L-g,M.D-g,z0+g),S(M.L-g,M.D-g,z0+g+sub),S(M.L-g,g,z0+g+sub)],'#463828');
+    out += poly([S(g,g,z0+g+sub),S(M.L-g,g,z0+g+sub),S(M.L-g,M.D-g,z0+g+sub),S(g,M.D-g,z0+g+sub)],'#6d5a43');
+    out += poly([A(0,0,z0),A(M.L,0,z0),A(M.L,0,z1),A(0,0,z1)],'rgba(150,215,235,.10)');
+    out += poly([A(M.L,0,z0),A(M.L,M.D,z0),A(M.L,M.D,z1),A(M.L,0,z1)],'rgba(150,215,235,.12)');
+    out += edges12(A,0,M.L,0,M.D,z0,z1,'rgba(60,150,180,.8)',1.3);
+  }
+
+  if(o.dims){
+    out += dimEl(P(0,0,0), P(M.L,0,0), 'L '+f0(M.L), 46);
+    out += dimEl(P(M.L,0,0), P(M.L,M.D,0), 'D '+f0(M.D), 42);
+    out += dimEl(P(M.L,0,M.H), P(M.L,0,0), 'H '+f0(M.H), 42);
+    out += dimEl(P(0,0,M.H), P(0,0,M.H+M.Ht), 'H акв '+f0(M.Ht), 40);
+  }
+
+  if(o.badges){
+    const b=M.bays[0], b2=M.bays[Math.min(1,M.bays.length-1)];
+    const pu=M.uprights.find(u=>u.kind!=='side');
+    const I=M.idOf;
+    if(I.top)    out += badge(P(M.Lc/2, M.D/2, M.zTop+ez), I.top, 0, -30);
+    if(I.intop)  out += badge(P(M.Lc/2, 140, M.zU), I.intop, -90, -6);
+    if(I.side)   out += badge(P(9, K.T, 300), I.side, -42, 20);
+    if(pu && I.part) out += badge(P((pu.x0+pu.x1)/2, K.T, 300), I.part, 0, -40);
+    if(I.bottom) out += badge(P((b.x0+b.x1)/2, K.T+40, M.zBot+9), I.bottom, 0, 44);
+    if(I.back)   out += badge(P((b2.x0+b2.x1)/2, M.D-K.T, 240), I.back, 44, -14);
+    if(I.shelf)  out += badge(P((b.x0+b.x1)/2, 160, M.shelfZ1), I.shelf, -36, 26);
+  }
+  if(o.doors){
+    M.doors.forEach((d)=>{
+      out += `<line x1="${P(d.x0,0,M.doorZ0)[0].toFixed(1)}" y1="${P(d.x0,0,M.doorZ0)[1].toFixed(1)}" x2="${P(d.x0,0,M.doorZ1)[0].toFixed(1)}" y2="${P(d.x0,0,M.doorZ1)[1].toFixed(1)}" stroke="${CL.joint}" stroke-width="1.5"/>`;
+    });
+    const last = M.doors[M.doors.length-1];
+    out += `<line x1="${P(last.x1,0,M.doorZ0)[0].toFixed(1)}" y1="${P(last.x1,0,M.doorZ0)[1].toFixed(1)}" x2="${P(last.x1,0,M.doorZ1)[0].toFixed(1)}" y2="${P(last.x1,0,M.doorZ1)[1].toFixed(1)}" stroke="${CL.joint}" stroke-width="1.2"/>`;
+    /* теневая линия под крышкой */
+    out += poly([P(0,0,M.zU),P(M.Lc,0,M.zU),P(M.Lc,0,M.zOut),P(0,0,M.zOut)],CL.gap);
+  }
+  return svgWrap(W,Hh,out);
+}
+
+/* ---------- вид спереди ---------- */
+function drawFront(M, o){
+  const W=1000, Hh=880;
+  const CL = PALETTE[o.color || 'beige'];
+  const pts=[[0,0],[M.L,0],[0,-(M.H+M.Ht)],[M.L,-(M.H+M.Ht)]];
+  const fit=fit2(pts,W,Hh,100);
+  const P=(x,z)=>fit.f(x,-z);
+  CTR=[(P(0,0)[0]+P(M.L,0)[0])/2, (P(0,0)[1]+P(0,M.H+M.Ht)[1])/2];
+  const R=(x0,z0,x1,z1,at)=>{
+    const a=P(x0,z0), b=P(x1,z1);
+    return `<rect x="${Math.min(a[0],b[0]).toFixed(1)}" y="${Math.min(a[1],b[1]).toFixed(1)}" width="${Math.abs(b[0]-a[0]).toFixed(1)}" height="${Math.abs(b[1]-a[1]).toFixed(1)}" ${at}/>`;
+  };
+  let s='';
+  /* аквариум — строго внутри крышки */
+  s += R(0,M.H,M.L,M.H+M.Ht,'fill="rgba(120,185,205,.20)" stroke="none"');
+  s += R(10,M.H+10,M.L-10,M.H+10+M.Ht*0.88,'fill="rgba(96,170,196,.30)" stroke="none"');
+  s += R(10,M.H+10,M.L-10,M.H+60,'fill="#5c4b38" stroke="none"');
+  s += R(0,M.H,M.L,M.H+M.Ht,'fill="none" stroke="#4f9fbb" stroke-width="1.3"');
+  /* накладная крышка */
+  s += R(0,M.zOut,M.L,M.H,'fill="'+CL.top[0]+'" stroke="'+CL.edge+'" stroke-width="1"');
+  /* теневой зазор 5 мм */
+  s += R(0,M.zU,M.L,M.zOut,'fill="#b9ad99" stroke="none"');
+  /* вкладная крышка (виден торец) */
+  s += R(K.T,M.zIn0,M.L-K.T,M.zU,'fill="'+CL.intop[0]+'" stroke="'+CL.edge+'" stroke-width=".8"');
+  /* корпус */
+  s += R(0,M.zBotTop,M.Lc,M.zIn0,'fill="#f3ede3" stroke="none"');
+  /* стойки */
+  M.uprights.forEach(u=>{ s += R(u.x0,M.zBotTop,u.x1,M.zIn0,u.kind==='double'?'fill="#d9cebb" stroke="#c3b7a1"':'fill="#e8e0d2" stroke="#cfc4b1"'); });
+  /* полки */
+  M.bays.forEach(b=>{ s += R(b.x0+2,M.shelfZ0,b.x1-2,M.shelfZ1,'fill="'+CL.shelf[0]+'" stroke="'+CL.edge+'" stroke-width=".8"'); });
+  /* дверцы */
+  M.doors.forEach(d=>{
+    s += R(d.x0,M.doorZ0,d.x1,M.doorZ1,'fill="'+CL.door[0]+'" stroke="'+CL.edge+'" stroke-width="1"');
+    const hx = d.hinge==='L' ? d.x0+9 : d.x1-9;
+    s += `<circle cx="${P(hx,M.doorZ0+90)[0].toFixed(1)}" cy="${P(hx,M.doorZ0+90)[1].toFixed(1)}" r="2.4" fill="#b3a894"/>`;
+    s += `<circle cx="${P(hx,M.doorZ1-90)[0].toFixed(1)}" cy="${P(hx,M.doorZ1-90)[1].toFixed(1)}" r="2.4" fill="#b3a894"/>`;
+  });
+  /* тень под дверцей 1 мм */
+  s += R(0,0,M.Lc,K.LEG+K.DGAP,'fill="#8f8674" stroke="none"');
+  /* уровень воды */
+  const wl = M.H+10+M.Ht*0.88;
+  s += `<line x1="${P(0,wl)[0].toFixed(1)}" y1="${P(0,wl)[1].toFixed(1)}" x2="${P(M.L,wl)[0].toFixed(1)}" y2="${P(M.L,wl)[1].toFixed(1)}" stroke="#5aa9c4" stroke-width="1" stroke-dasharray="7 5" opacity=".7"/>`;
+  s += `<text x="${(P(0,wl)[0]+14).toFixed(1)}" y="${(P(0,wl)[1]+17).toFixed(1)}" class="lbl2">уровень воды</text>`;
+
+  M.bays.forEach(b=>{ s += dimEl(P(b.x0,0),P(b.x1,0), f0(b.x1-b.x0), 26); });
+  s += dimEl(P(0,0),P(M.L,0), f0(M.L), 78);
+  s += dimEl(P(M.L,0),P(M.L,M.H), f0(M.H), 58);
+  s += dimEl(P(M.L,M.H),P(M.L,M.H+M.Ht), f0(M.Ht), 58);
+  s += `<text x="${P(0,M.H+M.Ht)[0].toFixed(1)}" y="${(P(0,M.H+M.Ht)[1]-16).toFixed(1)}" class="sub">аквариум ${f0(M.L)} × ${f0(M.D)} × ${f0(M.Ht)} · крышка ${f0(M.topW)} × ${f0(M.topD)}</text>`;
+  return svgWrap(W,Hh,s);
+}
+
+/* ---------- вид сбоку (разрез) ---------- */
+function drawSide(M, o){
+  const W=1000, Hh=880;
+  const pts=[[0,0],[M.D,0],[0,-M.H],[M.D,-M.H]];
+  const fit=fit2(pts,W,Hh,100);
+  const P=(x,z)=>fit.f(x,-z);
+  CTR=[(P(0,0)[0]+P(M.D,0)[0])/2, (P(0,0)[1]+P(0,M.H)[1])/2];
+  const R=(x0,z0,x1,z1,at)=>{
+    const a=P(x0,z0), b=P(x1,z1);
+    return `<rect x="${Math.min(a[0],b[0]).toFixed(1)}" y="${Math.min(a[1],b[1]).toFixed(1)}" width="${Math.abs(b[0]-a[0]).toFixed(1)}" height="${Math.abs(b[1]-a[1]).toFixed(1)}" ${at}/>`;
+  };
+  let s='<defs><pattern id="hatchS" width="10" height="10" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#f3e6d2"/><line x1="0" y1="0" x2="0" y2="10" stroke="#c8ab84" stroke-width="1.6"/></pattern></defs>';
+  /* фон корпуса */
+  s += R(K.T,M.zBotTop,M.D-K.T,M.zIn0,'fill="#fdfaf5" stroke="none"');
+  /* дно */
+  s += R(K.T,M.zBot,M.D,M.zBotTop,'fill="url(#hatchS)" stroke="#b99f7c" stroke-width="1"');
+  /* задняя стенка — вкладная, равна боковинам по высоте */
+  s += R(M.D-K.T,M.zBotTop,M.D,M.zU,'fill="url(#hatchS)" stroke="#b99f7c" stroke-width="1"');
+  /* вкладная крышка */
+  s += R(K.T,M.zIn0,M.D-K.T,M.zU,'fill="url(#hatchS)" stroke="#b99f7c" stroke-width="1"');
+  /* накладная крышка */
+  s += R(0,M.zOut,M.D,M.H,'fill="url(#hatchS)" stroke="#b99f7c" stroke-width="1"');
+  /* дверца */
+  s += R(0,M.doorZ0,K.T,M.doorZ1,'fill="url(#hatchS)" stroke="#b99f7c" stroke-width="1"');
+  /* полка */
+  s += R(K.T+30,M.shelfZ0,M.D-K.T,M.shelfZ1,'fill="url(#hatchS)" stroke="#b99f7c" stroke-width="1"');
+  /* выноска теневого зазора */
+  s += `<line x1="${P(M.D+24,M.zU)[0].toFixed(1)}" y1="${P(M.D+24,M.zU)[1].toFixed(1)}" x2="${P(M.D-40,M.zU+2.5)[0].toFixed(1)}" y2="${P(M.D-40,M.zU+2.5)[1].toFixed(1)}" stroke="#8b919b" stroke-width="1" stroke-dasharray="3 2"/>`;
+  s += `<text x="${(P(M.D+28,M.zU)[0]+4).toFixed(1)}" y="${P(M.D+28,M.zU)[1].toFixed(1)}" class="lbl2">зазор 5</text>`;
+
+  s += dimEl(P(0,0),P(M.D,0), f0(M.D), 66);
+  s += dimEl(P(M.D,0),P(M.D,M.H), f0(M.H), 58);
+  s += `<text x="${P(0,M.H)[0].toFixed(1)}" y="${(P(0,M.H)[1]-26).toFixed(1)}" class="sub">разрез по секции</text>`;
+  return svgWrap(W,Hh,s);
+}
+
+/* ---------- узел полки ---------- */
+function drawDetail(M){
+  const W=1000, Hh=470;
+  const shelf = M.parts.find(p=>p.role==='shelf');
+  let s = `<defs><pattern id="hatch" width="9" height="9" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="9" height="9" fill="#f3e6d2"/><line x1="0" y1="0" x2="0" y2="9" stroke="#c8ab84" stroke-width="1.5"/></pattern></defs>`;
+
+  s += `<text x="24" y="30" class="ttl">Узел полки — разрез</text>`;
+  s += `<text x="24" y="49" class="sub">полка на цилиндрах, снимается</text>`;
+  const scl = 3.2, ox = 250, oy = 300;
+  const X = mm => ox + mm*scl;
+  const Y = mm => oy - mm*scl;
+  s += `<rect x="${X(-40).toFixed(1)}" y="${Y(26).toFixed(1)}" width="${(40*scl).toFixed(1)}" height="${(52*scl).toFixed(1)}" fill="url(#hatch)" stroke="#b99f7c" stroke-width="1"/>`;
+  s += `<rect x="${X(2).toFixed(1)}" y="${Y(18).toFixed(1)}" width="${(68*scl).toFixed(1)}" height="${(18*scl).toFixed(1)}" fill="#e0c093" stroke="#b08c5e" stroke-width="1.1"/>`;
+  s += `<rect x="${X(0).toFixed(1)}" y="${Y(0).toFixed(1)}" width="${(7*scl).toFixed(1)}" height="${(5*scl).toFixed(1)}" rx="2" fill="#8d9096" stroke="#6f7378"/>`;
+  s += `<rect x="${X(-12).toFixed(1)}" y="${Y(0).toFixed(1)}" width="${(12*scl).toFixed(1)}" height="${(5*scl).toFixed(1)}" fill="none" stroke="#8d9096" stroke-dasharray="3 2"/>`;
+  const call = (ax,ay,bx,by,n) => `<line x1="${ax.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${bx.toFixed(1)}" y2="${by.toFixed(1)}" stroke="#4d6bfe" stroke-width="1" stroke-dasharray="3 2" opacity=".7"/><circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="10" fill="#fff" stroke="#4d6bfe" stroke-width="1.3"/><text x="${bx.toFixed(1)}" y="${by.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="700" fill="#3a55df">${n}</text>`;
+  s += call(X(4), Y(2.5), 336, 352, 1);
+  s += call(X(1), Y(9), 352, 198, 2);
+  s += call(X(-7), Y(2.5), 148, 168, 3);
+  s += `<text x="24" y="404" class="lbl2">1 — полкодержатель Ø5×16, вылет 7</text>`;
+  s += `<text x="24" y="422" class="lbl2">2 — зазор 2 мм по бокам</text>`;
+  s += `<text x="24" y="440" class="lbl2">3 — отверстие Ø5×12 в стойке</text>`;
+
+  s += `<line x1="510" y1="24" x2="510" y2="450" stroke="#e6e7ec"/>`;
+  s += `<text x="538" y="30" class="ttl">План секции</text>`;
+  s += `<text x="538" y="49" class="sub">4 цилиндра, зазор 2 мм</text>`;
+  const pw = 396, ph = 250;
+  const sc2 = Math.min(pw/M.clear, ph/M.inD);
+  const px0 = 560, py0 = 88;
+  const qx = mm => px0 + mm*sc2;
+  const qy = mm => py0 + mm*sc2;
+  s += `<rect x="${(qx(0)-18*sc2).toFixed(1)}" y="${qy(0).toFixed(1)}" width="${(18*sc2).toFixed(1)}" height="${(M.inD*sc2).toFixed(1)}" fill="url(#hatch)" stroke="#b99f7c"/>`;
+  s += `<rect x="${qx(M.clear).toFixed(1)}" y="${qy(0).toFixed(1)}" width="${(18*sc2).toFixed(1)}" height="${(M.inD*sc2).toFixed(1)}" fill="url(#hatch)" stroke="#b99f7c"/>`;
+  s += `<rect x="${qx(0).toFixed(1)}" y="${(qy(M.inD)-18*sc2).toFixed(1)}" width="${(M.clear*sc2).toFixed(1)}" height="${(18*sc2).toFixed(1)}" fill="#e2d2b8" stroke="#c3ac8b"/>`;
+  s += `<rect x="${qx(2).toFixed(1)}" y="${qy(30).toFixed(1)}" width="${((M.clear-4)*sc2).toFixed(1)}" height="${((M.inD-30)*sc2).toFixed(1)}" fill="#e0c093" stroke="#b08c5e" stroke-width="1.2"/>`;
+  [[3.5,80],[3.5,M.inD-50],[M.clear-3.5,80],[M.clear-3.5,M.inD-50]].forEach(([x,y])=>{
+    s += `<circle cx="${qx(x).toFixed(1)}" cy="${qy(y).toFixed(1)}" r="3" fill="#8d9096" stroke="#6f7378"/>`;
+  });
+  s += `<text x="${qx(M.clear/2).toFixed(1)}" y="${qy(M.inD/2).toFixed(1)}" class="lbl" text-anchor="middle">полка ${f0(shelf.w)} × ${f0(shelf.h)}</text>`;
+  s += `<line x1="${qx(0).toFixed(1)}" y1="${(qy(M.inD)+30).toFixed(1)}" x2="${qx(M.clear).toFixed(1)}" y2="${(qy(M.inD)+30).toFixed(1)}" stroke="#b3b9c4"/>`;
+  s += `<text x="${qx(M.clear/2).toFixed(1)}" y="${(qy(M.inD)+44).toFixed(1)}" class="lbl" text-anchor="middle">${f0(M.clear)}</text>`;
+  const dxl = qx(M.clear) + 18*sc2 + 16;
+  s += `<line x1="${dxl.toFixed(1)}" y1="${qy(0).toFixed(1)}" x2="${dxl.toFixed(1)}" y2="${qy(M.inD).toFixed(1)}" stroke="#b3b9c4"/>`;
+  s += `<text x="${(dxl+8).toFixed(1)}" y="${qy(M.inD/2).toFixed(1)}" class="lbl">${f0(M.inD)}</text>`;
+  s += `<text x="538" y="404" class="lbl2">Цилиндры — 50 мм от кромок.</text>`;
+  s += `<text x="538" y="422" class="lbl2">Полка снимается без инструмента.</text>`;
+  return svgWrap(W,Hh,s);
+}
+/* =========================================================
+   ИНТЕРФЕЙС
+   ========================================================= */
+const state = { tab:'tumba', color:'beige' };
+let MODEL = null;
+
+function renderKpis(M){
+  const cards = [
+    ['Объём', `${f0(M.liters)}<small>л</small>`, 'воды', false],
+    ['Расчётный вес', `${f0(M.wDesign)}<small>кг</small>`, '+10 % запаса', true],
+    ['Секции', `${M.n}<small>×</small>${f0(M.clear)}`, 'мм', false],
+    ['Дверцы', `${M.n}`, `${f0(M.doorW)} × ${f0(M.doorH)}`, false],
+    ['Стойки', `${M.n+1}`, M.t>18 ? 'есть 36 мм' : '18 мм', false],
+    ['Листы', `${M.sheets.length}`, `${f1(M.area)} м²`, false]
+  ];
+  $('#kpis').innerHTML = cards.map(([k,v,s,acc])=>
+    `<div class="kpi${acc?' acc':''}"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`
+  ).join('');
+}
+
+function renderSide(M){
+  const warn = [];
+  if(M.clear > K.RANGE[1] + 2) warn.push(`Секция ${f0(M.clear)} мм шире 600 — добавьте стойку.`);
+  if(M.clear < K.RANGE[0] - 2) warn.push(`Секция ${f0(M.clear)} мм уже 400 — ровных секций 400–600 не получается.`);
+  if(!M.spanOK) warn.push(`Пролёт ${f0(M.clear)} мм больше расчётного ${f0(M.span)} — прогиб крышки свыше 3 мм.`);
+  if(!M.topOK) warn.push('Расчётный пролёт меньше 400 — нужна фанера толще.');
+  if(M.sheets.some(s=>s.oversize)) warn.push('Деталь больше листа — выберите лист крупнее.');
+
+  const rows = [
+    ['Корпус', `${f0(M.Lc)} × ${f0(M.C)}`],
+    ['Секции', `${M.n} · ${f0(M.clear)}`],
+    ['Стойки', `${M.n+1} · ${M.t} мм`],
+    ['Дверцы', `${M.n} · ${f0(M.doorW)}×${f0(M.doorH)}`],
+    ['Опоры', `${M.feetN} · НО-10`],
+    ['Просвет', `${K.LEG} мм`],
+    ['Вес', `≈ ${f0(M.standW)} кг`],
+    ['На опору', `${f0(M.perFoot)} кг`]
+  ];
+  $('#sideSpec').innerHTML = `<h2 class="ct">Размеры</h2>
+    <div class="chk" style="grid-template-columns:1fr 1fr">${
+      rows.map(([k,v])=>`<div style="padding:9px 11px"><dt>${k}</dt><dd style="font-size:12.5px">${v}</dd></div>`).join('')
+    }</div>
+    ${warn.length ? `<div class="warnbox">${warn.map(w=>'<div>· '+w+'</div>').join('')}</div>` : ''}`;
+}
+
+function renderCalc(M){
+  const kq = M.wDesign / M.L * 1000;
+  const items = [
+    ['Нагрузка', `${f0(kq)} <small>кг/м</small>`],
+    ['Пролёт расчётный', `${f0(M.span)} <small>мм</small>`],
+    ['Пролёт фактический', `${f0(M.clear)} <small>мм</small>`],
+    ['Прогиб', `${f1(M.defl)} <small>мм</small>`],
+    ['Напряжение', `${f1(M.sig)} <small>МПа</small>`],
+    ['Запас', `×${f1(3/Math.max(M.defl,0.05))}`]
+  ];
+  const okDefl = M.defl <= K.DEFL, okSig = M.sig <= K.SIG;
+  $('#calcCard').innerHTML = `<h2 class="ct">Крышка <span class="hint">18 мм · пролёт между стойками</span></h2>
+    <div class="chk">${items.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</div>
+    <p class="note" style="margin-top:14px">
+      Норма прогиба ${K.DEFL} мм, напряжения ${K.SIG} МПа. Каждый пролёт считается отдельной балкой —
+      <b class="${okDefl && okSig ? 'badge-ok' : 'badge-warn'}">${okDefl && okSig ? 'запас есть' : 'прогиб выше нормы'}</b>.
+    </p>`;
+}
+
+function sheetSVG(M, sh, idx){
+  const W=520, Hh=300, pad=16;
+  const sc = Math.min((W-2*pad)/M.SW, (Hh-2*pad-18)/M.SH);
+  const w = M.SW*sc, h = M.SH*sc;
+  const ox = (W-w)/2, oy = 8;
+  let s = `<rect x="${ox}" y="${oy}" width="${w}" height="${h}" fill="#ffffff" stroke="#d8dae1" stroke-width="1.2"/>`;
+  sh.items.forEach(it=>{
+    const col = PAL[(it.id-1)%PAL.length];
+    const x = ox + it.x*sc, y = oy + it.y*sc, ww = it.w*sc, hh = it.h*sc;
+    s += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(1,ww-0.6).toFixed(1)}" height="${Math.max(1,hh-0.6).toFixed(1)}" fill="${col}" fill-opacity=".13" stroke="${col}" stroke-opacity=".9" stroke-width="1"/>`;
+    if(ww > 30 && hh > 15)
+      s += `<text x="${(x+ww/2).toFixed(1)}" y="${(y+hh/2+4).toFixed(1)}" text-anchor="middle" fill="${col}" font-size="12" font-weight="700" font-family="Segoe UI">${it.id}</text>`;
+    if(ww > 80 && hh > 36)
+      s += `<text x="${(x+ww/2).toFixed(1)}" y="${(y+hh/2+18).toFixed(1)}" text-anchor="middle" fill="#8b919b" font-size="9.5" font-family="Consolas">${Math.round(it.w)}×${Math.round(it.h)}</text>`;
+  });
+  s += `<text x="${ox+4}" y="${oy+h+13}" fill="#8b919b" font-size="10.5" font-family="Consolas">${M.SW} × ${M.SH} · лист ${idx+1}</text>`;
+  return `<svg viewBox="0 0 ${W} ${Hh}" width="100%" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+}
+
+function renderCut(M){
+  const rows = M.parts.map(p=>{
+    const a = p.w*p.h*p.qty/1e6;
+    return `<tr>
+      <td class="num" style="color:${PAL[(p.id-1)%PAL.length]}">${p.id}</td>
+      <td><div class="nm"><i class="sw" style="background:${PAL[(p.id-1)%PAL.length]}"></i>${p.name}</div></td>
+      <td class="num">${f0(p.w)} × ${f0(p.h)}</td>
+      <td class="num">${p.qty}</td>
+      <td class="num">${a.toFixed(3)}</td>
+      <td class="mut">${p.note||''}</td>
+    </tr>`;
+  }).join('');
+  const used = M.area, all = M.sheets.length * (M.SW*M.SH/1e6);
+  const waste = 100*(1 - used/Math.max(all,0.001));
+  $('#cutCard').innerHTML = `
+    <h2 class="ct">Раскрой <span class="hint">фанера 18 мм · лист ${M.SW}×${M.SH} · пропил ${K.KERF} мм</span></h2>
+    <div class="btnrow" style="margin-bottom:12px">
+      <button class="btn" id="btnCsv">⤓ Спецификация CSV</button>
+      <button class="btn" id="btnPrint">⎙ Печать</button>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead><tr><th>№</th><th>Деталь</th><th>Размер, мм</th><th>Кол-во</th><th>Площадь, м²</th><th>Примечание</th></tr></thead>
+      <tbody>${rows}
+        <tr class="tot"><td></td><td>Итого</td><td></td><td class="num">${M.parts.reduce((s,p)=>s+p.qty,0)}</td><td class="num">${used.toFixed(2)}</td><td class="mut">${M.sheets.length} ${pl(M.sheets.length,'лист','листа','листов')} · отход ${Math.round(waste)} %</td></tr>
+      </tbody>
+    </table></div>
+    <div class="sheets">${M.sheets.map((sh,i)=>`<div class="sheet"><h4>Лист ${i+1} <span>${Math.round(100*sh.items.reduce((s,it)=>s+it.w*it.h,0)/(M.SW*M.SH))} %</span></h4>${sheetSVG(M,sh,i)}</div>`).join('')}</div>
+    <div class="legend">${M.parts.map(p=>`<span><i style="background:${PAL[(p.id-1)%PAL.length]}"></i>${p.id} — ${p.name}</span>`).join('')}</div>
+    <p class="note">Пропил ${K.KERF} мм учтён. Текстура — вдоль длинной стороны.</p>`;
+  $('#btnCsv').onclick = downloadCSV;
+  $('#btnPrint').onclick = ()=>window.print();
+}
+
+function downloadCSV(){
+  const M = MODEL;
+  const rows = [['№','Деталь','Длина, мм','Ширина, мм','Кол-во','Площадь, м2','Примечание']];
+  M.parts.forEach(p=>rows.push([p.id,p.name,Math.round(p.w),Math.round(p.h),p.qty,
+    (p.w*p.h*p.qty/1e6).toFixed(3),p.note]));
+  rows.push([]);
+  rows.push(['Итого площади, м2', M.area.toFixed(3)]);
+  rows.push([`Листов ${M.SW}x${M.SH}`, M.sheets.length]);
+  rows.push(['Расчётный вес, кг', Math.round(M.wDesign)]);
+  const csv = '\uFEFF' + rows.map(r=>r.join(';')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = 'раскрой-тумба.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+function renderAsm(M){
+  const pinFromBottom = M.pinZ - M.zBotTop;
+  const hinges = 3*M.n;
+  const screw70 = 4*(M.n+1);
+  const screw30 = 6*M.n;
+  const screw16 = 4*hinges + 4*M.feetN + 8;
+
+  const steps = [
+    ['Раскрой', `Распилить по картам, пронумеровать. Текстура — вдоль длинной стороны.`],
+    ['Присадка', `Ø5×12 в стойках под полкодержатели: 2 шт., 50 мм от кромок, <b>${f0(pinFromBottom)} мм от верха дна</b>. Ø5 под саморезы.`],
+    ['Корпус', `Стойки на дно. Клей, саморезы 5×70 снизу, 2 на стойку. Проверить диагонали.`],
+    ['Задняя стенка', `Вкладная, на 36 мм короче дна. Клей, 4×30 в кромки, шаг 150 мм.`],
+    ['Вкладная крышка', `На стойки. Клей, 5×70 сверху, 2 на стойку.`],
+    ['Накладная крышка', `Проставки ${K.TGAP} мм на стойки. Крышка сверху, 5×70 через проставки.`],
+    ['Полки', `4 полкодержателя на секцию. Зазор 2 мм, снимается без инструмента.`],
+    ['Опоры', `${M.feetN} опор НО-10 в дно, 2 на стойку. Выставить по уровню.`],
+    ['Дверцы', `${hinges} петель, по 3 на дверцу. Чашки Ø35, 22 мм от кромки. Зазор ${K.DGAP} мм. Без ручек.`],
+    ['Отделка', `Шлифовка 120/180, кромки r2, масло в 2 слоя.`],
+    ['Контроль', `Диагонали, уровень, зазоры.`]
+  ];
+
+  $('#asmCard').innerHTML = `
+    <h2 class="ct">Сборка</h2>
+    <ol class="steps">${steps.map(([h,p])=>`<li><h5>${h}</h5><p>${p}</p></li>`).join('')}</ol>
+    <h2 class="ct" style="margin-top:26px">Фурнитура</h2>
+    <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead><tr><th>Позиция</th><th>Кол-во</th><th>Назначение</th></tr></thead>
+      <tbody>
+        <tr><td>Саморез 5×70</td><td class="num">${screw70}</td><td class="mut">дно → стойки, вкладная крышка → стойки</td></tr>
+        <tr><td>Саморез 4×30</td><td class="num">${screw30}</td><td class="mut">задние стенки</td></tr>
+        <tr><td>Саморез 3,5×16</td><td class="num">${screw16}</td><td class="mut">петли, опоры, проставки</td></tr>
+        <tr><td>Полкодержатель Ø5×16</td><td class="num">${4*M.n}</td><td class="mut">полки, 4 шт. на секцию</td></tr>
+        <tr><td>Опора мебельная НО-10 (${K.LEG} мм, Ø50)</td><td class="num">${M.feetN}</td><td class="mut">2 под каждой стойкой, скрытые</td></tr>
+        <tr><td>Проставка ${K.TGAP} мм под накладную крышку</td><td class="num">${2*(M.n+1)}</td><td class="mut">держит теневой зазор</td></tr>
+        <tr><td>Петля накладная 110°</td><td class="num">${hinges}</td><td class="mut">3 на дверцу</td></tr>
+        <tr><td>Клей ПВА Д3</td><td class="num">1</td><td class="mut">все соединения</td></tr>
+      </tbody>
+    </table></div>
+    <div class="warnbox" style="border-color:#e6e7ec;background:#f8f9fb;color:#5b616b">
+      Стойки передают вес сжатием, крепёж держит только от сдвига. Под аквариум — подложка 5–10 мм.
+    </div>`;
+}
+
+function renderView(M){
+  const tabs = [['tumba','Тумба'],['frame','Каркас'],['front','Спереди'],['side','Сбоку'],['detail','Узел полки']];
+  const I = M.idOf, leg = [];
+  const addLeg = (n, t) => { if(n) leg.push([n, `${n} — ${t}`]); };
+  addLeg(I.top, 'крышка накладная');
+  addLeg(I.intop, 'крышка вкладная');
+  addLeg(I.side, 'боковина');
+  addLeg(I.part, 'стойка');
+  addLeg(I.bottom, 'дно');
+  addLeg(I.back, 'задняя стенка');
+  addLeg(I.shelf, 'полка');
+  leg.sort((a,b)=>a[0]-b[0]);
+  const legTxt = leg.map(x=>x[1]).join(' · ');
+
+  const caps = {
+    tumba: `${M.n} ${pl(M.n,'секция','секции','секций')} по ${f0(M.clear)} мм. Дверцы ${f0(M.doorW)}×${f0(M.doorH)}. Крышка ${f0(M.topW)}×${f0(M.topD)}. Высота ${M.H}.`,
+    frame: `${legTxt}. Крышка поднята, опоры не показаны.`,
+    front: `Секции ${f0(M.clear)}. Зазор дверец ${K.DGAP} мм. Теневая линия ${K.TGAP} мм. Высота ${M.H}.`,
+    side: `Глубина ${f0(M.D)}. Дверца ${K.T}, корпус ${f0(M.C)}. Полка ${f0(M.parts.find(p=>p.role==='shelf').w)}×${f0(M.parts.find(p=>p.role==='shelf').h)} на ${f0(M.shelfZ0)} мм.`,
+    detail: ``
+  };
+  $('#vtabs').innerHTML = tabs.map(([k,n])=>`<button data-tab="${k}" class="${state.tab===k?'on':''}">${n}</button>`).join('');
+  $('#vtabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    state.tab=b.dataset.tab;
+    history.replaceState(null,'','#'+state.tab);
+    renderView(MODEL);
+  });
+  const capTxt = caps[state.tab] || '';
+  $('#vcap').innerHTML = capTxt;
+  $('#vcap').style.display = capTxt ? '' : 'none';
+
+  let svg='';
+  if(state.tab==='tumba')      svg = drawIso(M, {feet:true, plinth:true, doors:true, tank:true, dims:true, color:state.color});
+  else if(state.tab==='frame') svg = drawIso(M, {feet:true, plinth:true, doors:false, tank:false, badges:true, explode:240, color:state.color});
+  else if(state.tab==='front') svg = drawFront(M, {color:state.color});
+  else if(state.tab==='side')  svg = drawSide(M, {color:state.color});
+  else                         svg = drawDetail(M);
+  $('#stage').innerHTML = svg;
+}
+
+function renderAll(){
+  const L  = clamp(+$('#inL').value || 1200, 300, 4200);
+  const D  = clamp(+$('#inD').value || 500, 300, 1200);
+  const Ht = clamp(+$('#inH').value || 500, 200, 1200);
+  const H  = +$('#inHS').value || 900;
+  const [SW, SH] = $('#inSheet').value.split(',').map(Number);
+  $('#tagSheet').textContent = `лист ${SW} × ${SH}`;
+  MODEL = build(L, D, Ht, H, SW, SH);
+  renderKpis(MODEL);
+  renderSide(MODEL);
+  renderView(MODEL);
+  renderCalc(MODEL);
+  renderCut(MODEL);
+  renderAsm(MODEL);
+}
+
+/* ---------- пресеты ---------- */
+const PRESETS = [
+  [600,300,300],[800,350,400],[1000,400,500],[1200,500,500],
+  [1500,500,600],[1800,600,600],[2000,600,700],[2400,600,700]
+];
+$('#presets').innerHTML = PRESETS.map(([L,D,Ht])=>`<button data-p="${L},${D},${Ht}">${L/10}×${D/10}×${Ht/10}</button>`).join('');
+$('#presets').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  const [L,D,Ht] = b.dataset.p.split(',').map(Number);
+  $('#inL').value=L; $('#inD').value=D; $('#inH').value=Ht;
+  renderAll();
+});
+
+/* ---------- ввод ---------- */
+let tmr=null;
+['inL','inD','inH'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>{
+    clearTimeout(tmr);
+    tmr = setTimeout(renderAll, 130);
+  });
+});
+$('#inHS').addEventListener('change', renderAll);
+$('#inSheet').addEventListener('change', renderAll);
+$('#colors').querySelectorAll('.sw').forEach(b=>b.onclick=()=>{
+  state.color = b.dataset.c;
+  $('#colors').querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
+  renderView(MODEL);
+});
+
+const hashTab = location.hash.replace('#','');
+if(['tumba','frame','front','side','detail'].includes(hashTab)) state.tab = hashTab;
+
+try{
+  const qp = new URLSearchParams(location.search);
+  if(qp.get('l')) $('#inL').value = qp.get('l');
+  if(qp.get('d')) $('#inD').value = qp.get('d');
+  if(qp.get('h')) $('#inH').value = qp.get('h');
+  if(qp.get('H')) $('#inHS').value = qp.get('H');
+  if(qp.get('sheet')) $('#inSheet').value = qp.get('sheet');
+  if(qp.get('color')==='black'){ state.color='black'; $('#colors').querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.c==='black'))); }
+}catch(e){}
+
+renderAll();
+</script>
+</body>
+</html>
