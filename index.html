@@ -52,6 +52,10 @@ body{
 .segs button.on{color:var(--tx)}
 .segs button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--tx);border-radius:2px}
 .hide{display:none!important}
+.lang{display:flex;gap:4px;margin-left:auto}
+.lang button{background:#fff;border:1px solid var(--line2);color:var(--tx3);border-radius:9px;padding:6px 11px;font:650 12px/1 inherit;cursor:pointer;transition:.14s}
+.lang button:hover{color:var(--tx2);border-color:var(--acc)}
+.lang button.on{background:var(--tx);border-color:var(--tx);color:#fff}
 .f3{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px}
 .f3 .field{margin-bottom:10px}
 @media (max-width:1000px){.f3{grid-template-columns:1fr 1fr}}
@@ -62,6 +66,9 @@ body{
 .two + .card{margin-top:16px}
 .card + .two{margin-top:16px}
 .two.single{grid-template-columns:1fr}
+.side.merge #cardTank{border-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0;box-shadow:none;padding-bottom:6px}
+.side.merge #cardTank + #cardStand{margin-top:0;border-top:0;border-top-left-radius:0;border-top-right-radius:0}
+.side.merge #cardStand{padding-top:8px}
 .two.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:1200px){.two.three{grid-template-columns:1fr 1fr}}
 @media (max-width:900px){.two{grid-template-columns:1fr}}
@@ -69,7 +76,12 @@ body{
 .ct .hint{text-transform:none;letter-spacing:0;font-weight:400;color:var(--tx3);font-size:12px}
 
 /* ---------- поля ---------- */
-.side{position:sticky;top:20px}
+.side{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#cbd0da transparent;padding-right:4px}
+.side::-webkit-scrollbar{width:6px}
+.side::-webkit-scrollbar-thumb{background:#d2d6df;border-radius:3px}
+.side::-webkit-scrollbar-track{background:transparent}
+.side.merge .field{margin-bottom:8px}
+.side.merge .card{padding-top:14px;padding-bottom:14px}
 .seghint{margin:-8px 0 16px;font-size:13px;line-height:1.45;color:var(--tx3)}
 .now{background:linear-gradient(160deg,#f6f8ff,#eef1f7 62%,#f4f6fa);border-color:#dfe4ee}
 .now .nk{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);font-weight:650}
@@ -136,6 +148,16 @@ text.lbl2{fill:#7a828d;font:500 11px/1 var(--mono);paint-order:stroke;stroke:#fb
 text.ttl{fill:#2a2d33;font:650 13px/1 -apple-system,"Segoe UI",sans-serif;paint-order:stroke;stroke:#fbfbfd;stroke-width:4px}
 text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
 
+/* ---------- стеклянные детали ---------- */
+.gp{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:16px;align-items:start}
+.gp .dwg{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:2px 6px 0;min-width:0}
+.gp .dwg svg{display:block;width:100%;height:auto}
+.gpmeta{display:flex;flex-wrap:wrap;gap:4px 18px;margin:-3px 0 10px;font-size:12.5px;color:var(--tx3)}
+.gpmeta b{font-family:var(--mono);font-weight:650;color:var(--tx);margin-left:4px}
+.gpline{margin:0 0 14px;font-size:12.5px;color:var(--tx2)}
+.gpline b{color:var(--tx);font-weight:650}
+@media (max-width:1180px){.gp{grid-template-columns:1fr}}
+
 /* ---------- таблицы ---------- */
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
 .tbl th{text-align:left;font:650 10.5px/1.4 -apple-system,"Segoe UI",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);padding:9px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
@@ -194,9 +216,13 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
         </svg>
       </div>
       <div>
-        <h1>Калькулятор аквариумиста</h1>
-        <p>аквариум · тумба · техника · биология</p>
+        <h1 data-i18n="app_title">Калькулятор аквариумиста</h1>
+        <p data-i18n="app_sub">аквариум · тумба · техника · биология</p>
       </div>
+    </div>
+    <div class="lang" id="lang">
+      <button data-l="ru">RU</button>
+      <button data-l="en">EN</button>
     </div>
   </header>
 
@@ -205,26 +231,27 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
       <section class="card now" id="cardNow"></section>
 
       <section class="card" id="cardTank">
-        <h2 class="ct">Аквариум</h2>
+        <h2 class="ct" data-i18n="card_aqua">Аквариум</h2>
         <div class="field">
-          <label for="inL">Длина <b>мм</b></label>
-          <div class="inp"><input id="inL" type="number" value="1200" min="300" max="4200" step="10"><em>мм</em></div>
+          <label for="inL"><span data-i18n="f_len">Длина</span> <b data-i18n="u_mm">мм</b></label>
+          <div class="inp"><input id="inL" type="number" value="1200" min="300" max="4200" step="10"><em data-i18n="u_mm">мм</em></div>
         </div>
         <div class="field">
-          <label for="inD">Глубина <b>мм</b></label>
-          <div class="inp"><input id="inD" type="number" value="500" min="250" max="1200" step="10"><em>мм</em></div>
+          <label for="inD"><span data-i18n="f_depth">Глубина</span> <b data-i18n="u_mm">мм</b></label>
+          <div class="inp"><input id="inD" type="number" value="500" min="250" max="1200" step="10"><em data-i18n="u_mm">мм</em></div>
         </div>
         <div class="field" style="margin-bottom:4px">
-          <label for="inH">Высота <b>мм</b></label>
-          <div class="inp"><input id="inH" type="number" value="500" min="200" max="1200" step="10"><em>мм</em></div>
+          <label for="inH"><span data-i18n="f_height">Высота</span> <b data-i18n="u_mm">мм</b></label>
+          <div class="inp"><input id="inH" type="number" value="500" min="200" max="1200" step="10"><em data-i18n="u_mm">мм</em></div>
         </div>
         <div class="presets" id="presets"></div>
+        
       </section>
 
       <section class="card" id="cardStand">
-        <h2 class="ct">Тумба</h2>
+        <h2 class="ct" data-i18n="card_stand">Тумба</h2>
         <div class="field">
-          <label for="inHS">Высота <b>мм</b></label>
+          <label for="inHS"><span data-i18n="f_standH">Высота тумбы</span> <b data-i18n="u_mm">мм</b></label>
           <select id="inHS">
             <option value="750">750</option>
             <option value="800">800</option>
@@ -235,7 +262,7 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
           </select>
         </div>
         <div class="field">
-          <label for="inSheet">Лист <b>мм</b></label>
+          <label for="inSheet"><span data-i18n="f_sheet">Лист</span> <b data-i18n="u_mm">мм</b></label>
           <select id="inSheet">
             <option value="2440,1220" selected>2440 × 1220</option>
             <option value="2500,1250">2500 × 1250</option>
@@ -243,109 +270,119 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
             <option value="3000,1500">3000 × 1500</option>
           </select>
         </div>
+        <div class="field" id="doorField" style="margin-top:12px">
+          <label for="inDoors"><span data-i18n="f_doors">Дверцы</span> <b id="doorHint"></b></label>
+          <select id="inDoors">
+            <option value="0" data-i18n="opt_auto">авто</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
         <div class="field" style="margin-bottom:2px">
-          <label>Цвет</label>
+          <label data-i18n="f_color">Цвет</label>
           <div class="swatches" id="colors">
-            <button class="sw" data-c="beige" aria-pressed="true"><i style="background:#dcbc90"></i>Бежевый</button>
-            <button class="sw" data-c="black" aria-pressed="false"><i style="background:#33363b"></i>Чёрный</button>
+            <button class="sw" data-c="beige" aria-pressed="true"><i style="background:#dcbc90"></i><span data-i18n="f_beige">Бежевый</span></button>
+            <button class="sw" data-c="black" aria-pressed="false"><i style="background:#33363b"></i><span data-i18n="f_black">Чёрный</span></button>
           </div>
         </div>
       </section>
 
       <section class="card" id="cardBio">
-        <h2 class="ct">Фильтр</h2>
+        <h2 class="ct" data-i18n="card_filter">Фильтр</h2>
         <div class="field">
-          <label for="inMedia">Материал</label>
+          <label for="inMedia"><span data-i18n="f_media">Материал</span></label>
           <select id="inMedia">
-            <option value="sponge">Губка 30 ppi</option>
-            <option value="k1" selected>K1 статичный</option>
-            <option value="k1f">K1 кипящий слой</option>
-            <option value="rings">Керамические кольца</option>
-            <option value="matrix">Матрикс / Biohome</option>
-            <option value="wool">Синтепон, мочалки</option>
+            <option value="sponge" data-i18n="opt_sponge">Губка 30 ppi</option>
+            <option value="k1" data-i18n="opt_k1" selected>K1 статичный</option>
+            <option value="k1f" data-i18n="opt_k1f">K1 кипящий слой</option>
+            <option value="rings" data-i18n="opt_rings">Керамические кольца</option>
+            <option value="matrix" data-i18n="opt_matrix">Матрикс / Biohome</option>
+            <option value="wool" data-i18n="opt_wool">Синтепон, мочалки</option>
           </select>
         </div>
         <div class="field">
-          <label for="inMV">Объём <b>л</b></label>
-          <div class="inp"><input id="inMV" type="number" value="5" min="0.5" max="100" step="0.5"><em>л</em></div>
+          <label for="inMV"><span data-i18n="f_vol">Объём</span> <b data-i18n="u_l">л</b></label>
+          <div class="inp"><input id="inMV" type="number" value="5" min="0.5" max="100" step="0.5"><em data-i18n="u_l">л</em></div>
         </div>
         <div class="field">
-          <label for="inTemp">Температура <b>°C</b></label>
+          <label for="inTemp"><span data-i18n="f_temp">Температура</span> <b>°C</b></label>
           <select id="inTemp">
             <option>22</option><option>24</option><option selected>25</option><option>26</option><option>27</option><option>28</option><option>30</option>
           </select>
         </div>
         <div class="field">
-          <label for="inProt">Белок корма <b>%</b></label>
+          <label for="inProt"><span data-i18n="f_protein">Белок корма</span> <b>%</b></label>
           <div class="inp"><input id="inProt" type="number" value="40" min="20" max="60" step="1"><em>%</em></div>
         </div>
         <div class="field">
-          <label for="inRate">Кормление <b>% массы</b></label>
+          <label for="inRate"><span data-i18n="f_rate">Кормление</span> <b data-i18n="u_pctmass">% массы</b></label>
           <div class="inp"><input id="inRate" type="number" value="2" min="0.5" max="5" step="0.5"><em>%</em></div>
         </div>
         <div class="field" style="margin-bottom:2px">
-          <label for="inFish">Рыба <b>г</b></label>
-          <div class="inp"><input id="inFish" type="number" value="300" min="10" max="10000" step="10"><em>г</em></div>
+          <label for="inFish"><span data-i18n="f_fish">Рыба</span> <b data-i18n="u_g">г</b></label>
+          <div class="inp"><input id="inFish" type="number" value="300" min="10" max="10000" step="10"><em data-i18n="u_g">г</em></div>
         </div>
       </section>
 
       <section class="card" id="cardWater">
-        <h2 class="ct">Вода <span class="hint">пусто = нет теста</span></h2>
+        <h2 class="ct"><span data-i18n="card_water">Вода</span> <span class="hint" data-i18n="hint_empty">пусто = нет теста</span></h2>
         <div class="f3">
-          <div class="field"><label for="inPH">pH</label><div class="inp"><input id="inPH" type="number" value="7" min="4" max="10" step="0.1"><em>pH</em></div></div>
-          <div class="field"><label for="inKH">KH</label><div class="inp"><input id="inKH" type="number" value="4" min="0" max="30" step="0.5"><em>°dKH</em></div></div>
-          <div class="field"><label for="inGH">GH</label><div class="inp"><input id="inGH" type="number" value="" min="0" max="40" step="0.5"><em>°dGH</em></div></div>
-          <div class="field"><label for="inTDS">TDS</label><div class="inp"><input id="inTDS" type="number" value="" min="0" max="2000" step="10"><em>ppm</em></div></div>
-          <div class="field"><label for="inEC">EC</label><div class="inp"><input id="inEC" type="number" value="" min="0" max="3000" step="10"><em>µS</em></div></div>
+          <div class="field"><label for="inPH"><span data-i18n="f_ph">pH</span></label><div class="inp"><input id="inPH" type="number" value="7" min="4" max="10" step="0.1"><em>pH</em></div></div>
+          <div class="field"><label for="inKH"><span data-i18n="f_kh">KH</span></label><div class="inp"><input id="inKH" type="number" value="4" min="0" max="30" step="0.5"><em>°dKH</em></div></div>
+          <div class="field"><label for="inGH"><span data-i18n="f_gh">GH</span></label><div class="inp"><input id="inGH" type="number" value="" min="0" max="40" step="0.5"><em>°dGH</em></div></div>
+          <div class="field"><label for="inTDS"><span data-i18n="f_tds">TDS</span></label><div class="inp"><input id="inTDS" type="number" value="" min="0" max="2000" step="10"><em>ppm</em></div></div>
+          <div class="field"><label for="inEC"><span data-i18n="f_ec">EC</span></label><div class="inp"><input id="inEC" type="number" value="" min="0" max="3000" step="10"><em>µS</em></div></div>
         </div>
       </section>
 
       <section class="card" id="cardNP">
-        <h2 class="ct">Азот и фосфор</h2>
+        <h2 class="ct" data-i18n="card_np">Азот и фосфор</h2>
         <div class="f3">
-          <div class="field f-extra"><label for="inNH3">NH₃ / NH₄</label><div class="inp"><input id="inNH3" type="number" value="" min="0" max="10" step="0.01"><em>мг/л</em></div></div>
-          <div class="field f-extra"><label for="inNO2">Нитрит NO₂</label><div class="inp"><input id="inNO2" type="number" value="" min="0" max="10" step="0.01"><em>мг/л</em></div></div>
-          <div class="field"><label for="inNO3">Нитрат NO₃</label><div class="inp"><input id="inNO3" type="number" value="5" min="0" max="200" step="0.5"><em>мг/л</em></div></div>
-          <div class="field"><label for="inPO4">Фосфат PO₄</label><div class="inp"><input id="inPO4" type="number" value="5" min="0" max="50" step="0.1"><em>мг/л</em></div></div>
+          <div class="field f-extra"><label for="inNH3"><span data-i18n="f_nh3">NH₃ / NH₄</span></label><div class="inp"><input id="inNH3" type="number" value="" min="0" max="10" step="0.01"><em data-i18n="u_mgl">мг/л</em></div></div>
+          <div class="field f-extra"><label for="inNO2"><span data-i18n="f_no2">Нитрит NO₂</span></label><div class="inp"><input id="inNO2" type="number" value="" min="0" max="10" step="0.01"><em data-i18n="u_mgl">мг/л</em></div></div>
+          <div class="field"><label for="inNO3"><span data-i18n="f_no3">Нитрат NO₃</span></label><div class="inp"><input id="inNO3" type="number" value="5" min="0" max="200" step="0.5"><em data-i18n="u_mgl">мг/л</em></div></div>
+          <div class="field"><label for="inPO4"><span data-i18n="f_po4">Фосфат PO₄</span></label><div class="inp"><input id="inPO4" type="number" value="5" min="0" max="50" step="0.1"><em data-i18n="u_mgl">мг/л</em></div></div>
         </div>
       </section>
 
       <section class="card" id="cardMin">
-        <h2 class="ct">Минералы</h2>
+        <h2 class="ct" data-i18n="card_min">Минералы</h2>
         <div class="f3">
-          <div class="field"><label for="inK">Калий K</label><div class="inp"><input id="inK" type="number" value="25" min="0" max="200" step="1"><em>мг/л</em></div></div>
-          <div class="field"><label for="inCa">Кальций Ca</label><div class="inp"><input id="inCa" type="number" value="30" min="0" max="200" step="1"><em>мг/л</em></div></div>
-          <div class="field"><label for="inMg">Магний Mg</label><div class="inp"><input id="inMg" type="number" value="8" min="0" max="100" step="0.5"><em>мг/л</em></div></div>
-          <div class="field"><label for="inFe">Железо Fe</label><div class="inp"><input id="inFe" type="number" value="0.05" min="0" max="2" step="0.01"><em>мг/л</em></div></div>
-          <div class="field f-extra"><label for="inCu">Медь Cu</label><div class="inp"><input id="inCu" type="number" value="" min="0" max="2" step="0.01"><em>мг/л</em></div></div>
+          <div class="field"><label for="inK"><span data-i18n="f_k">Калий K</span></label><div class="inp"><input id="inK" type="number" value="25" min="0" max="200" step="1"><em data-i18n="u_mgl">мг/л</em></div></div>
+          <div class="field"><label for="inCa"><span data-i18n="f_ca">Кальций Ca</span></label><div class="inp"><input id="inCa" type="number" value="30" min="0" max="200" step="1"><em data-i18n="u_mgl">мг/л</em></div></div>
+          <div class="field"><label for="inMg"><span data-i18n="f_mg">Магний Mg</span></label><div class="inp"><input id="inMg" type="number" value="8" min="0" max="100" step="0.5"><em data-i18n="u_mgl">мг/л</em></div></div>
+          <div class="field"><label for="inFe"><span data-i18n="f_fe">Железо Fe</span></label><div class="inp"><input id="inFe" type="number" value="0.05" min="0" max="2" step="0.01"><em data-i18n="u_mgl">мг/л</em></div></div>
+          <div class="field f-extra"><label for="inCu"><span data-i18n="f_cu">Медь Cu</span></label><div class="inp"><input id="inCu" type="number" value="" min="0" max="2" step="0.01"><em data-i18n="u_mgl">мг/л</em></div></div>
         </div>
       </section>
 
       <section class="card" id="cardGoal">
-        <h2 class="ct">Цели</h2>
+        <h2 class="ct" data-i18n="card_goal">Цели</h2>
         <div class="field">
-          <label for="inGNO3">Нитрат NO₃ <b>мг/л</b></label>
-          <div class="inp"><input id="inGNO3" type="number" value="20" min="0" max="200" step="1"><em>мг/л</em></div>
+          <label for="inGNO3"><span data-i18n="f_no3">Нитрат NO₃</span> <b data-i18n="u_mgl">мг/л</b></label>
+          <div class="inp"><input id="inGNO3" type="number" value="20" min="0" max="200" step="1"><em data-i18n="u_mgl">мг/л</em></div>
         </div>
         <div class="field">
-          <label for="inGPO4">Фосфат PO₄ <b>мг/л</b></label>
-          <div class="inp"><input id="inGPO4" type="number" value="1.5" min="0" max="50" step="0.1"><em>мг/л</em></div>
+          <label for="inGPO4"><span data-i18n="f_po4">Фосфат PO₄</span> <b data-i18n="u_mgl">мг/л</b></label>
+          <div class="inp"><input id="inGPO4" type="number" value="1.5" min="0" max="50" step="0.1"><em data-i18n="u_mgl">мг/л</em></div>
         </div>
         <div class="field">
-          <label for="inGK">Калий K <b>мг/л</b></label>
-          <div class="inp"><input id="inGK" type="number" value="20" min="0" max="200" step="1"><em>мг/л</em></div>
+          <label for="inGK"><span data-i18n="f_k">Калий K</span> <b data-i18n="u_mgl">мг/л</b></label>
+          <div class="inp"><input id="inGK" type="number" value="20" min="0" max="200" step="1"><em data-i18n="u_mgl">мг/л</em></div>
         </div>
         <div class="field">
-          <label for="inGCa">Кальций Ca <b>мг/л</b></label>
-          <div class="inp"><input id="inGCa" type="number" value="30" min="0" max="200" step="1"><em>мг/л</em></div>
+          <label for="inGCa"><span data-i18n="f_ca">Кальций Ca</span> <b data-i18n="u_mgl">мг/л</b></label>
+          <div class="inp"><input id="inGCa" type="number" value="30" min="0" max="200" step="1"><em data-i18n="u_mgl">мг/л</em></div>
         </div>
         <div class="field">
-          <label for="inGMg">Магний Mg <b>мг/л</b></label>
-          <div class="inp"><input id="inGMg" type="number" value="10" min="0" max="100" step="0.5"><em>мг/л</em></div>
+          <label for="inGMg"><span data-i18n="f_mg">Магний Mg</span> <b data-i18n="u_mgl">мг/л</b></label>
+          <div class="inp"><input id="inGMg" type="number" value="10" min="0" max="100" step="0.5"><em data-i18n="u_mgl">мг/л</em></div>
         </div>
         <div class="field" style="margin-bottom:2px">
-          <label for="inGFe">Железо Fe <b>мг/л</b></label>
-          <div class="inp"><input id="inGFe" type="number" value="0.1" min="0" max="2" step="0.01"><em>мг/л</em></div>
+          <label for="inGFe"><span data-i18n="f_fe">Железо Fe</span> <b data-i18n="u_mgl">мг/л</b></label>
+          <div class="inp"><input id="inGFe" type="number" value="0.1" min="0" max="2" step="0.01"><em data-i18n="u_mgl">мг/л</em></div>
         </div>
       </section>
 
@@ -354,12 +391,12 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
 
     <main class="main">
       <div class="segs" id="segs">
-        <button data-s="tank" class="on">Аквариум</button>
-        <button data-s="stand">Тумба</button>
-        <button data-s="gear">Оборудование</button>
-        <button data-s="bio">Биология</button>
-        <button data-s="fert">Тесты</button>
-        <button data-s="udo">Удо</button>
+        <button data-s="tank" class="on" data-i18n="tab_tank">Аквариум</button>
+        <button data-s="stand" data-i18n="tab_stand">Тумба</button>
+        <button data-s="gear" data-i18n="tab_gear">Оборудование</button>
+        <button data-s="bio" data-i18n="tab_bio">Биология</button>
+        <button data-s="fert" data-i18n="tab_test">Тесты</button>
+        <button data-s="udo" data-i18n="tab_udo">Удо</button>
       </div>
       <p class="seghint" id="seghint"></p>
       <div class="kpis" id="kpis"></div>
@@ -403,9 +440,21 @@ const K = {
 const $ = s => document.querySelector(s);
 const nf = new Intl.NumberFormat('ru-RU');
 const nf1 = new Intl.NumberFormat('ru-RU', {minimumFractionDigits:1, maximumFractionDigits:1});
-const f0 = v => nf.format(Math.round(v));
-const f1 = v => nf1.format(v);
-const f2 = v => new Intl.NumberFormat('ru-RU',{minimumFractionDigits:2, maximumFractionDigits:2}).format(v);
+const _nfc = {
+  ru: {
+    n0: new Intl.NumberFormat('ru-RU'),
+    n1: new Intl.NumberFormat('ru-RU', {minimumFractionDigits:1, maximumFractionDigits:1}),
+    n2: new Intl.NumberFormat('ru-RU', {minimumFractionDigits:2, maximumFractionDigits:2})
+  },
+  en: {
+    n0: new Intl.NumberFormat('en-US'),
+    n1: new Intl.NumberFormat('en-US', {minimumFractionDigits:1, maximumFractionDigits:1}),
+    n2: new Intl.NumberFormat('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})
+  }
+};
+const f0 = v => _nfc[LANG].n0.format(Math.round(v));
+const f1 = v => _nfc[LANG].n1.format(v);
+const f2 = v => _nfc[LANG].n2.format(v);
 const clamp = (v,a,b) => Math.min(b, Math.max(a,v));
 const pl = (n, one, few, many) => {
   const a = Math.abs(n) % 100, b = a % 10;
@@ -439,9 +488,176 @@ function chooseSections(Lc, spanMax){
 }
 
 /* =========================================================
+   ЯЗЫК
+   ========================================================= */
+let LANG = 'ru';
+try { LANG = localStorage.getItem('aqua-lang') || 'ru'; } catch(e){}
+if(LANG !== 'en') LANG = 'ru';
+
+const I18N = {
+  ru: {
+    app_title:'Калькулятор аквариумиста', app_sub:'аквариум · тумба · техника · биология',
+    tab_tank:'Аквариум', tab_stand:'Тумба', tab_gear:'Оборудование', tab_bio:'Биология', tab_test:'Тесты', tab_udo:'Удо',
+    h_tank:'Стекло, грунт и вес по размерам аквариума.',
+    h_stand:'Корпус, раскрой фанеры и порядок сборки.',
+    h_gear:'Фильтр, свет, аэрация и обогрев под объём воды.',
+    h_bio:'Сколько азота перерабатывает фильтр и сколько рыбы это кормит.',
+    h_test:'Ваши показатели против эталона травника.',
+    h_udo:'Сколько и каких солей добавить до цели.',
+    card_aqua:'Аквариум', card_stand:'Тумба', card_filter:'Фильтр', card_water:'Вода',
+    hint_empty:'пусто = нет теста', card_np:'Азот и фосфор', card_min:'Минералы', card_goal:'Цели',
+    f_len:'Длина', f_depth:'Глубина', f_height:'Высота', f_standH:'Высота тумбы', f_doors:'Дверцы', f_sheet:'Лист',
+    f_color:'Цвет', f_beige:'Бежевый', f_black:'Чёрный', f_media:'Материал', f_vol:'Объём',
+    f_temp:'Температура', f_protein:'Белок корма', f_rate:'Кормление', f_fish:'Рыба',
+    f_ph:'pH', f_kh:'KH', f_gh:'GH', f_tds:'TDS', f_ec:'EC', f_nh3:'NH₃ / NH₄',
+    f_no2:'Нитрит NO₂', f_no3:'Нитрат NO₃', f_po4:'Фосфат PO₄',
+    f_k:'Калий K', f_ca:'Кальций Ca', f_mg:'Магний Mg', f_fe:'Железо Fe', f_cu:'Медь Cu',
+    door_def:'по умолчанию',
+    now_lbl:'Сейчас',
+    page_title:'Калькулятор аквариумиста — стекло, тумба, вода, удобрения',
+    page_short:'Калькулятор аквариумиста',
+    page_desc:'Расчёт аквариума: толщина стекла и грунт, вес, тумба с раскроем фанеры, фильтр и свет, бионагрузка, тесты воды и рецепт удобрений.',
+    page_desc_short:'Стекло, грунт и вес аквариума, тумба с раскроем фанеры, фильтр и свет, бионагрузка, тесты воды, рецепт удобрений.',
+    u_mm:'мм', u_l:'л', u_g:'г', u_mgl:'мг/л', u_pctmass:'% массы',
+    opt_auto:'авто', opt_sponge:'Губка 30 ppi', opt_k1:'K1 статичный', opt_k1f:'K1 кипящий слой',
+    opt_rings:'Керамические кольца', opt_matrix:'Матрикс / Biohome', opt_wool:'Синтепон, мочалки'
+  },
+  en: {
+    app_title:'Aquarium Calculator', app_sub:'aquarium · stand · equipment · biology',
+    tab_tank:'Aquarium', tab_stand:'Stand', tab_gear:'Equipment', tab_bio:'Biology', tab_test:'Tests', tab_udo:'Fertilizers',
+    h_tank:'Glass, substrate and weight from the tank dimensions.',
+    h_stand:'Carcass, plywood cutting plan and assembly order.',
+    h_gear:'Filter, light, aeration and heating for the water volume.',
+    h_bio:'How much nitrogen the filter processes and how much fish it feeds.',
+    h_test:'Your parameters against a reference planted tank.',
+    h_udo:'How much of which salt to add to reach the target.',
+    card_aqua:'Aquarium', card_stand:'Stand', card_filter:'Filter', card_water:'Water',
+    hint_empty:'empty = no test', card_np:'Nitrogen & phosphate', card_min:'Minerals', card_goal:'Targets',
+    f_len:'Length', f_depth:'Depth', f_height:'Height', f_standH:'Stand height', f_doors:'Doors', f_sheet:'Sheet',
+    f_color:'Colour', f_beige:'Beige', f_black:'Black', f_media:'Media', f_vol:'Volume',
+    f_temp:'Temperature', f_protein:'Feed protein', f_rate:'Feeding', f_fish:'Fish',
+    f_ph:'pH', f_kh:'KH', f_gh:'GH', f_tds:'TDS', f_ec:'EC', f_nh3:'NH₃ / NH₄',
+    f_no2:'Nitrite NO₂', f_no3:'Nitrate NO₃', f_po4:'Phosphate PO₄',
+    f_k:'Potassium K', f_ca:'Calcium Ca', f_mg:'Magnesium Mg', f_fe:'Iron Fe', f_cu:'Copper Cu',
+    door_def:'default',
+    now_lbl:'Now',
+    page_title:'Aquarium Calculator — glass, stand, water, fertilizers',
+    page_short:'Aquarium Calculator',
+    page_desc:'Aquarium calculation: glass thickness and substrate, weight, a plywood-cut stand, filter and light, biological load, water tests and a fertilizer recipe.',
+    page_desc_short:'Glass, substrate and weight, a plywood-cut stand, filter and light, biological load, water tests, a fertilizer recipe.',
+    u_mm:'mm', u_l:'l', u_g:'g', u_mgl:'mg/l', u_pctmass:'% of body weight',
+    opt_auto:'auto', opt_sponge:'Sponge 30 ppi', opt_k1:'K1 static', opt_k1f:'K1 fluidized',
+    opt_rings:'Ceramic rings', opt_matrix:'Matrix / Biohome', opt_wool:'Filter wool, sponges'
+  }
+};
+const t = k => (I18N[LANG] && I18N[LANG][k]) || I18N.ru[k] || k;
+const EN_MAP = {
+  'Объём воды':'Water volume','Стекло':'Glass','Грунт 5 см':'Substrate 5 cm','Вес':'Weight','С запасом':'With margin',
+  'Запас по стеклу':'Glass safety','Объём':'Volume','Расчётный вес':'Design weight','Секции':'Sections','Дверцы':'Doors',
+  'Стойки':'Uprights','Листы':'Sheets','Фильтр':'Filter','Свет':'Light','Аэрация':'Aeration','Обогрев':'Heater',
+  'Подмена':'Water change','Мощность':'Capacity','Корм':'Feed','Рыба':'Fish','Загрузка':'Load','Нитрат':'Nitrate',
+  'Фосфат':'Phosphate','Жёсткость':'Hardness','Железо':'Iron','В норме':'In range',
+  'Стенки':'Walls','Дно':'Bottom','Отбортовка':'Rim bracing','Стяжки':'Cross-braces','Напряжение':'Stress',
+  'Запас':'Factor','Вода':'Water','Грунт':'Substrate','Итого':'Total','На литр':'Per litre','да':'yes','нет':'no',
+  'Песок кварцевый':'Quartz sand','Гравий 2–4 мм':'Gravel 2–4 mm','Гравий 4–8 мм':'Gravel 4–8 mm',
+  'Керамзит':'Expanded clay','Активный грунт':'Active soil','Пропант':'Propant','Лава':'Lava',
+  'Раскрой':'Cutting plan','Деталь':'Part','Размер, мм':'Size, mm','Кол-во':'Qty','Площадь, м²':'Area, m²',
+  'Примечание':'Note','Спецификация CSV':'CSV export','Печать':'Print','Лист':'Sheet',
+  'Крышка':'Top panel','Пролёт расчётный':'Design span','Пролёт фактический':'Actual span','Прогиб':'Deflection',
+  'Сколько рыб':'Fish count','Объём материала':'Media volume','Площадь':'Area','Скорость':'Rate',
+  'Белок':'Protein','Кормление':'Feeding','Подмена до 20 мг/л':'Change to 20 mg/l',
+  'Показатели':'Parameters','Рекомендации':'Recommendations','Подмены':'Water changes','Параметр':'Parameter',
+  'Сейчас':'Now','Норма':'Range','Азот и фосфор':'Nitrogen & phosphate','Минералы':'Minerals',
+  'нет данных':'no data','норма':'in range','низко':'low','высоко':'high',
+  'Рецепт':'Recipe','В магазине':'Store name','Формула':'Formula','Разовая правка':'One-off',
+  'На приём (3 раза в неделю)':'Per dose (3×/week)','Что даёт':'Provides',
+  'Тумба':'Cabinet','Каркас':'Frame','Спереди':'Front','Сбоку':'Side','Узел полки':'Shelf detail','авто':'auto',
+  'Готовый вид':'Finished view','Фурнитура':'Hardware','Сборка':'Assembly',
+  'по габаритам':'by dimensions','стенки / дно':'walls / bottom','вода, стекло, грунт':'water, glass, substrate',
+  'норма 3,8':'factor 3.8','3–5 объёмов':'3–5 volumes','20–35 лм/л':'20–35 lm/l','0,3–0,5 Вт/л':'0.3–0.5 W/l',
+  '0,5–1 на 100 л':'0.5–1 per 100 l','0,8–1 Вт/л':'0.8–1 W/l','в неделю':'per week','нитрификация':'nitrification',
+  'предел по фильтру':'filter limit','от мощности':'of capacity','без растений':'without plants','в приросте':'accumulated',
+  'известных показателей':'known parameters','норма 10–30':'range 10–30','норма 0,5–2':'range 0.5–2',
+  'расчёт по pH и KH':'from pH and KH','норма 4–14':'range 4–14','норма 0,05–0,2':'range 0.05–0.2',
+  'вода':'water','мм':'mm','мг/л':'mg/l','л/ч':'l/h','Вт':'W','лм':'lm','л/мин':'l/min',
+  '+10 %':'+10 %','+10 % запаса':'+10 % margin','кг':'kg','л':'l','г/сут':'g/day','г':'g','м²':'m²','шт':'pcs',
+  'кг/м':'kg/m','МПа':'MPa','кг/л':'kg/l','г/м²·сут':'g/m²·day','г TAN/сут':'g TAN/day',
+  'мг/л·нед':'mg/l·week','л/нед':'l/week','см':'cm','CO₂ (расчёт)':'CO₂ (calc)',
+  'Боковина':'Side panel','Стойка':'Upright','Задняя стенка':'Back panel',
+  'Крышка вкладная':'Inset top','Крышка накладная':'Overlay top','Полка съёмная':'Removable shelf',
+  'Дверца':'Door','Накладка стыка крышки':'Top splice plate',
+  'стойки стоят на нём':'uprights stand on it','сдвоенная 36 мм':'double 36 mm',
+  'вкладная, −36 от дна':'inset, −36 from the bottom','из частей':'in parts','в каркасе':'inside the frame',
+  'на полкодержателях':'on shelf pins','снизу, на клей':'underneath, glued',
+  'крышка накладная':'overlay top','крышка вкладная':'inset top','боковина':'side panel','стойка':'upright',
+  'дно':'bottom','задняя стенка':'back panel','полка':'shelf',
+  'Корпус':'Carcass','Опоры':'Feet','Просвет':'Clearance','На опору':'Per foot','Размеры':'Dimensions',
+  'Нагрузка':'Load','18 мм · пролёт между стойками':'18 mm · span between uprights',
+  'запас есть':'factor OK','прогиб выше нормы':'deflection above norm',
+  'вес по слою':'weight by layer','Этот вес уходит в расчёт тумбы.':'This weight goes into the stand calculation.',
+  'Расчёт':'Calculation','Как считали':'How calculated',
+  'Фильтр, реальный поток':'Filter, real flow','3–5 объёмов в час':'3–5 volumes per hour',
+  'То же по паспорту':'Same by datasheet','с запасом на потери':'with allowance for losses',
+  '0,5–1 л/мин на 100 л':'0.5–1 l/min per 100 l','Освещение, световой поток':'Lighting, luminous flux',
+  '20–35 лм на литр':'20–35 lm per litre','Освещение, мощность LED':'Lighting, LED power',
+  '0,3–0,5 Вт на литр':'0.3–0.5 W per litre','Обогреватель':'Heater',
+  '0,8–1 Вт на литр, кратно 25':'0.8–1 W per litre, in steps of 25','Подмена воды':'Water change',
+  '10–20 % в неделю':'10–20 % per week','для большинства тропических рыб':'for most tropical fish',
+  'Фильтры':'Filters','паспортные данные':'datasheet data','Бренд':'Brand','Модель':'Model',
+  'Паспорт, л/ч':'Datasheet, l/h','Реально, л/ч':'Real, l/h','Мощность, Вт':'Power, W','Засыпка, л':'Media, l',
+  'Порядок запуска':'Startup order','Вода и грунт':'Water and substrate','Оборудование':'Equipment',
+  'Запуск бактерий':'Bacteria startup',
+  'Гуппи':'Guppy','Неон':'Neon tetra','Данио':'Zebra danio','Тетра':'Tetra','Моллинезия':'Molly',
+  'Меченосец':'Swordtail','Барбус':'Barb','Гурами':'Gourami','Петушок':'Betta','Скалярия':'Angelfish',
+  'Анциструс':'Bristlenose','Цихлида':'Cichlid','Золотая рыбка':'Goldfish','Дискус':'Discus',
+  'Аммиак':'Ammonia','% массы':'% of body weight','без растений и подмен':'without plants or water changes',
+  'по нагрузке, не по комфорту':'by load, not by comfort',
+  'Взрослый вес, г':'Adult weight, g','По фильтру, шт':'By filter, pcs','По объёму, шт':'By volume, pcs',
+  'чтобы вернуть в норму':'to bring back in range','Подменить':'Change',
+  'Ничего выводить не нужно — всё в норме или неизвестно.':'Nothing to remove — everything is in range or unknown.',
+  'Калиевая селитра':'Potassium nitrate','Кальциевая селитра':'Calcium nitrate','Мочевина, карбамид':'Urea',
+  'Монофосфат калия':'Monopotassium phosphate','Сульфат калия':'Potassium sulphate',
+  'Магнезия, сульфат магния':'Magnesium sulphate','Микро + железо, хелат':'Micro + iron chelate',
+  'калий до цели':'potassium to target','магний до цели':'magnesium to target','железо до цели':'iron to target',
+  'Всё в цели — вносить нечего.':'Everything is on target — nothing to add.',
+  'Азот':'Nitrogen','Фосфор':'Phosphorus','Калий':'Potassium','норма 10–20':'range 10–20',
+  'есть 36 мм':'has 36 mm','18 мм':'18 mm',
+  'Температура':'Temperature','µS/см':'µS/cm','воды':'water',
+  'Присадка':'Drilling','Вкладная крышка':'Inset top','Накладная крышка':'Overlay top',
+  'Полки':'Shelves','Отделка':'Finishing','Контроль':'Check','Позиция':'Item','Назначение':'Purpose',
+  'Стеклянные детали':'Glass parts','Передняя и задняя':'Front & back','Шов':'Seam','Схема':'Scheme',
+  'поддон, стенки стоят на нём':'tray, the walls stand on it','между боковинами':'between the sides',
+  'стоит на дне':'stands on the bottom','по верху, 60 мм':'along the top, 60 mm',
+  'поперёк, 60 мм':'across, 60 mm'
+};
+const tstr = v => LANG === 'en' ? (EN_MAP[v] || v) : v;
+function translateDom(root){
+  if(LANG !== 'en' || !root) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const list = [];
+  while(w.nextNode()) list.push(w.currentNode);
+  list.forEach(nd => {
+    const raw = nd.nodeValue, v = raw.trim();
+    if(v && EN_MAP[v] && !v.includes('${')) nd.nodeValue = raw.replace(v, EN_MAP[v]);
+  });
+}
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.title = t('page_title');
+  const md = document.querySelector('meta[name="description"]');
+  if(md) md.setAttribute('content', t('page_desc'));
+  const ogt = document.querySelector('meta[property="og:title"]');
+  if(ogt) ogt.setAttribute('content', t('page_short'));
+  const ogd = document.querySelector('meta[property="og:description"]');
+  if(ogd) ogd.setAttribute('content', t('page_desc_short'));
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('#lang button').forEach(b => b.classList.toggle('on', b.dataset.l === LANG));
+}
+
+/* =========================================================
    МОДЕЛЬ
    ========================================================= */
-function build(L, D, Ht, H, SW, SH, bio, fert, goal){
+function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant){
   L = Math.round(L); D = Math.round(D); Ht = Math.round(Ht); H = Math.round(H);
   SW = SW || 2440; SH = SH || 1220;
 
@@ -486,6 +702,28 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal){
   const wDesign = tankW * 1.1;
   const q       = wDesign * K.G / L;   // Н/мм
 
+  /* ---------- стеклянные детали: шов и размеры ---------- */
+  const seamBase = glassW <= 8 ? 1.5 : (glassW <= 12 ? 2 : 2.5);
+  const seam     = (L >= 2000 || Ht >= 700) ? 3 : seamBase;
+  const partFrontW = Math.round(L - 2*glassW - 2*seam);
+  const partWallH  = Math.round(Ht - glassB);
+  const bigTank    = (L >= 1500 || liters >= 400);
+  const hugeTank   = (L >= 2000 || Ht >= 700);
+  const partRows = [
+    { key:'Дно', w:L, h:D, qty:1, note:'поддон, стенки стоят на нём' },
+    { key:'Боковина', w:D, h:partWallH, qty:2, note:'стоит на дне' },
+    { key:'Передняя и задняя', w:partFrontW, h:partWallH, qty:2, note:'между боковинами', seamNote:true }
+  ];
+  if(ribs){
+    partRows.push({ key:'Отбортовка', w:partFrontW, h:60, qty:2, note:'по верху, 60 мм' });
+    partRows.push({ key:'Отбортовка', w:Math.round(D - 2*seam), h:60, qty:2, note:'по верху, 60 мм' });
+  }
+  if(braces > 0){
+    partRows.push({ key:'Стяжки', w:Math.round(D - 2*glassW - 2*seam), h:60, qty:braces, note:'поперёк, 60 мм' });
+  }
+  const glassParts = { seam, seamBase, frontW:partFrontW, wallH:partWallH,
+                       big:bigTank, huge:hugeTank, rows:partRows };
+
   /* проверка накладной крышки на прогиб */
   const spanFor = T => {
     const I  = D * Math.pow(T,3) / 12;
@@ -500,8 +738,6 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal){
   /* габариты корпуса */
   const Lc = L;                     // корпус по длине = длина аквариума
   const C  = D - K.T;               // глубина корпуса (без дверцы)
-  const sel   = chooseSections(Lc, span);
-  const n     = sel.n, t = sel.t, clear = sel.clear;
 
   const zBot    = K.LEG;                    // низ ящика (стоит на скрытых опорах)
   const zBotTop = zBot + K.T;               // верх дна
@@ -518,7 +754,28 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal){
   const doorZ0  = K.LEG + K.DGAP;           // 1 мм над низом ящика (10 мм опоры)
   const doorZ1  = zU - K.DGAP;              // 1 мм до верха корпуса
   const doorH   = doorZ1 - doorZ0;          // = H - 10 - 18 - 5 - 2
-  const doorPitch = Lc / n;                 // шаг дверей по длине аквариума
+  /* дверь от 400 до 800 мм: предлагаем только количества, попадающие в рамки */
+  /* ограничение по пролёту считаем по внутреннему просвету, а не по модулю фасада */
+  const dMinSpan = Math.ceil((Lc - K.T) / (Math.max(200, span) + K.T));
+  const dMin = Math.max(1, Math.ceil(Lc/800), dMinSpan);
+  const dMax = Math.max(dMin, Math.min(6, Math.floor(Lc/400)));
+  let doorSug = dMin;
+  for(let i = dMin; i <= dMax; i++){ if(Math.abs(Lc/i - 450) < Math.abs(Lc/doorSug - 450)) doorSug = i; }
+  const doorMax = dMax;
+  const doorN   = doorWant ? Math.max(dMin, Math.min(dMax, doorWant)) : doorSug;
+  const doorPitch = Lc / doorN;
+  /* число дверей задаёт число отсеков: три двери — три секции */
+  const sel   = chooseSections(Lc, span);
+  let n = sel.n, t = sel.t, clear = sel.clear;
+  n = doorN;
+  clear = (Lc - 2*K.T - (n - 1)*t) / n;
+  /* если отсек подошёл к пределу прогиба ближе 5 %, стойки делаем сдвоенными */
+  if(t === K.T && clear > span * 0.95){
+    t = 2*K.T;
+    clear = (Lc - 2*K.T - (n - 1)*t) / n;
+  }
+  const pitch = Lc / n;
+                 // шаг дверей по длине аквариума
   const doorW   = doorPitch - 2*K.DGAP;     // минус 2 мм
 
   /* стойки и секции */
@@ -535,7 +792,7 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal){
 
   /* дверцы: шаг = длина / количество, зазор 1 мм по кругу */
   const doors = [];
-  for(let i=0;i<n;i++){
+  for(let i=0;i<doorN;i++){
     const x0 = i*doorPitch + K.DGAP;
     doors.push({x0, x1:x0+doorW, hinge: i%2===0 ? 'L' : 'R'});
   }
@@ -565,9 +822,9 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal){
   add('Стойка', Hpart, C-K.T, (n-1)*(t>18?2:1), 'part', t>18 ? 'сдвоенная 36 мм' : '');
   add('Задняя стенка', Lc-2*K.T, Hu, 1, 'back', 'вкладная, −36 от дна');
   add('Крышка вкладная', innerW/innerK, C-K.T, innerK, 'intop', innerK>1?'из частей':'в каркасе');
-  add('Крышка накладная', topW/topK, topD, topK, 'top', topK>1?`из ${topK} частей`:'');
+  add('Крышка накладная', topW/topK, topD, topK, 'top', topK>1 ? (LANG==='en' ? `in ${topK} parts` : `из ${topK} частей`) : '');
   add('Полка съёмная', clear-4, C-K.T-30, n, 'shelf', 'на полкодержателях');
-  add('Дверца', doorW, doorH, n, 'door');
+  add('Дверца', doorW, doorH, doorN, 'door');
   if(topK > 1) add('Накладка стыка крышки', 250, topD-40, topK-1, 'splice', 'снизу, на клей');
 
   /* площадь, вес, листы */
@@ -647,29 +904,30 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal){
   const mCSM    = Math.max(0, TGT.fe - n0(f.fe)) * waterV / 0.07 / 1000;
 
   const fertRec = [];
-  const miss = TPAR.filter(v => v[1] == null).map(v => v[0]);
-  if(f.nh3 != null && f.nh3 > 0.1)  fertRec.push(['Аммиак выше 0,1 мг/л — срочно подмена 50 % и не кормить.', 'bad']);
-  if(f.no2 != null && f.no2 > 0.2)  fertRec.push(['Нитрит выше 0,2 мг/л — цикл не работает. Подмена и ждать нулей.', 'bad']);
-  if(f.cu != null && f.cu > 0.05)   fertRec.push(['Медь выше 0,05 мг/л — гибель креветок и улиток. Подмена, убрать источник.', 'bad']);
-  if(f.no3 != null && f.no3 < 5)    fertRec.push(['Нитрат ниже 5 мг/л — растения останавливаются.', 'bad']);
-  if(f.no3 != null && f.no3 > 30)   fertRec.push(['Нитрат выше 30 мг/л — не вносить, подмена.', 'warn']);
-  if(f.po4 != null && f.po4 > 2)    fertRec.push(['Фосфат выше 2 мг/л — не вносить, выводить подменой чистой воды или GFO.', 'bad']);
-  if(ratioNP > 0 && f.po4 > 1.5 && f.no3 < 15) fertRec.push([`Фосфата многовато при нитрате ${f1(f.no3)} — соотношение ${f1(ratioNP)} : 1. Поднять нитрат.`, 'warn']);
-  if(ratioNP > 0 && f.no3 > 25 && f.po4 < 1)   fertRec.push([`Нитрата много при фосфате ${f1(f.po4)} — соотношение ${f1(ratioNP)} : 1.`, 'warn']);
-  if(f.k != null && f.ca != null && f.k > 2.5*f.ca) fertRec.push(['Калий выше 2,5 кальция — блокирует кальций и магний. Убрать K₂SO₄, проверить GH.', 'bad']);
-  if(f.mg != null && f.mg > 0.01 && f.ca != null && (f.ca/f.mg < 3 || f.ca/f.mg > 5)) fertRec.push([`Ca : Mg = ${f1(f.ca/f.mg)} — вне нормы 3–5.`, 'warn']);
-  if(f.ph != null && (f.ph < 6 || f.ph > 8.5)) fertRec.push([`pH ${f1(f.ph)} — вне рабочего диапазона 6,0–8,5.`, 'warn']);
-  if(f.kh != null && f.kh < 2) fertRec.push(['KH ниже 2 — нет буфера, pH будет скакать.', 'warn']);
-  if(co2 != null && co2 > 30) fertRec.push([`CO₂ ${f0(co2)} мг/л — выше 30, рыбе не хватает кислорода. Уменьшить подачу.`, 'bad']);
-  if(co2 != null && co2 < 5)  fertRec.push([`CO₂ ${f0(co2)} мг/л — мало для травника, норма 15–30.`, 'warn']);
-  if(f.tds != null && f.tds > 400) fertRec.push([`TDS ${f0(f.tds)} ppm — накопились соли, нужна подмена.`, 'warn']);
-  if(ghMeas != null && ghMeas < 4)  fertRec.push(['GH ниже 4 — мягкая вода, кальция и магния на минимуме.', 'warn']);
-  if(ghMeas != null && ghMeas > 14) fertRec.push(['GH выше 14 — жёсткая вода, Ca и Mg уже с запасом, не добавлять.', 'warn']);
-  if(f.fe != null && f.fe < 0.05) fertRec.push(['Железо ниже 0,05 мг/л — межжилковый хлороз на молодых листьях.', 'warn']);
-  if(dN > 0 && n0(f.k) >= MAXK)     fertRec.push(['Калий на пределе — азот даём не калиевой селитрой.', 'warn']);
-  if(dN > 0 && no3FromUrea > 0)     fertRec.push([`Часть азота (${f0(no3FromUrea)} мг/л) уйдёт мочевиной: обе селитры упёрлись в потолок.`, 'warn']);
-  if(miss.length) fertRec.push([`Нет тестов: ${miss.join(', ')}. Эти параметры не проверены.`, 'warn']);
-  if(!fertRec.length) fertRec.push(['Все показатели в эталоне — держите дозами, а не подменами.', 'ok']);
+  const miss = TPAR.filter(v => v[1] == null).map(v => tstr(v[0]));
+  const tr = (en, ru) => LANG==='en' ? en : ru;
+  if(f.nh3 != null && f.nh3 > 0.1)  fertRec.push([tr('Ammonia above 0.1 mg/l — change 50 % at once and do not feed.', 'Аммиак выше 0,1 мг/л — срочно подмена 50 % и не кормить.'), 'bad']);
+  if(f.no2 != null && f.no2 > 0.2)  fertRec.push([tr('Nitrite above 0.2 mg/l — the cycle is not working. Change water and wait for zeros.', 'Нитрит выше 0,2 мг/л — цикл не работает. Подмена и ждать нулей.'), 'bad']);
+  if(f.cu != null && f.cu > 0.05)   fertRec.push([tr('Copper above 0.05 mg/l — kills shrimp and snails. Change water and remove the source.', 'Медь выше 0,05 мг/л — гибель креветок и улиток. Подмена, убрать источник.'), 'bad']);
+  if(f.no3 != null && f.no3 < 5)    fertRec.push([tr('Nitrate below 5 mg/l — plants stall.', 'Нитрат ниже 5 мг/л — растения останавливаются.'), 'bad']);
+  if(f.no3 != null && f.no3 > 30)   fertRec.push([tr('Nitrate above 30 mg/l — do not dose, change water.', 'Нитрат выше 30 мг/л — не вносить, подмена.'), 'warn']);
+  if(f.po4 != null && f.po4 > 2)    fertRec.push([tr('Phosphate above 2 mg/l — do not dose; remove it with clean-water changes or GFO.', 'Фосфат выше 2 мг/л — не вносить, выводить подменой чистой воды или GFO.'), 'bad']);
+  if(ratioNP > 0 && f.po4 > 1.5 && f.no3 < 15) fertRec.push([tr(`Phosphate is high for nitrate ${f1(f.no3)} — ratio ${f1(ratioNP)} : 1. Raise nitrate.`, `Фосфата многовато при нитрате ${f1(f.no3)} — соотношение ${f1(ratioNP)} : 1. Поднять нитрат.`), 'warn']);
+  if(ratioNP > 0 && f.no3 > 25 && f.po4 < 1)   fertRec.push([tr(`Nitrate is high for phosphate ${f1(f.po4)} — ratio ${f1(ratioNP)} : 1.`, `Нитрата много при фосфате ${f1(f.po4)} — соотношение ${f1(ratioNP)} : 1.`), 'warn']);
+  if(f.k != null && f.ca != null && f.k > 2.5*f.ca) fertRec.push([tr('Potassium above 2.5× calcium — blocks calcium and magnesium. Remove K₂SO₄, check GH.', 'Калий выше 2,5 кальция — блокирует кальций и магний. Убрать K₂SO₄, проверить GH.'), 'bad']);
+  if(f.mg != null && f.mg > 0.01 && f.ca != null && (f.ca/f.mg < 3 || f.ca/f.mg > 5)) fertRec.push([tr(`Ca : Mg = ${f1(f.ca/f.mg)} — outside the 3–5 range.`, `Ca : Mg = ${f1(f.ca/f.mg)} — вне нормы 3–5.`), 'warn']);
+  if(f.ph != null && (f.ph < 6 || f.ph > 8.5)) fertRec.push([tr(`pH ${f1(f.ph)} — outside the working range 6.0–8.5.`, `pH ${f1(f.ph)} — вне рабочего диапазона 6,0–8,5.`), 'warn']);
+  if(f.kh != null && f.kh < 2) fertRec.push([tr('KH below 2 — no buffer, pH will swing.', 'KH ниже 2 — нет буфера, pH будет скакать.'), 'warn']);
+  if(co2 != null && co2 > 30) fertRec.push([tr(`CO₂ ${f0(co2)} mg/l — above 30, the fish lack oxygen. Reduce the supply.`, `CO₂ ${f0(co2)} мг/л — выше 30, рыбе не хватает кислорода. Уменьшить подачу.`), 'bad']);
+  if(co2 != null && co2 < 5)  fertRec.push([tr(`CO₂ ${f0(co2)} mg/l — low for a planted tank, the range is 15–30.`, `CO₂ ${f0(co2)} мг/л — мало для травника, норма 15–30.`), 'warn']);
+  if(f.tds != null && f.tds > 400) fertRec.push([tr(`TDS ${f0(f.tds)} ppm — salts have built up, a water change is needed.`, `TDS ${f0(f.tds)} ppm — накопились соли, нужна подмена.`), 'warn']);
+  if(ghMeas != null && ghMeas < 4)  fertRec.push([tr('GH below 4 — soft water, calcium and magnesium at the minimum.', 'GH ниже 4 — мягкая вода, кальция и магния на минимуме.'), 'warn']);
+  if(ghMeas != null && ghMeas > 14) fertRec.push([tr('GH above 14 — hard water, Ca and Mg are already in surplus, do not add.', 'GH выше 14 — жёсткая вода, Ca и Mg уже с запасом, не добавлять.'), 'warn']);
+  if(f.fe != null && f.fe < 0.05) fertRec.push([tr('Iron below 0.05 mg/l — interveinal chlorosis on young leaves.', 'Железо ниже 0,05 мг/л — межжилковый хлороз на молодых листьях.'), 'warn']);
+  if(dN > 0 && n0(f.k) >= MAXK)     fertRec.push([tr('Potassium is at the limit — supply nitrogen without potassium nitrate.', 'Калий на пределе — азот даём не калиевой селитрой.'), 'warn']);
+  if(dN > 0 && no3FromUrea > 0)     fertRec.push([tr(`Part of the nitrogen (${f0(no3FromUrea)} mg/l) will come from urea: both nitrates have hit the ceiling.`, `Часть азота (${f0(no3FromUrea)} мг/л) уйдёт мочевиной: обе селитры упёрлись в потолок.`), 'warn']);
+  if(miss.length) fertRec.push([tr(`No tests: ${miss.join(', ')}. These parameters are unverified.`, `Нет тестов: ${miss.join(', ')}. Эти параметры не проверены.`), 'warn']);
+  if(!fertRec.length) fertRec.push([tr('All parameters are on target — keep them with dosing, not water changes.', 'Все показатели в эталоне — держите дозами, а не подменами.'), 'ok']);
 
   const fertRes = {
     f, TGT, gh: ghMeas, co2, ratioNP, dN, dP, mKNO3, mCaNO3, mUrea, mKH2PO4, kTotal, mK2SO4, mMgSO4, mCaCl2, mCSM,
@@ -704,7 +962,7 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal){
   return {
     L, D, Ht, H, SW, SH, liters, wWater, wDesign, q, span, topOK,
     Lc, C, n, t, clear, Hu, Hpart, inD, inH, zBot, zBotTop, zU, zIn0, zOut, zTop: H,
-    shelfZ0, shelfZ1, pinZ, doorZ0, doorZ1, doorH, doorW, topW, topD, innerW,
+    shelfZ0, shelfZ1, pinZ, doorZ0, doorZ1, doorH, doorW, topW, topD, innerW, doorN, doorSug, doorMax, dMin, dMax, pitch,
     uprights, bays, doors, feet, feetN, parts: partsList, idOf, footNo,
     area, standW, perFoot, sheets, topK, innerK,
     I, Z, defl, sig,
@@ -713,6 +971,7 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal){
     /* аквариум */
     glass: { w: glassW, b: glassB, need: sNeed, plain: sPlain, ribs, braces,
              beta: betaEff, sig: sigAct, sf: sfGlass, safety: SAFETY, sigAllow: SIG_A },
+    glassParts,
     hw, waterV, glassM, soilM, soilD, soilV, SOILS, tankW, innerL, innerD, gW, gB,
     bioRes,
     fertRes,
@@ -947,11 +1206,11 @@ function drawIso(M, o){
   /* полки и вкладная крышка прижаты справа к стойке — правую грань не рисуем */
   M.bays.forEach(b=>bx(b.x0+2,b.x1-2,K.T+30,M.D-K.T,M.shelfZ0,M.shelfZ1,CL.shelf,40,{noRight:true}));
   bx(K.T, M.Lc-K.T, K.T, M.D-K.T, M.zIn0, M.zU, CL.intop, 50, {noRight:true});
-  /* передние кромки стоек поверх полок */
+  /* передняя кромка и передняя часть правой грани стоек — поверх полок, но ниже дверец */
   M.uprights.forEach((u,idx)=>{
     if(idx === M.uprights.length-1) return;
     const h = u.kind==='side' ? M.zU : M.zIn0;
-    bx(u.x0,u.x1,K.T,K.T+0.5,M.zBotTop,h,u.kind==='double'?CL.part:CL.side,45,{strip:true});
+    bx(u.x0,u.x1,K.T,K.T+30,M.zBotTop,h,u.kind==='double'?CL.part:CL.side,56,{noTop:true});
   });
 
   const ez = o.explode || 0;
@@ -985,7 +1244,7 @@ function drawIso(M, o){
     const E=P(x1,y1,z0), F=P(x1,y1,z1), G=P(x0,y1,z1);
     out += poly([A,B,Cc,Dd], cs[0], CL.edge, .7);
     if(!it.strip && !it.noRight) out += poly([B,E,F,Cc], cs[1], CL.edge, .7);
-    if(!it.strip) out += poly([Dd,Cc,F,G], cs[2], CL.edge, .7);
+    if(!it.strip && !it.noTop) out += poly([Dd,Cc,F,G], cs[2], CL.edge, .7);
   }
 
   if(o.tank){
@@ -1008,7 +1267,7 @@ function drawIso(M, o){
     out += dimEl(P(0,0,0), P(M.L,0,0), 'L '+f0(M.L), 46);
     out += dimEl(P(M.L,0,0), P(M.L,M.D,0), 'D '+f0(M.D), 42);
     out += dimEl(P(M.L,0,M.H), P(M.L,0,0), 'H '+f0(M.H), 42);
-    out += dimEl(P(0,0,M.H), P(0,0,M.H+M.Ht), 'H акв '+f0(M.Ht), 40);
+    out += dimEl(P(0,0,M.H), P(0,0,M.H+M.Ht), (LANG==='en' ? 'H tank ' : 'H акв ') + f0(M.Ht), 40);
   }
 
   if(o.badges){
@@ -1077,13 +1336,13 @@ function drawFront(M, o){
   /* уровень воды */
   const wl = M.H+10+M.Ht*0.88;
   s += `<line x1="${P(0,wl)[0].toFixed(1)}" y1="${P(0,wl)[1].toFixed(1)}" x2="${P(M.L,wl)[0].toFixed(1)}" y2="${P(M.L,wl)[1].toFixed(1)}" stroke="#5aa9c4" stroke-width="1" stroke-dasharray="7 5" opacity=".7"/>`;
-  s += `<text x="${(P(0,wl)[0]+14).toFixed(1)}" y="${(P(0,wl)[1]+17).toFixed(1)}" class="lbl2">уровень воды</text>`;
+  s += `<text x="${(P(0,wl)[0]+14).toFixed(1)}" y="${(P(0,wl)[1]+17).toFixed(1)}" class="lbl2">${LANG==='en' ? 'water level' : 'уровень воды'}</text>`;
 
   M.bays.forEach(b=>{ s += dimEl(P(b.x0,0),P(b.x1,0), f0(b.x1-b.x0), 26); });
   s += dimEl(P(0,0),P(M.L,0), f0(M.L), 78);
   s += dimEl(P(M.L,0),P(M.L,M.H), f0(M.H), 58);
   s += dimEl(P(M.L,M.H),P(M.L,M.H+M.Ht), f0(M.Ht), 58);
-  s += `<text x="${P(0,M.H+M.Ht)[0].toFixed(1)}" y="${(P(0,M.H+M.Ht)[1]-16).toFixed(1)}" class="sub">аквариум ${f0(M.L)} × ${f0(M.D)} × ${f0(M.Ht)} · крышка ${f0(M.topW)} × ${f0(M.topD)}</text>`;
+  s += `<text x="${P(0,M.H+M.Ht)[0].toFixed(1)}" y="${(P(0,M.H+M.Ht)[1]-16).toFixed(1)}" class="sub">${LANG==='en' ? `aquarium ${f0(M.L)} × ${f0(M.D)} × ${f0(M.Ht)} · top ${f0(M.topW)} × ${f0(M.topD)}` : `аквариум ${f0(M.L)} × ${f0(M.D)} × ${f0(M.Ht)} · крышка ${f0(M.topW)} × ${f0(M.topD)}`}</text>`;
   return svgWrap(W,Hh,s);
 }
 
@@ -1115,11 +1374,11 @@ function drawSide(M, o){
   s += R(K.T+30,M.shelfZ0,M.D-K.T,M.shelfZ1,'fill="url(#hatchS)" stroke="#b99f7c" stroke-width="1"');
   /* выноска теневого зазора */
   s += `<line x1="${P(M.D+24,M.zU)[0].toFixed(1)}" y1="${P(M.D+24,M.zU)[1].toFixed(1)}" x2="${P(M.D-40,M.zU+2.5)[0].toFixed(1)}" y2="${P(M.D-40,M.zU+2.5)[1].toFixed(1)}" stroke="#8b919b" stroke-width="1" stroke-dasharray="3 2"/>`;
-  s += `<text x="${(P(M.D+28,M.zU)[0]+4).toFixed(1)}" y="${P(M.D+28,M.zU)[1].toFixed(1)}" class="lbl2">зазор 5</text>`;
+  s += `<text x="${(P(M.D+28,M.zU)[0]+4).toFixed(1)}" y="${P(M.D+28,M.zU)[1].toFixed(1)}" class="lbl2">${LANG==='en' ? 'gap 5' : 'зазор 5'}</text>`;
 
   s += dimEl(P(0,0),P(M.D,0), f0(M.D), 66);
   s += dimEl(P(M.D,0),P(M.D,M.H), f0(M.H), 58);
-  s += `<text x="${P(0,M.H)[0].toFixed(1)}" y="${(P(0,M.H)[1]-26).toFixed(1)}" class="sub">разрез по секции</text>`;
+  s += `<text x="${P(0,M.H)[0].toFixed(1)}" y="${(P(0,M.H)[1]-26).toFixed(1)}" class="sub">${LANG==='en' ? 'section cut' : 'разрез по секции'}</text>`;
   return svgWrap(W,Hh,s);
 }
 
@@ -1129,8 +1388,8 @@ function drawDetail(M){
   const shelf = M.parts.find(p=>p.role==='shelf');
   let s = `<defs><pattern id="hatch" width="9" height="9" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="9" height="9" fill="#f3e6d2"/><line x1="0" y1="0" x2="0" y2="9" stroke="#c8ab84" stroke-width="1.5"/></pattern></defs>`;
 
-  s += `<text x="24" y="30" class="ttl">Узел полки — разрез</text>`;
-  s += `<text x="24" y="49" class="sub">полка на цилиндрах, снимается</text>`;
+  s += `<text x="24" y="30" class="ttl">${LANG==='en' ? 'Shelf detail — section' : 'Узел полки — разрез'}</text>`;
+  s += `<text x="24" y="49" class="sub">${LANG==='en' ? 'shelf on pins, removable' : 'полка на цилиндрах, снимается'}</text>`;
   const scl = 3.2, ox = 250, oy = 300;
   const X = mm => ox + mm*scl;
   const Y = mm => oy - mm*scl;
@@ -1142,13 +1401,13 @@ function drawDetail(M){
   s += call(X(4), Y(2.5), 336, 352, 1);
   s += call(X(1), Y(9), 352, 198, 2);
   s += call(X(-7), Y(2.5), 148, 168, 3);
-  s += `<text x="24" y="404" class="lbl2">1 — полкодержатель Ø5×16, вылет 7</text>`;
-  s += `<text x="24" y="422" class="lbl2">2 — зазор 2 мм по бокам</text>`;
-  s += `<text x="24" y="440" class="lbl2">3 — отверстие Ø5×12 в стойке</text>`;
+  s += `<text x="24" y="404" class="lbl2">${LANG==='en' ? '1 — shelf pin Ø5×16, 7 mm reach' : '1 — полкодержатель Ø5×16, вылет 7'}</text>`;
+  s += `<text x="24" y="422" class="lbl2">${LANG==='en' ? '2 — 2 mm clearance at the sides' : '2 — зазор 2 мм по бокам'}</text>`;
+  s += `<text x="24" y="440" class="lbl2">${LANG==='en' ? '3 — Ø5×12 hole in the upright' : '3 — отверстие Ø5×12 в стойке'}</text>`;
 
   s += `<line x1="510" y1="24" x2="510" y2="450" stroke="#e6e7ec"/>`;
-  s += `<text x="538" y="30" class="ttl">План секции</text>`;
-  s += `<text x="538" y="49" class="sub">4 цилиндра, зазор 2 мм</text>`;
+  s += `<text x="538" y="30" class="ttl">${LANG==='en' ? 'Bay plan' : 'План секции'}</text>`;
+  s += `<text x="538" y="49" class="sub">${LANG==='en' ? '4 pins, 2 mm clearance' : '4 цилиндра, зазор 2 мм'}</text>`;
   const pw = 396, ph = 250;
   const sc2 = Math.min(pw/M.clear, ph/M.inD);
   const px0 = 560, py0 = 88;
@@ -1161,14 +1420,14 @@ function drawDetail(M){
   [[3.5,80],[3.5,M.inD-50],[M.clear-3.5,80],[M.clear-3.5,M.inD-50]].forEach(([x,y])=>{
     s += `<circle cx="${qx(x).toFixed(1)}" cy="${qy(y).toFixed(1)}" r="3" fill="#8d9096" stroke="#6f7378"/>`;
   });
-  s += `<text x="${qx(M.clear/2).toFixed(1)}" y="${qy(M.inD/2).toFixed(1)}" class="lbl" text-anchor="middle">полка ${f0(shelf.w)} × ${f0(shelf.h)}</text>`;
+  s += `<text x="${qx(M.clear/2).toFixed(1)}" y="${qy(M.inD/2).toFixed(1)}" class="lbl" text-anchor="middle">${LANG==='en' ? 'shelf' : 'полка'} ${f0(shelf.w)} × ${f0(shelf.h)}</text>`;
   s += `<line x1="${qx(0).toFixed(1)}" y1="${(qy(M.inD)+30).toFixed(1)}" x2="${qx(M.clear).toFixed(1)}" y2="${(qy(M.inD)+30).toFixed(1)}" stroke="#b3b9c4"/>`;
   s += `<text x="${qx(M.clear/2).toFixed(1)}" y="${(qy(M.inD)+44).toFixed(1)}" class="lbl" text-anchor="middle">${f0(M.clear)}</text>`;
   const dxl = qx(M.clear) + 18*sc2 + 16;
   s += `<line x1="${dxl.toFixed(1)}" y1="${qy(0).toFixed(1)}" x2="${dxl.toFixed(1)}" y2="${qy(M.inD).toFixed(1)}" stroke="#b3b9c4"/>`;
   s += `<text x="${(dxl+8).toFixed(1)}" y="${qy(M.inD/2).toFixed(1)}" class="lbl">${f0(M.inD)}</text>`;
-  s += `<text x="538" y="404" class="lbl2">Цилиндры — 50 мм от кромок.</text>`;
-  s += `<text x="538" y="422" class="lbl2">Полка снимается без инструмента.</text>`;
+  s += `<text x="538" y="404" class="lbl2">${LANG==='en' ? 'Pins — 50 mm from the edges.' : 'Цилиндры — 50 мм от кромок.'}</text>`;
+  s += `<text x="538" y="422" class="lbl2">${LANG==='en' ? 'The shelf comes out without tools.' : 'Полка снимается без инструмента.'}</text>`;
   return svgWrap(W,Hh,s);
 }
 /* =========================================================
@@ -1183,80 +1442,93 @@ function renderKpis(M){
   if(sec === 'tank'){
     const g = M.glass;
     cards = [
-      ['Объём воды', `${f0(M.waterV)}<small>л</small>`, `по габаритам ${f0(M.liters)} л`, true],
-      ['Стекло', `${g.w} / ${g.b}<small>мм</small>`, 'стенки / дно', false],
-      ['Грунт 5 см', `${f0(M.soilV(50))}<small>л</small>`, `${f0(M.soilM)} кг`, false],
-      ['Вес', `${f0(M.tankW)}<small>кг</small>`, 'вода, стекло, грунт', false],
-      ['С запасом', `${f0(M.wDesign)}<small>кг</small>`, '+10 %', false],
-      ['Запас по стеклу', `×${f1(g.sf)}`, 'норма 3,8', false]
+      ['Объём воды', `${f0(M.waterV)}<small>${tstr('л')}</small>`, LANG==='en' ? `by dimensions ${f0(M.liters)} l` : `по габаритам ${f0(M.liters)} л`, true],
+      ['Стекло', `${g.w} / ${g.b}<small>${tstr('мм')}</small>`, tstr('стенки / дно'), false],
+      ['Грунт 5 см', `${f0(M.soilV(50))}<small>${tstr('л')}</small>`, `${f0(M.soilM)} ${tstr('кг')}`, false],
+      ['Вес', `${f0(M.tankW)}<small>${tstr('кг')}</small>`, tstr('вода, стекло, грунт'), false],
+      ['С запасом', `${f0(M.wDesign)}<small>${tstr('кг')}</small>`, '+10 %', false],
+      ['Запас по стеклу', `×${f1(g.sf)}`, tstr('норма 3,8'), false]
     ];
   } else if(sec === 'gear'){
     const g = M.gear;
     cards = [
-      ['Фильтр', `${f0(g.flowMin)}–${f0(g.flowMax)}<small>л/ч</small>`, '3–5 объёмов', true],
-      ['Свет', `${f0(g.lmMin)}–${f0(g.lmMax)}<small>лм</small>`, '20–35 лм/л', false],
-      ['LED', `${f0(g.wMin)}–${f0(g.wMax)}<small>Вт</small>`, '0,3–0,5 Вт/л', false],
-      ['Аэрация', `${f1(g.lpmMin)}–${f1(g.lpmMax)}<small>л/мин</small>`, '0,5–1 на 100 л', false],
-      ['Обогрев', `${f0(Math.max(25, Math.round(g.heatMax/25)*25))}<small>Вт</small>`, '0,8–1 Вт/л', false],
-      ['Подмена', `${f0(g.changeMin)}–${f0(g.changeMax)}<small>л</small>`, 'в неделю', false]
+      ['Фильтр', `${f0(g.flowMin)}–${f0(g.flowMax)}<small>${tstr('л/ч')}</small>`, tstr('3–5 объёмов'), true],
+      ['Свет', `${f0(g.lmMin)}–${f0(g.lmMax)}<small>${tstr('лм')}</small>`, tstr('20–35 лм/л'), false],
+      ['LED', `${f0(g.wMin)}–${f0(g.wMax)}<small>${tstr('Вт')}</small>`, tstr('0,3–0,5 Вт/л'), false],
+      ['Аэрация', `${f1(g.lpmMin)}–${f1(g.lpmMax)}<small>${tstr('л/мин')}</small>`, tstr('0,5–1 на 100 л'), false],
+      ['Обогрев', `${f0(Math.max(25, Math.round(g.heatMax/25)*25))}<small>${tstr('Вт')}</small>`, tstr('0,8–1 Вт/л'), false],
+      ['Подмена', `${f0(g.changeMin)}–${f0(g.changeMax)}<small>${tstr('л')}</small>`, tstr('в неделю'), false]
     ];
   } else if(sec === 'fert' || sec === 'udo'){
     const r = M.fertRes, f = r.f;
     const [rt, rc] = r.ratioNP === 0 ? ['—',''] : (r.ratioNP < 10 ? [f1(r.ratioNP),'badge-bad'] : (r.ratioNP > 20 ? [f1(r.ratioNP),'badge-warn'] : [f1(r.ratioNP),'badge-ok']));
     cards = [
-      ['NO₃ : PO₄', `<span class="${rc}">${rt}</span><small>: 1</small>`, 'норма 10–20', true],
-      ['Азот', `${f1(f.no3)}<small>мг/л</small>`, `до ${r.TGT.no3}`, false],
-      ['Фосфор', `${f1(f.po4)}<small>мг/л</small>`, `до ${r.TGT.po4}`, false],
-      ['Калий', `${f1(f.k)}<small>мг/л</small>`, 'норма 10–30', false],
-      ['Жёсткость', `${f1(r.gh)}<small>°dGH</small>`, 'норма 4–14', false],
-      ['Железо', `${f2(f.fe)}<small>мг/л</small>`, 'норма 0,05–0,2', false]
+      ['NO₃ : PO₄', `<span class="${rc}">${rt}</span><small>: 1</small>`, LANG==='en' ? 'range 10–20' : 'норма 10–20', true],
+      ['Азот', `${f1(f.no3)}<small>${tstr('мг/л')}</small>`, LANG==='en' ? `up to ${r.TGT.no3}` : `до ${r.TGT.no3}`, false],
+      ['Фосфор', `${f1(f.po4)}<small>${tstr('мг/л')}</small>`, LANG==='en' ? `up to ${r.TGT.po4}` : `до ${r.TGT.po4}`, false],
+      ['Калий', `${f1(f.k)}<small>${tstr('мг/л')}</small>`, tstr('норма 10–30'), false],
+      ['Жёсткость', `${f1(r.gh)}<small>°dGH</small>`, tstr('норма 4–14'), false],
+      ['Железо', `${f2(f.fe)}<small>${tstr('мг/л')}</small>`, tstr('норма 0,05–0,2'), false]
     ];
   } else if(sec === 'bio'){
     const b = M.bioRes;
     cards = [
-      ['Мощность', `${f1(b.capTAN)}<small>г TAN/сут</small>`, 'нитрификация', true],
-      ['Корм', `${f0(b.feedCap)}<small>г/сут</small>`, 'предел по фильтру', false],
-      ['Рыба', `${f1(b.fishCap/1000)}<small>кг</small>`, `${f0(b.fishCap)} г`, false],
-      ['Загрузка', `${Math.round(b.load*100)}<small>%</small>`, 'от мощности', false],
-      ['Нитрат', `${f1(b.no3Week)}<small>мг/л·нед</small>`, 'без растений', false],
-      ['NO₃ : PO₄', `${f1(b.npRatio)}<small>: 1</small>`, 'в приросте', false]
+      ['Мощность', `${f1(b.capTAN)}<small>${tstr('г TAN/сут')}</small>`, tstr('нитрификация'), true],
+      ['Корм', `${f0(b.feedCap)}<small>${tstr('г/сут')}</small>`, tstr('предел по фильтру'), false],
+      ['Рыба', `${f1(b.fishCap/1000)}<small>${tstr('кг')}</small>`, `${f0(b.fishCap)} ${tstr('г')}`, false],
+      ['Загрузка', `${Math.round(b.load*100)}<small>%</small>`, tstr('от мощности'), false],
+      ['Нитрат', `${f1(b.no3Week)}<small>${tstr('мг/л·нед')}</small>`, tstr('без растений'), false],
+      ['NO₃ : PO₄', `${f1(b.npRatio)}<small>: 1</small>`, tstr('в приросте'), false]
     ];
   } else {
     cards = [
-      ['Объём', `${f0(M.waterV)}<small>л</small>`, 'воды', false],
-      ['Расчётный вес', `${f0(M.wDesign)}<small>кг</small>`, '+10 % запаса', true],
-      ['Секции', `${M.n}<small>×</small>${f0(M.clear)}`, 'мм', false],
-      ['Дверцы', `${M.n}`, `${f0(M.doorW)} × ${f0(M.doorH)}`, false],
-      ['Стойки', `${M.n+1}`, M.t>18 ? 'есть 36 мм' : '18 мм', false],
-      ['Листы', `${M.sheets.length}`, `${f1(M.area)} м²`, false]
+      ['Объём', `${f0(M.waterV)}<small>${tstr('л')}</small>`, tstr('воды'), false],
+      ['Расчётный вес', `${f0(M.wDesign)}<small>${tstr('кг')}</small>`, tstr('+10 % запаса'), true],
+      ['Секции', `${M.n}<small>×</small>${f0(M.pitch)}`, tstr('мм'), false],
+      ['Дверцы', `${M.doorN}`, `${f0(M.doorW)} × ${f0(M.doorH)}`, false],
+      ['Стойки', `${M.n+1}`, M.t>18 ? tstr('есть 36 мм') : tstr('18 мм'), false],
+      ['Листы', `${M.sheets.length}`, `${f1(M.area)} ${tstr('м²')}`, false]
     ];
   }
   $('#kpis').innerHTML = cards.map(([k,v,s,acc])=>
-    `<div class="kpi${acc?' acc':''}"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`
+    `<div class="kpi${acc?' acc':''}"><div class="k">${tstr(k)}</div><div class="v">${v}</div><div class="s">${tstr(s)}</div></div>`
   ).join('');
 }
 
 function renderSide(M){
   const warn = [];
-  if(M.clear > K.RANGE[1] + 2) warn.push(`Секция ${f0(M.clear)} мм шире 600 — добавьте стойку.`);
-  if(M.clear < K.RANGE[0] - 2) warn.push(`Секция ${f0(M.clear)} мм уже 400 — ровных секций 400–600 не получается.`);
-  if(!M.spanOK) warn.push(`Пролёт ${f0(M.clear)} мм больше расчётного ${f0(M.span)} — прогиб крышки свыше 3 мм.`);
-  if(!M.topOK) warn.push('Расчётный пролёт меньше 400 — нужна фанера толще.');
-  if(M.sheets.some(s=>s.oversize)) warn.push('Деталь больше листа — выберите лист крупнее.');
+  if(M.pitch > K.RANGE[1] + 2) warn.push(LANG==='en'
+    ? `Bay ${f0(M.pitch)} mm is wider than 600 — add an upright.`
+    : `Секция ${f0(M.pitch)} мм шире 600 — добавьте стойку.`);
+  if(M.pitch < K.RANGE[0] - 2) warn.push(LANG==='en'
+    ? `Bay ${f0(M.pitch)} mm is narrower than 400 — reduce the number of doors.`
+    : `Секция ${f0(M.pitch)} мм уже 400 — уменьшите число дверей.`);
+  if(!M.spanOK) warn.push(LANG==='en'
+    ? `Span ${f0(M.clear)} mm is greater than the design span ${f0(M.span)} — top deflection is over 3 mm.`
+    : `Пролёт ${f0(M.clear)} мм больше расчётного ${f0(M.span)} — прогиб крышки свыше 3 мм.`);
+  if(M.spanOK && M.clear > M.span * 0.95) warn.push(LANG==='en'
+    ? `Deflection margin is under 5 % (bay ${f0(M.clear)} of ${f0(M.span)} mm) — keep the double upright or add a door.`
+    : `Запас по прогибу меньше 5 % (отсек ${f0(M.clear)} из ${f0(M.span)} мм) — оставьте сдвоенную стойку или добавьте дверь.`);
+  if(!M.topOK) warn.push(LANG==='en'
+    ? 'Design span is under 400 — use thicker plywood.'
+    : 'Расчётный пролёт меньше 400 — нужна фанера толще.');
+  if(M.sheets.some(s=>s.oversize)) warn.push(LANG==='en'
+    ? 'A part is larger than the sheet — choose a bigger sheet.'
+    : 'Деталь больше листа — выберите лист крупнее.');
 
   const rows = [
     ['Корпус', `${f0(M.Lc)} × ${f0(M.C)}`],
-    ['Секции', `${M.n} · ${f0(M.clear)}`],
-    ['Стойки', `${M.n+1} · ${M.t} мм`],
-    ['Дверцы', `${M.n} · ${f0(M.doorW)}×${f0(M.doorH)}`],
-    ['Опоры', `${M.feetN} · НО-10`],
-    ['Просвет', `${K.LEG} мм`],
-    ['Вес', `≈ ${f0(M.standW)} кг`],
-    ['На опору', `${f0(M.perFoot)} кг`]
+    ['Секции', `${M.n} · ${f0(M.pitch)}`],
+    ['Стойки', `${M.n+1} · ${M.t} ${tstr('мм')}`],
+    ['Дверцы', `${M.doorN} · ${f0(M.doorW)}×${f0(M.doorH)}`],
+    ['Опоры', `${M.feetN} · ${LANG==='en' ? 'NO-10' : 'НО-10'}`],
+    ['Просвет', `${K.LEG} ${tstr('мм')}`],
+    ['Вес', `≈ ${f0(M.standW)} ${tstr('кг')}`],
+    ['На опору', `${f0(M.perFoot)} ${tstr('кг')}`]
   ];
-  $('#sideSpec').innerHTML = `<h2 class="ct">Размеры</h2>
+  $('#sideSpec').innerHTML = `<h2 class="ct">${tstr('Размеры')}</h2>
     <div class="chk" style="grid-template-columns:1fr 1fr">${
-      rows.map(([k,v])=>`<div style="padding:9px 11px"><dt>${k}</dt><dd style="font-size:12.5px">${v}</dd></div>`).join('')
+      rows.map(([k,v])=>`<div style="padding:9px 11px"><dt>${tstr(k)}</dt><dd style="font-size:12.5px">${v}</dd></div>`).join('')
     }</div>
     ${warn.length ? `<div class="warnbox">${warn.map(w=>'<div>· '+w+'</div>').join('')}</div>` : ''}`;
 }
@@ -1264,20 +1536,22 @@ function renderSide(M){
 function renderCalc(M){
   const kq = M.wDesign / M.L * 1000;
   const items = [
-    ['Нагрузка', `${f0(kq)} <small>кг/м</small>`],
-    ['Пролёт расчётный', `${f0(M.span)} <small>мм</small>`],
-    ['Пролёт фактический', `${f0(M.clear)} <small>мм</small>`],
-    ['Прогиб', `${f1(M.defl)} <small>мм</small>`],
-    ['Напряжение', `${f1(M.sig)} <small>МПа</small>`],
+    ['Нагрузка', `${f0(kq)} <small>${tstr('кг/м')}</small>`],
+    ['Пролёт расчётный', `${f0(M.span)} <small>${tstr('мм')}</small>`],
+    ['Пролёт фактический', `${f0(M.clear)} <small>${tstr('мм')}</small>`],
+    ['Прогиб', `${f1(M.defl)} <small>${tstr('мм')}</small>`],
+    ['Напряжение', `${f1(M.sig)} <small>${tstr('МПа')}</small>`],
     ['Запас', `×${f1(3/Math.max(M.defl,0.05))}`]
   ];
   const okDefl = M.defl <= K.DEFL, okSig = M.sig <= K.SIG;
-  $('#calcCard').innerHTML = `<h2 class="ct">Крышка <span class="hint">18 мм · пролёт между стойками</span></h2>
-    <div class="chk">${items.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</div>
-    <p class="note" style="margin-top:14px">
-      Норма прогиба ${K.DEFL} мм, напряжения ${K.SIG} МПа. Каждый пролёт считается отдельной балкой —
-      <b class="${okDefl && okSig ? 'badge-ok' : 'badge-warn'}">${okDefl && okSig ? 'запас есть' : 'прогиб выше нормы'}</b>.
-    </p>`;
+  const note = LANG==='en'
+    ? `Deflection limit ${K.DEFL} mm, stress ${K.SIG} MPa. Each span is treated as a separate beam —
+      <b class="${okDefl && okSig ? 'badge-ok' : 'badge-warn'}">${okDefl && okSig ? 'factor OK' : 'deflection above norm'}</b>.`
+    : `Норма прогиба ${K.DEFL} мм, напряжения ${K.SIG} МПа. Каждый пролёт считается отдельной балкой —
+      <b class="${okDefl && okSig ? 'badge-ok' : 'badge-warn'}">${okDefl && okSig ? 'запас есть' : 'прогиб выше нормы'}</b>.`;
+  $('#calcCard').innerHTML = `<h2 class="ct">${tstr('Крышка')} <span class="hint">${tstr('18 мм · пролёт между стойками')}</span></h2>
+    <div class="chk">${items.map(([k,v])=>`<div><dt>${tstr(k)}</dt><dd>${v}</dd></div>`).join('')}</div>
+    <p class="note" style="margin-top:14px">${note}</p>`;
 }
 
 function sheetSVG(M, sh, idx){
@@ -1295,7 +1569,7 @@ function sheetSVG(M, sh, idx){
     if(ww > 80 && hh > 36)
       s += `<text x="${(x+ww/2).toFixed(1)}" y="${(y+hh/2+18).toFixed(1)}" text-anchor="middle" fill="#8b919b" font-size="9.5" font-family="Consolas">${Math.round(it.w)}×${Math.round(it.h)}</text>`;
   });
-  s += `<text x="${ox+4}" y="${oy+h+13}" fill="#8b919b" font-size="10.5" font-family="Consolas">${M.SW} × ${M.SH} · лист ${idx+1}</text>`;
+  s += `<text x="${ox+4}" y="${oy+h+13}" fill="#8b919b" font-size="10.5" font-family="Consolas">${M.SW} × ${M.SH} · ${LANG==='en' ? 'sheet' : 'лист'} ${idx+1}</text>`;
   return `<svg viewBox="0 0 ${W} ${Hh}" width="100%" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
 }
 
@@ -1304,114 +1578,156 @@ function renderCut(M){
     const a = p.w*p.h*p.qty/1e6;
     return `<tr>
       <td class="num" style="color:${PAL[(p.id-1)%PAL.length]}">${p.id}</td>
-      <td><div class="nm"><i class="sw" style="background:${PAL[(p.id-1)%PAL.length]}"></i>${p.name}</div></td>
+      <td><div class="nm"><i class="sw" style="background:${PAL[(p.id-1)%PAL.length]}"></i>${tstr(p.name)}</div></td>
       <td class="num">${f0(p.w)} × ${f0(p.h)}</td>
       <td class="num">${p.qty}</td>
       <td class="num">${a.toFixed(3)}</td>
-      <td class="mut">${p.note||''}</td>
+      <td class="mut">${tstr(p.note||'')}</td>
     </tr>`;
   }).join('');
   const used = M.area, all = M.sheets.length * (M.SW*M.SH/1e6);
   const waste = 100*(1 - used/Math.max(all,0.001));
+  const total = LANG==='en'
+    ? `${M.sheets.length} ${M.sheets.length===1?'sheet':'sheets'} · waste ${Math.round(waste)} %`
+    : `${M.sheets.length} ${pl(M.sheets.length,'лист','листа','листов')} · отход ${Math.round(waste)} %`;
   $('#cutCard').innerHTML = `
-    <h2 class="ct">Раскрой <span class="hint">фанера 18 мм · лист ${M.SW}×${M.SH} · пропил ${K.KERF} мм</span></h2>
+    <h2 class="ct">${tstr('Раскрой')} <span class="hint">${LANG==='en' ? `plywood 18 mm · sheet ${M.SW}×${M.SH} · kerf ${K.KERF} mm` : `фанера 18 мм · лист ${M.SW}×${M.SH} · пропил ${K.KERF} мм`}</span></h2>
     <div class="btnrow" style="margin-bottom:12px">
-      <button class="btn" id="btnCsv">⤓ Спецификация CSV</button>
-      <button class="btn" id="btnPrint">⎙ Печать</button>
+      <button class="btn" id="btnCsv">⤓ ${tstr('Спецификация CSV')}</button>
+      <button class="btn" id="btnPrint">⎙ ${tstr('Печать')}</button>
     </div>
     <div style="overflow-x:auto">
     <table class="tbl">
-      <thead><tr><th>№</th><th>Деталь</th><th>Размер, мм</th><th>Кол-во</th><th>Площадь, м²</th><th>Примечание</th></tr></thead>
+      <thead><tr><th>№</th><th>${tstr('Деталь')}</th><th>${tstr('Размер, мм')}</th><th>${tstr('Кол-во')}</th><th>${tstr('Площадь, м²')}</th><th>${tstr('Примечание')}</th></tr></thead>
       <tbody>${rows}
-        <tr class="tot"><td></td><td>Итого</td><td></td><td class="num">${M.parts.reduce((s,p)=>s+p.qty,0)}</td><td class="num">${used.toFixed(2)}</td><td class="mut">${M.sheets.length} ${pl(M.sheets.length,'лист','листа','листов')} · отход ${Math.round(waste)} %</td></tr>
+        <tr class="tot"><td></td><td>${tstr('Итого')}</td><td></td><td class="num">${M.parts.reduce((s,p)=>s+p.qty,0)}</td><td class="num">${used.toFixed(2)}</td><td class="mut">${total}</td></tr>
       </tbody>
     </table></div>
-    <div class="sheets">${M.sheets.map((sh,i)=>`<div class="sheet"><h4>Лист ${i+1} <span>${Math.round(100*sh.items.reduce((s,it)=>s+it.w*it.h,0)/(M.SW*M.SH))} %</span></h4>${sheetSVG(M,sh,i)}</div>`).join('')}</div>
-    <div class="legend">${M.parts.map(p=>`<span><i style="background:${PAL[(p.id-1)%PAL.length]}"></i>${p.id} — ${p.name}</span>`).join('')}</div>
-    <p class="note">Пропил ${K.KERF} мм учтён. Текстура — вдоль длинной стороны.</p>`;
+    <div class="sheets">${M.sheets.map((sh,i)=>`<div class="sheet"><h4>${LANG==='en' ? 'Sheet' : 'Лист'} ${i+1} <span>${Math.round(100*sh.items.reduce((s,it)=>s+it.w*it.h,0)/(M.SW*M.SH))} %</span></h4>${sheetSVG(M,sh,i)}</div>`).join('')}</div>
+    <div class="legend">${M.parts.map(p=>`<span><i style="background:${PAL[(p.id-1)%PAL.length]}"></i>${p.id} — ${tstr(p.name)}</span>`).join('')}</div>
+    <p class="note">${LANG==='en' ? `Kerf ${K.KERF} mm is included. Grain runs along the long side.` : `Пропил ${K.KERF} мм учтён. Текстура — вдоль длинной стороны.`}</p>`;
   $('#btnCsv').onclick = downloadCSV;
   $('#btnPrint').onclick = ()=>window.print();
 }
 
 function downloadCSV(){
   const M = MODEL;
-  const rows = [['№','Деталь','Длина, мм','Ширина, мм','Кол-во','Площадь, м²','Примечание']];
-  M.parts.forEach(p=>rows.push([p.id,p.name,Math.round(p.w),Math.round(p.h),p.qty,
-    (p.w*p.h*p.qty/1e6).toFixed(3),p.note]));
+  const rows = [LANG==='en'
+    ? ['№','Part','Length, mm','Width, mm','Qty','Area, m²','Note']
+    : ['№','Деталь','Длина, мм','Ширина, мм','Кол-во','Площадь, м²','Примечание']];
+  M.parts.forEach(p=>rows.push([p.id,tstr(p.name),Math.round(p.w),Math.round(p.h),p.qty,
+    (p.w*p.h*p.qty/1e6).toFixed(3),tstr(p.note)]));
   rows.push([]);
-  rows.push(['Итого площади, м²', M.area.toFixed(3)]);
-  rows.push([`Листов ${M.SW}x${M.SH}`, M.sheets.length]);
-  rows.push(['Расчётный вес, кг', Math.round(M.wDesign)]);
+  rows.push([LANG==='en' ? 'Total area, m²' : 'Итого площади, м²', M.area.toFixed(3)]);
+  rows.push([LANG==='en' ? `Sheets ${M.SW}x${M.SH}` : `Листов ${M.SW}x${M.SH}`, M.sheets.length]);
+  rows.push([LANG==='en' ? 'Design weight, kg' : 'Расчётный вес, кг', Math.round(M.wDesign)]);
   const csv = '\uFEFF' + rows.map(r=>r.join(';')).join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
-  a.download = 'раскрой-тумба.csv';
+  a.download = LANG==='en' ? 'cutting-stand.csv' : 'раскрой-тумба.csv';
   document.body.appendChild(a); a.click(); a.remove();
 }
 
 function renderAsm(M){
   const pinFromBottom = M.pinZ - M.zBotTop;
-  const hinges = 3*M.n;
+  const hinges = 3*M.doorN;
   const screw70 = 4*(M.n+1);
   const screw30 = 6*M.n;
   const screw16 = 4*hinges + 4*M.feetN + 8;
 
   const steps = [
-    ['Раскрой', `Распилить по картам, пронумеровать. Текстура — вдоль длинной стороны.`],
-    ['Присадка', `Ø5×12 в стойках под полкодержатели: 2 шт., 50 мм от кромок, <b>${f0(pinFromBottom)} мм от верха дна</b>. Ø5 под саморезы.`],
-    ['Корпус', `Стойки на дно. Клей, саморезы 5×70 снизу, 2 на стойку. Проверить диагонали.`],
-    ['Задняя стенка', `Вкладная, на 36 мм короче дна. Клей, 4×30 в кромки, шаг 150 мм.`],
-    ['Вкладная крышка', `На стойки. Клей, 5×70 сверху, 2 на стойку.`],
-    ['Накладная крышка', `Проставки ${K.TGAP} мм на стойки. Крышка сверху, 5×70 через проставки.`],
-    ['Полки', `4 полкодержателя на секцию. Зазор 2 мм, снимается без инструмента.`],
-    ['Опоры', `${M.feetN} опор НО-10 в дно, 2 на стойку. Выставить по уровню.`],
-    ['Дверцы', `${hinges} петель, по 3 на дверцу. Чашки Ø35, 22 мм от кромки. Зазор ${K.DGAP} мм. Без ручек.`],
-    ['Отделка', `Шлифовка 120/180, кромки r2, масло в 2 слоя.`],
-    ['Контроль', `Диагонали, уровень, зазоры.`]
+    ['Раскрой', LANG==='en'
+      ? `Cut to the cutting maps and number the parts. Grain runs along the long side.`
+      : `Распилить по картам, пронумеровать. Текстура — вдоль длинной стороны.`],
+    ['Присадка', LANG==='en'
+      ? `Ø5×12 in the uprights for shelf pins: 2 pcs, 50 mm from the edges, <b>${f0(pinFromBottom)} mm from the top of the bottom</b>. Ø5 for the screws.`
+      : `Ø5×12 в стойках под полкодержатели: 2 шт., 50 мм от кромок, <b>${f0(pinFromBottom)} мм от верха дна</b>. Ø5 под саморезы.`],
+    ['Корпус', LANG==='en'
+      ? `Uprights onto the bottom. Glue, 5×70 screws from below, 2 per upright. Check the diagonals.`
+      : `Стойки на дно. Клей, саморезы 5×70 снизу, 2 на стойку. Проверить диагонали.`],
+    ['Задняя стенка', LANG==='en'
+      ? `Inset, 36 mm shorter than the bottom. Glue, 4×30 into the edges, 150 mm spacing.`
+      : `Вкладная, на 36 мм короче дна. Клей, 4×30 в кромки, шаг 150 мм.`],
+    ['Вкладная крышка', LANG==='en'
+      ? `Onto the uprights. Glue, 5×70 from above, 2 per upright.`
+      : `На стойки. Клей, 5×70 сверху, 2 на стойку.`],
+    ['Накладная крышка', LANG==='en'
+      ? `Spacers ${K.TGAP} mm on the uprights. Top panel on top, 5×70 through the spacers.`
+      : `Проставки ${K.TGAP} мм на стойки. Крышка сверху, 5×70 через проставки.`],
+    ['Полки', LANG==='en'
+      ? `4 shelf pins per bay. 2 mm clearance, removable without tools.`
+      : `4 полкодержателя на секцию. Зазор 2 мм, снимается без инструмента.`],
+    ['Опоры', LANG==='en'
+      ? `${M.feetN} NO-10 feet into the bottom, 2 per upright. Level the stand.`
+      : `${M.feetN} опор НО-10 в дно, 2 на стойку. Выставить по уровню.`],
+    ['Дверцы', LANG==='en'
+      ? `${hinges} hinges, 3 per door. Ø35 cups, 22 mm from the edge. ${K.DGAP} mm gap. No handles.`
+      : `${hinges} петель, по 3 на дверцу. Чашки Ø35, 22 мм от кромки. Зазор ${K.DGAP} мм. Без ручек.`],
+    ['Отделка', LANG==='en'
+      ? `Sanding 120/180, r2 edges, two coats of oil.`
+      : `Шлифовка 120/180, кромки r2, масло в 2 слоя.`],
+    ['Контроль', LANG==='en'
+      ? `Diagonals, level, gaps.`
+      : `Диагонали, уровень, зазоры.`]
   ];
 
+  const purpose = (en, ru) => LANG==='en' ? en : ru;
   $('#asmCard').innerHTML = `
-    <h2 class="ct">Сборка</h2>
-    <ol class="steps">${steps.map(([h,p])=>`<li><h5>${h}</h5><p>${p}</p></li>`).join('')}</ol>
-    <h2 class="ct" style="margin-top:26px">Фурнитура</h2>
+    <h2 class="ct">${tstr('Сборка')}</h2>
+    <ol class="steps">${steps.map(([h,p])=>`<li><h5>${tstr(h)}</h5><p>${p}</p></li>`).join('')}</ol>
+    <h2 class="ct" style="margin-top:26px">${tstr('Фурнитура')}</h2>
     <div style="overflow-x:auto">
     <table class="tbl">
-      <thead><tr><th>Позиция</th><th>Кол-во</th><th>Назначение</th></tr></thead>
+      <thead><tr><th>${tstr('Позиция')}</th><th>${tstr('Кол-во')}</th><th>${tstr('Назначение')}</th></tr></thead>
       <tbody>
-        <tr><td>Саморез 5×70</td><td class="num">${screw70}</td><td class="mut">дно → стойки, вкладная крышка → стойки</td></tr>
-        <tr><td>Саморез 4×30</td><td class="num">${screw30}</td><td class="mut">задние стенки</td></tr>
-        <tr><td>Саморез 3,5×16</td><td class="num">${screw16}</td><td class="mut">петли, опоры, проставки</td></tr>
-        <tr><td>Полкодержатель Ø5×16</td><td class="num">${4*M.n}</td><td class="mut">полки, 4 шт. на секцию</td></tr>
-        <tr><td>Опора мебельная НО-10 (${K.LEG} мм, Ø50)</td><td class="num">${M.feetN}</td><td class="mut">2 под каждой стойкой, скрытые</td></tr>
-        <tr><td>Проставка ${K.TGAP} мм под накладную крышку</td><td class="num">${2*(M.n+1)}</td><td class="mut">держит теневой зазор</td></tr>
-        <tr><td>Петля накладная 110°</td><td class="num">${hinges}</td><td class="mut">3 на дверцу</td></tr>
-        <tr><td>Клей ПВА Д3</td><td class="num">1</td><td class="mut">все соединения</td></tr>
+        <tr><td>${purpose('Screw 5×70','Саморез 5×70')}</td><td class="num">${screw70}</td><td class="mut">${purpose('bottom → uprights, inset top → uprights','дно → стойки, вкладная крышка → стойки')}</td></tr>
+        <tr><td>${purpose('Screw 4×30','Саморез 4×30')}</td><td class="num">${screw30}</td><td class="mut">${purpose('back panels','задние стенки')}</td></tr>
+        <tr><td>${purpose('Screw 3.5×16','Саморез 3,5×16')}</td><td class="num">${screw16}</td><td class="mut">${purpose('hinges, feet, spacers','петли, опоры, проставки')}</td></tr>
+        <tr><td>${purpose('Shelf pin Ø5×16','Полкодержатель Ø5×16')}</td><td class="num">${4*M.n}</td><td class="mut">${purpose('shelves, 4 pcs per bay','полки, 4 шт. на секцию')}</td></tr>
+        <tr><td>${purpose(`Furniture foot NO-10 (${K.LEG} mm, Ø50)`,`Опора мебельная НО-10 (${K.LEG} мм, Ø50)`)}</td><td class="num">${M.feetN}</td><td class="mut">${purpose('2 under each upright, hidden','2 под каждой стойкой, скрытые')}</td></tr>
+        <tr><td>${purpose(`Spacer ${K.TGAP} mm for the overlay top`,`Проставка ${K.TGAP} мм под накладную крышку`)}</td><td class="num">${2*(M.n+1)}</td><td class="mut">${purpose('keeps the shadow gap','держит теневой зазор')}</td></tr>
+        <tr><td>${purpose('Overlay hinge 110°','Петля накладная 110°')}</td><td class="num">${hinges}</td><td class="mut">${purpose('3 per door','3 на дверцу')}</td></tr>
+        <tr><td>${purpose('PVA glue D3','Клей ПВА Д3')}</td><td class="num">1</td><td class="mut">${purpose('all joints','все соединения')}</td></tr>
       </tbody>
     </table></div>
     <div class="warnbox" style="border-color:#e6e7ec;background:#f8f9fb;color:#5b616b">
-      Стойки передают вес сжатием, крепёж держит только от сдвига. Под аквариум — подложка 5–10 мм.
+      ${purpose('Uprights carry the weight in compression; the fasteners only resist shear. Put a 5–10 mm mat under the aquarium.','Стойки передают вес сжатием, крепёж держит только от сдвига. Под аквариум — подложка 5–10 мм.')}
     </div>`;
 }
 
 function renderView(M){
-  const tabs = [['tumba','Тумба'],['frame','Каркас'],['front','Спереди'],['side','Сбоку'],['detail','Узел полки']];
+  const tabs = [
+    ['tumba', LANG==='en' ? 'Stand' : 'Тумба'],
+    ['frame', LANG==='en' ? 'Frame' : 'Каркас'],
+    ['front', LANG==='en' ? 'Front' : 'Спереди'],
+    ['side', LANG==='en' ? 'Side' : 'Сбоку'],
+    ['detail', LANG==='en' ? 'Shelf detail' : 'Узел полки']
+  ];
   const I = M.idOf, leg = [];
   const addLeg = (n, t) => { if(n) leg.push([n, `${n} — ${t}`]); };
-  addLeg(I.top, 'крышка накладная');
-  addLeg(I.intop, 'крышка вкладная');
-  addLeg(I.side, 'боковина');
-  addLeg(I.part, 'стойка');
-  addLeg(I.bottom, 'дно');
-  addLeg(I.back, 'задняя стенка');
-  addLeg(I.shelf, 'полка');
+  addLeg(I.top, tstr('крышка накладная'));
+  addLeg(I.intop, tstr('крышка вкладная'));
+  addLeg(I.side, tstr('боковина'));
+  addLeg(I.part, tstr('стойка'));
+  addLeg(I.bottom, tstr('дно'));
+  addLeg(I.back, tstr('задняя стенка'));
+  addLeg(I.shelf, tstr('полка'));
   leg.sort((a,b)=>a[0]-b[0]);
   const legTxt = leg.map(x=>x[1]).join(' · ');
 
   const caps = {
-    tumba: `${M.n} ${pl(M.n,'секция','секции','секций')} по ${f0(M.clear)} мм. Дверцы ${f0(M.doorW)}×${f0(M.doorH)}. Крышка ${f0(M.topW)}×${f0(M.topD)}. Высота ${M.H}.`,
-    frame: `${legTxt}. Крышка поднята, опоры не показаны.`,
-    front: `Секции ${f0(M.clear)}. Зазор дверец ${K.DGAP} мм. Теневая линия ${K.TGAP} мм. Высота ${M.H}.`,
-    side: `Глубина ${f0(M.D)}. Дверца ${K.T}, корпус ${f0(M.C)}. Полка ${f0(M.parts.find(p=>p.role==='shelf').w)}×${f0(M.parts.find(p=>p.role==='shelf').h)} на ${f0(M.shelfZ0)} мм.`,
+    tumba: LANG==='en'
+      ? `${M.n} section${M.n===1?'':'s'} of ${f0(M.clear)} mm. Doors ${f0(M.doorW)}×${f0(M.doorH)}. Top panel ${f0(M.topW)}×${f0(M.topD)}. Height ${M.H}.`
+      : `${M.n} ${pl(M.n,'секция','секции','секций')} по ${f0(M.pitch)} мм. Дверцы ${f0(M.doorW)}×${f0(M.doorH)}. Крышка ${f0(M.topW)}×${f0(M.topD)}. Высота ${M.H}.`,
+    frame: LANG==='en'
+      ? `${legTxt}. Doors removed (${M.doorN} pcs), top raised, feet not shown.`
+      : `${legTxt}. Сняты дверцы (${M.doorN} шт), крышка поднята, опоры не показаны.`,
+    front: LANG==='en'
+      ? `Bays ${f0(M.clear)}. Door gap ${K.DGAP} mm. Shadow line ${K.TGAP} mm. Height ${M.H}.`
+      : `Секции ${f0(M.pitch)}. Зазор дверец ${K.DGAP} мм. Теневая линия ${K.TGAP} мм. Высота ${M.H}.`,
+    side: LANG==='en'
+      ? `Depth ${f0(M.D)}. Door ${K.T}, carcass ${f0(M.C)}. Shelf ${f0(M.parts.find(p=>p.role==='shelf').w)}×${f0(M.parts.find(p=>p.role==='shelf').h)} at ${f0(M.shelfZ0)} mm.`
+      : `Глубина ${f0(M.D)}. Дверца ${K.T}, корпус ${f0(M.C)}. Полка ${f0(M.parts.find(p=>p.role==='shelf').w)}×${f0(M.parts.find(p=>p.role==='shelf').h)} на ${f0(M.shelfZ0)} мм.`,
     detail: ``
   };
   $('#vtabs').innerHTML = tabs.map(([k,n])=>`<button data-tab="${k}" class="${state.tab===k?'on':''}">${n}</button>`).join('');
@@ -1461,14 +1777,14 @@ function drawTank(M){
   s += `<line x1="${X(0)-34}" y1="${Y(0)}" x2="${X(0)-34}" y2="${Y(M.Ht)}" stroke="#b3b9c4"/>`;
   s += `<text x="${X(0)-40}" y="${(Y(0)+Y(M.Ht))/2}" class="lbl" text-anchor="end">${f0(M.Ht)}</text>`;
   /* выноски */
-  s += `<text x="${X(M.L)-4}" y="${Y(M.hw)-8}" class="lbl2" text-anchor="end">вода ${f0(M.hw)}</text>`;
+  s += `<text x="${X(M.L)-4}" y="${Y(M.hw)-8}" class="lbl2" text-anchor="end">${LANG==='en' ? 'water' : 'вода'} ${f0(M.hw)}</text>`;
 
   /* ---- план ---- */
   const px=650, py=90, pw=300, ph=250;
   const sP = Math.min(pw/M.L, ph/M.D);
   const PX=x=>px+(pw-M.L*sP)/2+x*sP, PZ=y=>py+(ph-M.D*sP)/2+y*sP;
   const Q=(x0,y0,x1,y1,at)=>`<rect x="${PX(x0).toFixed(1)}" y="${PZ(y0).toFixed(1)}" width="${((x1-x0)*sP).toFixed(1)}" height="${((y1-y0)*sP).toFixed(1)}" ${at}/>`;
-  s += `<text x="${px}" y="${py-16}" class="sub">план</text>`;
+  s += `<text x="${px}" y="${py-16}" class="sub">${LANG==='en' ? 'plan' : 'план'}</text>`;
   s += Q(0,0,M.L,M.D,'fill="rgba(150,215,235,.10)" stroke="#4f9fbb" stroke-width="1.2"');
   s += Q(g.w,g.w,M.L-g.w,M.D-g.w,'fill="none" stroke="#7fc0d6" stroke-width="1" stroke-dasharray="4 3"');
   if(g.braces){
@@ -1479,60 +1795,212 @@ function drawTank(M){
   }
   s += `<text x="${PX(M.L/2)}" y="${PZ(M.D)+22}" class="lbl" text-anchor="middle">${f0(M.L)}</text>`;
   s += `<text x="${PX(M.L)+10}" y="${PZ(M.D/2)}" class="lbl">${f0(M.D)}</text>`;
-  s += `<text x="${px}" y="${py+ph+48}" class="lbl2">стекло ${g.w} мм, дно ${g.b} мм${g.braces ? ', стяжек '+g.braces : ''}</text>`;
+  s += `<text x="${px}" y="${py+ph+48}" class="lbl2">${LANG==='en' ? `glass ${g.w} mm, bottom ${g.b} mm${g.braces ? ', braces '+g.braces : ''}` : `стекло ${g.w} мм, дно ${g.b} мм${g.braces ? ', стяжек '+g.braces : ''}`}</text>`;
+  return svgWrap(W,Hh,s);
+}
+
+/* ---------- стеклянные детали: фронт + план ---------- */
+function glassPartsHtml(M){
+  const P = M.glassParts;
+  const rows = P.rows.map(function(r){
+    const k = Math.min(150 / Math.max(r.w, 1), 120 / Math.max(r.h, 1));
+    const w = Math.max(24, Math.round(r.w * k));
+    const h = Math.max(24, Math.round(r.h * k));
+    const pcs = LANG === 'en' ? 'pcs' : 'шт';
+    return '<div style="flex:0 0 auto;text-align:center;width:170px;margin-bottom:16px">'
+      + '<div style="height:132px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:10px">'
+      + '<div style="width:' + w + 'px;height:' + h + 'px;border:1.5px solid #7fc0d6;background:rgba(150,215,235,.16);border-radius:3px"></div>'
+      + '</div>'
+      + '<div style="font:600 13px/1.25 inherit;color:var(--tx)">' + r.key + '</div>'
+      + '<div style="font:400 13px/1.25 var(--mono);color:var(--tx2);margin-top:3px">' + f0(r.w) + ' × ' + f0(r.h) + '</div>'
+      + '<div style="font:400 11.5px/1.25 inherit;color:var(--tx3);margin-top:2px">' + r.qty + ' ' + pcs + '</div>'
+      + '</div>';
+  }).join('');
+  return '<div style="display:flex;gap:10px;flex-wrap:wrap;padding:14px 4px 0">' + rows + '</div>';
+}
+
+function drawGlass(M){
+  const W=1000, Hh=640;
+  const g=M.glass, P=M.glassParts;
+  const tW=g.w, tB=g.b, sn=P.seam;
+
+  /* ---- фронтальная проекция ---- */
+  const fx=96, fw=560, fy=60, fh=290;
+  const sF=Math.min(fw/M.L, fh/M.Ht);
+  const ox=fx+(fw-M.L*sF)/2, oy=fy+(fh-M.Ht*sF)/2;
+  const X=x=>ox+x*sF, Y=z=>oy+(M.Ht-z)*sF;
+  const RX=(x0,z0,x1,z1,at)=>`<rect x="${X(x0).toFixed(1)}" y="${Y(z1).toFixed(1)}" width="${Math.max(.6,(x1-x0)*sF).toFixed(1)}" height="${Math.max(.6,(z1-z0)*sF).toFixed(1)}" ${at}/>`;
+  const tck=(x1,y1,x2,y2)=>`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#b3b9c4"/>`;
+  const swF=Math.max(1.5, sn*sF);
+
+  let s='';
+  s += `<text x="${fx}" y="${fy-18}" class="sub">${LANG==='en' ? 'front' : 'фронт'}</text>`;
+  s += RX(0,0,M.L,M.Ht,'fill="rgba(150,215,235,.10)" stroke="#4f9fbb" stroke-width="1.2"');
+  s += RX(0,0,M.L,tB,'fill="#c9e3ed" stroke="#7fb6c9" stroke-width=".9"');
+  s += RX(0,tB,tW,M.Ht,'fill="#dceff6" stroke="#7fb6c9" stroke-width=".9"');
+  s += RX(M.L-tW,tB,M.L,M.Ht,'fill="#dceff6" stroke="#7fb6c9" stroke-width=".9"');
+  s += RX(tW+sn,tB,M.L-tW-sn,M.Ht,'fill="rgba(168,222,240,.34)" stroke="#4f9fbb" stroke-width="1"');
+  s += `<rect x="${X(tW).toFixed(1)}" y="${Y(M.Ht).toFixed(1)}" width="${swF.toFixed(1)}" height="${Math.max(1,(M.Ht-tB)*sF).toFixed(1)}" fill="#d6dbe4"/>`;
+  s += `<rect x="${(X(M.L-tW)-swF).toFixed(1)}" y="${Y(M.Ht).toFixed(1)}" width="${swF.toFixed(1)}" height="${Math.max(1,(M.Ht-tB)*sF).toFixed(1)}" fill="#d6dbe4"/>`;
+
+  /* общая высота */
+  const dL=X(0)-44, midY=(Y(0)+Y(M.Ht))/2;
+  s += tck(dL,Y(0),dL,Y(M.Ht));
+  s += tck(dL-4,Y(0),dL+4,Y(0));
+  s += tck(dL-4,Y(M.Ht),dL+4,Y(M.Ht));
+  s += `<text transform="rotate(-90 ${(dL-10).toFixed(1)} ${midY.toFixed(1)})" x="${(dL-10).toFixed(1)}" y="${midY.toFixed(1)}" class="lbl" text-anchor="middle">Ht ${f0(M.Ht)}</text>`;
+
+  /* высота стенки */
+  const dR=X(M.L)+46, midW=(Y(tB)+Y(M.Ht))/2;
+  s += tck(dR,Y(tB),dR,Y(M.Ht));
+  s += tck(dR-4,Y(tB),dR+4,Y(tB));
+  s += tck(dR-4,Y(M.Ht),dR+4,Y(M.Ht));
+  s += `<text x="${(dR+8).toFixed(1)}" y="${midW.toFixed(1)}" class="lbl" text-anchor="start" dominant-baseline="central">Ht−tB ${f0(P.wallH)}</text>`;
+
+  /* длина передней/задней детали */
+  const dy=Y(0)+32, xa=X(tW+sn), xb=X(M.L-tW-sn);
+  s += tck(xa,dy,xb,dy);
+  s += tck(xa,dy-4,xa,dy+4);
+  s += tck(xb,dy-4,xb,dy+4);
+  s += `<text x="${((xa+xb)/2).toFixed(1)}" y="${(dy+15).toFixed(1)}" class="lbl" text-anchor="middle">L−2tW−2g ${f0(P.frontW)}</text>`;
+
+  /* ---- вид сверху ---- */
+  const px=96, pw=430, py=430, ph=160;
+  const sP=Math.min(pw/M.L, ph/M.D);
+  const PX=x=>px+(pw-M.L*sP)/2+x*sP, PZ=y=>py+(ph-M.D*sP)/2+y*sP;
+  const Q=(x0,y0,x1,y1,at)=>`<rect x="${PX(x0).toFixed(1)}" y="${PZ(y0).toFixed(1)}" width="${Math.max(.6,(x1-x0)*sP).toFixed(1)}" height="${Math.max(.6,(y1-y0)*sP).toFixed(1)}" ${at}/>`;
+  const swP=Math.max(1.6, sn*sP), hP=Math.max(3, tW*sP);
+  s += `<text x="${px}" y="${py-16}" class="sub">${LANG==='en' ? 'plan' : 'план'}</text>`;
+  s += Q(0,0,M.L,M.D,'fill="rgba(150,215,235,.08)" stroke="#4f9fbb" stroke-width="1.2"');
+  s += Q(0,0,tW,M.D,'fill="#dceff6" stroke="#7fb6c9" stroke-width=".9"');
+  s += Q(M.L-tW,0,M.L,M.D,'fill="#dceff6" stroke="#7fb6c9" stroke-width=".9"');
+  s += Q(tW+sn,0,M.L-tW-sn,tW,'fill="rgba(168,222,240,.34)" stroke="#4f9fbb" stroke-width="1"');
+  s += Q(tW+sn,M.D-tW,M.L-tW-sn,M.D,'fill="rgba(168,222,240,.34)" stroke="#4f9fbb" stroke-width="1"');
+  s += `<rect x="${PX(tW).toFixed(1)}" y="${PZ(0).toFixed(1)}" width="${swP.toFixed(1)}" height="${hP.toFixed(1)}" fill="#d6dbe4"/>`;
+  s += `<rect x="${PX(tW).toFixed(1)}" y="${(PZ(M.D)-hP).toFixed(1)}" width="${swP.toFixed(1)}" height="${hP.toFixed(1)}" fill="#d6dbe4"/>`;
+  s += `<rect x="${(PX(M.L-tW)-swP).toFixed(1)}" y="${PZ(0).toFixed(1)}" width="${swP.toFixed(1)}" height="${hP.toFixed(1)}" fill="#d6dbe4"/>`;
+  s += `<rect x="${(PX(M.L-tW)-swP).toFixed(1)}" y="${(PZ(M.D)-hP).toFixed(1)}" width="${swP.toFixed(1)}" height="${hP.toFixed(1)}" fill="#d6dbe4"/>`;
+
+  /* глубина боковины */
+  const dX=PX(M.L)+24, dY0=PZ(0), dY1=PZ(M.D);
+  s += tck(dX,dY0,dX,dY1);
+  s += tck(dX-4,dY0,dX+4,dY0);
+  s += tck(dX-4,dY1,dX+4,dY1);
+  s += `<text x="${(dX+8).toFixed(1)}" y="${((dY0+dY1)/2).toFixed(1)}" class="lbl" text-anchor="start" dominant-baseline="central">D ${f0(M.D)}</text>`;
+
+  /* длина */
+  const yL=PZ(M.D)+26;
+  s += tck(PX(0),yL,PX(M.L),yL);
+  s += tck(PX(0),yL-4,PX(0),yL+4);
+  s += tck(PX(M.L),yL-4,PX(M.L),yL+4);
+  s += `<text x="${((PX(0)+PX(M.L))/2).toFixed(1)}" y="${(yL+15).toFixed(1)}" class="lbl" text-anchor="middle">L ${f0(M.L)}</text>`;
+
+  /* условные обозначения */
+  const lx=640;
+  const lg=(y,fill,txt,st)=>`<rect x="${lx}" y="${y}" width="13" height="9" rx="2" fill="${fill}" stroke="${st||'#8fb9c9'}" stroke-width=".8"/><text x="${lx+19}" y="${y+8}" class="lbl2">${txt}</text>`;
+  s += `<text x="${lx}" y="440" class="sub">${LANG==='en' ? 'parts' : 'детали'}</text>`;
+  s += lg(452,'#c9e3ed',tstr('Дно'));
+  s += lg(476,'#dceff6',tstr('Боковина'));
+  s += lg(500,'rgba(168,222,240,.34)',LANG==='en' ? 'front & back' : 'передняя и задняя');
+  s += lg(524,'#d6dbe4',LANG==='en' ? 'silicone seam' : 'силиконовый шов','#aab1bd');
+  s += `<text x="${lx}" y="560" class="lbl2">${LANG==='en' ? 'wall height = Ht − tB' : 'высота стенки = Ht − tB'}</text>`;
+
   return svgWrap(W,Hh,s);
 }
 
 function renderTank(M){
   const g = M.glass;
-  const cell = (k,v) => `<div><dt>${k}</dt><dd>${v}</dd></div>`;
+  const gp = M.glassParts;
+  const cell = (k,v) => `<div><dt>${tstr(k)}</dt><dd>${v}</dd></div>`;
+  const gpNum = v => LANG === 'en' ? String(v) : String(v).replace('.', ',');
+  const gpQty = n => `${n} ${LANG==='en' ? (n===1 ? 'pc' : 'pcs') : 'шт'}`;
+  const gpRows = gp.rows.map(r=>{
+    const note = r.seamNote
+      ? `${tstr(r.note)}, ${LANG==='en' ? 'seam' : 'шов'} ${gpNum(gp.seam)} ${tstr('мм')}`
+      : tstr(r.note);
+    return `<tr><td>${tstr(r.key)}</td><td class="num">${f0(r.w)} × ${f0(r.h)}</td><td class="num">${gpQty(r.qty)}</td><td class="mut">${note}</td></tr>`;
+  }).join('');
+  const gpScheme = LANG === 'en'
+    ? `Scheme: walls on the bottom${gp.big ? ', extra-strong bottom seam' : ''}`
+    : `Схема: стенки на дне${gp.big ? ', шов по низу усиленный' : ''}`;
+  const gpWarn = [];
+  if(gp.big) gpWarn.push(LANG === 'en'
+    ? 'Butt joints are not used: the edges are ground and the bottom sits on a tray.'
+    : 'Встык не применяется — кромки шлифуются, низ сажается на поддон.');
+  if(gp.huge) gpWarn.push(LANG === 'en'
+    ? 'Top rim bracing and cross-braces are required; without them the lid and the walls will not hold.'
+    : 'Требуется отбортовка по верху и стяжки; без них крышка и стенки не держат.');
+  const gpWarnHtml = gpWarn.length ? `<div class="warnbox">${gpWarn.join('<br>')}</div>` : '';
   const soilRows = M.SOILS.map(([name, rho])=>{
-    const cells = [30,50,70].map(d=>`<td class="num">${f0(M.soilV(d)*rho)} кг</td>`).join('');
-    return `<tr><td>${name}<span class="mut"> · ${f1(rho)} кг/л</span></td>${cells}</tr>`;
+    const cells = [30,50,70].map(d=>`<td class="num">${f0(M.soilV(d)*rho)} ${tstr('кг')}</td>`).join('');
+    return `<tr><td>${tstr(name)}<span class="mut"> · ${f1(rho)} ${tstr('кг/л')}</span></td>${cells}</tr>`;
   }).join('');
 
   $('#secTank').innerHTML = `
     <section class="card viewer">
       <div class="stage">${drawTank(M)}</div>
-      <div class="vcap">Стекло ${g.w} мм, дно ${g.b} мм. Вода ${f0(M.waterV)} л, грунт ${M.soilD} мм.</div>
+      <div class="vcap">${LANG==='en' ? `Glass ${g.w} mm, bottom ${g.b} mm. Water ${f0(M.waterV)} l, substrate ${M.soilD} mm.` : `Стекло ${g.w} мм, дно ${g.b} мм. Вода ${f0(M.waterV)} л, грунт ${M.soilD} мм.`}</div>
     </section>
 
     <div class="two">
       <section class="card">
-        <h2 class="ct">Стекло <span class="hint">листовое, запас ${g.safety}</span></h2>
+        <h2 class="ct">${tstr('Стекло')} <span class="hint">${LANG==='en' ? `sheet glass, safety factor ${g.safety}` : `листовое, запас ${g.safety}`}</span></h2>
         <div class="chk">
-          ${cell('Стенки', `${g.w} <small>мм</small>`)}
-          ${cell('Дно', `${g.b} <small>мм</small>`)}
-          ${cell('Отбортовка', g.ribs ? 'да' : 'нет')}
-          ${cell('Стяжки', g.braces ? `${g.braces} шт` : 'нет')}
-          ${cell('Напряжение', `${f1(g.sig/1e6)} <small>МПа</small>`)}
+          ${cell('Стенки', `${g.w} <small>${tstr('мм')}</small>`)}
+          ${cell('Дно', `${g.b} <small>${tstr('мм')}</small>`)}
+          ${cell('Отбортовка', g.ribs ? tstr('да') : tstr('нет'))}
+          ${cell('Стяжки', g.braces ? `${g.braces} ${LANG==='en' ? (g.braces===1?'pc':'pcs') : 'шт'}` : tstr('нет'))}
+          ${cell('Напряжение', `${f1(g.sig/1e6)} <small>${tstr('МПа')}</small>`)}
           ${cell('Запас', `×${f1(g.sf)}`)}
         </div>
-        <p class="note">Расчёт по высоте воды ${f0(M.hw)} мм. Без отбортовки и стяжек хватило бы ${f0(Math.ceil(g.plain))} мм.</p>
+        <p class="note">${LANG==='en' ? `Calculated for a water height of ${f0(M.hw)} mm. Without rim bracing and cross-braces ${f0(Math.ceil(g.plain))} mm would have been enough.` : `Расчёт по высоте воды ${f0(M.hw)} мм. Без отбортовки и стяжек хватило бы ${f0(Math.ceil(g.plain))} мм.`}</p>
       </section>
 
       <section class="card">
-        <h2 class="ct">Вес</h2>
+        <h2 class="ct">${tstr('Вес')}</h2>
         <div class="chk">
-          ${cell('Вода', `${f0(M.waterV)} <small>кг</small>`)}
-          ${cell('Стекло', `${f0(M.glassM)} <small>кг</small>`)}
-          ${cell('Грунт', `${f0(M.soilM)} <small>кг</small>`)}
-          ${cell('Итого', `${f0(M.tankW)} <small>кг</small>`)}
-          ${cell('С запасом', `${f0(M.wDesign)} <small>кг</small>`)}
-          ${cell('На литр', `${f1(M.tankW/Math.max(1,M.waterV))} <small>кг</small>`)}
+          ${cell('Вода', `${f0(M.waterV)} <small>${tstr('кг')}</small>`)}
+          ${cell('Стекло', `${f0(M.glassM)} <small>${tstr('кг')}</small>`)}
+          ${cell('Грунт', `${f0(M.soilM)} <small>${tstr('кг')}</small>`)}
+          ${cell('Итого', `${f0(M.tankW)} <small>${tstr('кг')}</small>`)}
+          ${cell('С запасом', `${f0(M.wDesign)} <small>${tstr('кг')}</small>`)}
+          ${cell('На литр', `${f1(M.tankW/Math.max(1,M.waterV))} <small>${tstr('кг')}</small>`)}
         </div>
-        <p class="note">Этот вес уходит в расчёт тумбы.</p>
+        <p class="note">${LANG==='en' ? 'This weight goes into the stand calculation.' : 'Этот вес уходит в расчёт тумбы.'}</p>
       </section>
     </div>
 
     <section class="card">
-      <h2 class="ct">Грунт <span class="hint">вес по слою</span></h2>
+      <h2 class="ct">${tstr('Стеклянные детали')} <span class="hint">${LANG==='en' ? `silicone seam ${gpNum(gp.seam)} mm` : `силиконовый шов ${gpNum(gp.seam)} мм`}</span></h2>
+      <div class="gpmeta">
+        <span>${tstr('Стенки')}<b>${f0(g.w)} ${tstr('мм')}</b></span>
+        <span>${tstr('Дно')}<b>${f0(g.b)} ${tstr('мм')}</b></span>
+        <span>${LANG==='en' ? 'Seam' : 'Шов'}<b>${gpNum(gp.seam)} ${tstr('мм')}</b></span>
+      </div>
+      <p class="gpline">${gpScheme}</p>
+      <div class="gp">
+        <div class="dwg">${glassPartsHtml(M)}</div>
+        <div style="overflow-x:auto;min-width:0">
+          <table class="tbl">
+            <thead><tr><th>${tstr('Деталь')}</th><th>${tstr('Размер, мм')}</th><th>${tstr('Кол-во')}</th><th>${tstr('Примечание')}</th></tr></thead>
+            <tbody>${gpRows}</tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note">${LANG==='en'
+        ? `Assembly: the bottom lies underneath, the side panels stand on it, the front and back panes go between them. Sizes are the glass parts themselves; the ${gpNum(gp.seam)} mm silicone seam is already allowed for: front/back width = L − 2tW − 2g, wall height = Ht − tB, side panel depth = D.`
+        : `Сборка: дно лежит снизу, боковины стоят на нём, передняя и задняя детали — между боковинами. Размеры — это само стекло, шов ${gpNum(gp.seam)} мм уже учтён: ширина передней/задней = L − 2tW − 2g, высота стенки = Ht − tB, глубина боковины = D.`}</p>
+      ${gpWarnHtml}
+    </section>
+
+    <section class="card">
+      <h2 class="ct">${tstr('Грунт')} <span class="hint">${tstr('вес по слою')}</span></h2>
       <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th>Грунт</th>${[30,50,70].map(d=>`<th>${d/10} см <span class="mut">· ${f1(M.soilV(d))} л</span></th>`).join('')}</tr></thead>
+        <thead><tr><th>${tstr('Грунт')}</th>${[30,50,70].map(d=>`<th>${d/10} ${tstr('см')} <span class="mut">· ${f1(M.soilV(d))} ${tstr('л')}</span></th>`).join('')}</tr></thead>
         <tbody>${soilRows}</tbody>
       </table></div>
-      <p class="note">Площадь дна ${(M.innerL*M.innerD/1e6).toFixed(2)} м². Насыпной вес — ориентировочный, зависит от фракции и влажности.</p>
+      <p class="note">${LANG==='en' ? `Bottom area ${(M.innerL*M.innerD/1e6).toFixed(2)} m². Bulk weight is approximate and depends on grain size and moisture.` : `Площадь дна ${(M.innerL*M.innerD/1e6).toFixed(2)} м². Насыпной вес — ориентировочный, зависит от фракции и влажности.`}</p>
     </section>`;
 }
 
@@ -1561,45 +2029,45 @@ function renderGear(M){
       ? `<td rowspan="${FILTERS.filter(f=>f[0]===br).length}">${br}</td>` : '';
     return `<tr>${brand}<td>${md}</td><td class="num">${f0(flow)}</td><td class="num">${f0(Math.round(flow*0.55))}</td><td class="num">${String(w).replace(".",",")}</td><td class="num"><button class="mv" data-mv="${mid}">${vol}</button></td></tr>`;
   }).join('');
-  const row = (name, val, note) => `<tr><td>${name}</td><td class="num">${val}</td><td class="mut">${note}</td></tr>`;
+  const row = (name, val, note) => `<tr><td>${tstr(name)}</td><td class="num">${val}</td><td class="mut">${tstr(note)}</td></tr>`;
   const heat = Math.max(25, Math.round(g.heatMax/25)*25);
   $('#secGear').innerHTML = `
     <section class="card">
-      <h2 class="ct">Оборудование <span class="hint">по объёму воды ${f0(V)} л</span></h2>
+      <h2 class="ct">${tstr('Оборудование')} <span class="hint">${LANG==='en' ? `for water volume ${f0(V)} l` : `по объёму воды ${f0(V)} л`}</span></h2>
       <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th>Параметр</th><th>Расчёт</th><th>Как считали</th></tr></thead>
+        <thead><tr><th>${tstr('Параметр')}</th><th>${tstr('Расчёт')}</th><th>${tstr('Как считали')}</th></tr></thead>
         <tbody>
-          ${row('Фильтр, реальный поток', `${f0(g.flowMin)}–${f0(g.flowMax)} л/ч`, '3–5 объёмов в час')}
-          ${row('То же по паспорту', `${f0(g.flowMin/0.55)}–${f0(g.flowMax/0.55)} л/ч`, 'с запасом на потери')}
-          ${row('Аэрация', `${f1(g.lpmMin)}–${f1(g.lpmMax)} л/мин`, '0,5–1 л/мин на 100 л')}
-          ${row('Освещение, световой поток', `${f0(g.lmMin)}–${f0(g.lmMax)} лм`, '20–35 лм на литр')}
-          ${row('Освещение, мощность LED', `${f0(g.wMin)}–${f0(g.wMax)} Вт`, '0,3–0,5 Вт на литр')}
-          ${row('Обогреватель', `${heat} Вт`, `0,8–1 Вт на литр, кратно 25`)}
-          ${row('Подмена воды', `${f0(g.changeMin)}–${f0(g.changeMax)} л/нед`, '10–20 % в неделю')}
+          ${row('Фильтр, реальный поток', `${f0(g.flowMin)}–${f0(g.flowMax)} ${tstr('л/ч')}`, '3–5 объёмов в час')}
+          ${row('То же по паспорту', `${f0(g.flowMin/0.55)}–${f0(g.flowMax/0.55)} ${tstr('л/ч')}`, 'с запасом на потери')}
+          ${row('Аэрация', `${f1(g.lpmMin)}–${f1(g.lpmMax)} ${tstr('л/мин')}`, '0,5–1 л/мин на 100 л')}
+          ${row('Освещение, световой поток', `${f0(g.lmMin)}–${f0(g.lmMax)} ${tstr('лм')}`, '20–35 лм на литр')}
+          ${row('Освещение, мощность LED', `${f0(g.wMin)}–${f0(g.wMax)} ${tstr('Вт')}`, '0,3–0,5 Вт на литр')}
+          ${row('Обогреватель', `${heat} ${tstr('Вт')}`, '0,8–1 Вт на литр, кратно 25')}
+          ${row('Подмена воды', `${f0(g.changeMin)}–${f0(g.changeMax)} ${tstr('л/нед')}`, '10–20 % в неделю')}
           ${row('Температура', `24–26 °C`, 'для большинства тропических рыб')}
         </tbody>
       </table></div>
-      <p class="note">Фильтр считаем по реальному потоку: паспортный без наполнителя даёт примерно вдвое больше. Для травника берите свет по верхней границе, для рыб — по нижней.</p>
+      <p class="note">${LANG==='en' ? `We size the filter by real flow: the datasheet figure without media is roughly twice as high. For a planted tank take the upper end of the light range, for fish the lower end.` : `Фильтр считаем по реальному потоку: паспортный без наполнителя даёт примерно вдвое больше. Для травника берите свет по верхней границе, для рыб — по нижней.`}</p>
     </section>
 
     <section class="card">
-      <h2 class="ct">Фильтры <span class="hint">паспортные данные</span></h2>
+      <h2 class="ct">${tstr('Фильтры')} <span class="hint">${tstr('паспортные данные')}</span></h2>
       <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th>Бренд</th><th>Модель</th><th>Паспорт, л/ч</th><th>Реально, л/ч</th><th>Мощность, Вт</th><th>Засыпка, л</th></tr></thead>
+        <thead><tr><th>${tstr('Бренд')}</th><th>${tstr('Модель')}</th><th>${tstr('Паспорт, л/ч')}</th><th>${tstr('Реально, л/ч')}</th><th>${tstr('Мощность, Вт')}</th><th>${tstr('Засыпка, л')}</th></tr></thead>
         <tbody>${fRows}</tbody>
       </table></div>
-      <p class="note">Паспорт — нулевой напор без наполнителя. «Реально» — 55 % от паспорта: с губкой, керамикой и метром шланга канистра теряет примерно половину, у мелких моделей и больше. Засыпка — типовой объём камеры по числу кассет, нажмите на цифру, чтобы подставить её в расчёт биологии.</p>
+      <p class="note">${LANG==='en' ? `Datasheet — zero head without media. 'Real' — 55 % of the datasheet: with a sponge, ceramics and a metre of hose a canister loses about half, and small models even more. Media — the typical chamber volume by the number of baskets; click a figure to put it into the biology calculation.` : `Паспорт — нулевой напор без наполнителя. «Реально» — 55 % от паспорта: с губкой, керамикой и метром шланга канистра теряет примерно половину, у мелких моделей и больше. Засыпка — типовой объём камеры по числу кассет, нажмите на цифру, чтобы подставить её в расчёт биологии.`}</p>
     </section>
 
     <section class="card">
-      <h2 class="ct">Порядок запуска</h2>
+      <h2 class="ct">${tstr('Порядок запуска')}</h2>
       <ol class="steps">
-        <li><h5>Вода и грунт</h5><p>Промыть грунт, уложить ${M.soilD} мм, залить воду, дать отстояться сутки.</p></li>
-        <li><h5>Оборудование</h5><p>Фильтр и аэрация круглосуточно, обогреватель на 25 °C.</p></li>
-        <li><h5>Запуск бактерий</h5><p>Лучший старт — выжимка из губки рабочего аквариума. Готовые культуры помогают не всегда. Ждать до нулей по аммиаку и нитриту, обычно 4–6 недель.</p></li>
-        <li><h5>Рыба</h5><p>Не больше 2–3 см рыбы на 10 л на первом этапе.</p></li>
+        <li><h5>${tstr('Вода и грунт')}</h5><p>${LANG==='en' ? `Rinse the substrate, lay ${M.soilD} mm, fill with water, let it settle for a day.` : `Промыть грунт, уложить ${M.soilD} мм, залить воду, дать отстояться сутки.`}</p></li>
+        <li><h5>${tstr('Оборудование')}</h5><p>${LANG==='en' ? `Filter and aeration 24/7, heater at 25 °C.` : `Фильтр и аэрация круглосуточно, обогреватель на 25 °C.`}</p></li>
+        <li><h5>${tstr('Запуск бактерий')}</h5><p>${LANG==='en' ? `The best start is a squeeze from a sponge of a running tank. Off-the-shelf cultures do not always help. Wait for zero ammonia and nitrite, usually 4–6 weeks.` : `Лучший старт — выжимка из губки рабочего аквариума. Готовые культуры помогают не всегда. Ждать до нулей по аммиаку и нитриту, обычно 4–6 недель.`}</p></li>
+        <li><h5>${tstr('Рыба')}</h5><p>${LANG==='en' ? `No more than 2–3 cm of fish per 10 l at first.` : `Не больше 2–3 см рыбы на 10 л на первом этапе.`}</p></li>
       </ol>
     </section>`;
 
@@ -1610,7 +2078,7 @@ function renderGear(M){
 
 function renderBio(M){
   const b = M.bioRes;
-  const cell = (k,v) => `<div><dt>${k}</dt><dd>${v}</dd></div>`;
+  const cell = (k,v) => `<div><dt>${tstr(k)}</dt><dd>${v}</dd></div>`;
   const FISH = [
     ['Гуппи',2],['Неон',1],['Данио',2],['Тетра',2],['Моллинезия',6],['Меченосец',5],
     ['Барбус',5],['Гурами',8],['Петушок',3],['Скалярия',20],['Анциструс',25],
@@ -1620,65 +2088,76 @@ function renderBio(M){
   const rows = FISH.map(([n,w]) => {
     const nf = Math.floor(b.fishCap / w);
     const nv = Math.floor(volCap / w);
-    return `<tr><td>${n}</td><td class="num">${w}</td><td class="num">${f0(nf)}</td><td class="num">${f0(nv)}</td></tr>`;
+    return `<tr><td>${tstr(n)}</td><td class="num">${w}</td><td class="num">${f0(nf)}</td><td class="num">${f0(nv)}</td></tr>`;
   }).join('');
   const loadPct = Math.round(b.load*100);
   const loadCls = b.load > 1 ? 'badge-bad' : (b.load > 0.7 ? 'badge-warn' : 'badge-ok');
-  const loadTxt = b.load > 1 ? 'фильтр не справляется' : (b.load > 0.7 ? 'впритык' : `запас ×${f1(1/Math.max(b.load,0.001))}`);
-  const chg = b.fChange >= 1 ? 'подменами не удержать' : `${Math.round(b.fChange*100)} % в неделю`;
+  const loadTxt = b.load > 1
+    ? (LANG==='en' ? 'filter overloaded' : 'фильтр не справляется')
+    : (b.load > 0.7
+      ? (LANG==='en' ? 'at the limit' : 'впритык')
+      : (LANG==='en' ? `margin ×${f1(1/Math.max(b.load,0.001))}` : `запас ×${f1(1/Math.max(b.load,0.001))}`));
+  const chg = b.fChange >= 1
+    ? (LANG==='en' ? 'cannot be held by changes' : 'подменами не удержать')
+    : `${Math.round(b.fChange*100)} % ${LANG==='en' ? 'per week' : 'в неделю'}`;
 
   $('#secBio').innerHTML = `
     <div class="two">
       <section class="card">
-        <h2 class="ct">Фильтр <span class="hint">${f1(b.sfa)} м² на литр</span></h2>
+        <h2 class="ct">${tstr('Фильтр')} <span class="hint">${f1(b.sfa)} ${tstr('м²')} ${LANG==='en' ? 'per litre' : 'на литр'}</span></h2>
         <div class="chk">
-          ${cell('Объём материала', `${f1(b.mv)} <small>л</small>`)}
-          ${cell('Площадь', `${f1(b.areaM)} <small>м²</small>`)}
-          ${cell('Скорость', `${f2(b.vtr)} <small>г/м²·сут</small>`)}
-          ${cell('Мощность', `${f1(b.capTAN)} <small>г TAN/сут</small>`)}
-          ${cell('Корм', `${f0(b.feedCap)} <small>г/сут</small>`)}
-          ${cell('Рыба', `${f1(b.fishCap/1000)} <small>кг</small>`)}
+          ${cell('Объём материала', `${f1(b.mv)} <small>${tstr('л')}</small>`)}
+          ${cell('Площадь', `${f1(b.areaM)} <small>${tstr('м²')}</small>`)}
+          ${cell('Скорость', `${f2(b.vtr)} <small>${tstr('г/м²·сут')}</small>`)}
+          ${cell('Мощность', `${f1(b.capTAN)} <small>${tstr('г TAN/сут')}</small>`)}
+          ${cell('Корм', `${f0(b.feedCap)} <small>${tstr('г/сут')}</small>`)}
+          ${cell('Рыба', `${f1(b.fishCap/1000)} <small>${tstr('кг')}</small>`)}
         </div>
-        <p class="note">Температура ${b.t} °C, Q₁₀ = 2. Площадь — оценка по тестам, разброс между материалами в 5 раз.</p>
+        <p class="note">${LANG==='en' ? `Temperature ${b.t} °C, Q₁₀ = 2. The area is estimated from tests; materials differ by up to 5×.` : `Температура ${b.t} °C, Q₁₀ = 2. Площадь — оценка по тестам, разброс между материалами в 5 раз.`}</p>
       </section>
 
       <section class="card">
-        <h2 class="ct">Нагрузка</h2>
+        <h2 class="ct">${tstr('Нагрузка')}</h2>
         <div class="chk">
-          ${cell('Рыба', `${f0(b.fish)} <small>г</small>`)}
-          ${cell('Корм', `${f1(b.feedDay)} <small>г/сут</small>`)}
-          ${cell('Аммиак', `${f2(b.tanDay)} <small>г/сут</small>`)}
+          ${cell('Рыба', `${f0(b.fish)} <small>${tstr('г')}</small>`)}
+          ${cell('Корм', `${f1(b.feedDay)} <small>${tstr('г/сут')}</small>`)}
+          ${cell('Аммиак', `${f2(b.tanDay)} <small>${tstr('г/сут')}</small>`)}
           ${cell('Загрузка', `<span class="${loadCls}">${loadPct} %</span>`)}
           ${cell('Белок', `${b.prot} <small>%</small>`)}
-          ${cell('Кормление', `${f1(b.rate)} <small>% массы</small>`)}
+          ${cell('Кормление', `${f1(b.rate)} <small>${tstr('% массы')}</small>`)}
         </div>
-        <p class="note">1 г корма при ${b.prot} % белка даёт ${f1(b.tanPerFeed*1000)} мг аммиака по азоту. ${loadTxt[0].toUpperCase()+loadTxt.slice(1)}.</p>
+        <p class="note">${LANG==='en' ? `1 g of feed at ${b.prot} % protein yields ${f1(b.tanPerFeed*1000)} mg of ammonia nitrogen. ${loadTxt[0].toUpperCase()+loadTxt.slice(1)}.` : `1 г корма при ${b.prot} % белка даёт ${f1(b.tanPerFeed*1000)} мг аммиака по азоту. ${loadTxt[0].toUpperCase()+loadTxt.slice(1)}.`}</p>
       </section>
     </div>
 
     <section class="card">
-      <h2 class="ct">Вода <span class="hint">без растений и подмен</span></h2>
+      <h2 class="ct">${tstr('Вода')} <span class="hint">${tstr('без растений и подмен')}</span></h2>
       <div class="chk">
-        ${cell('Нитрат', `${f1(b.no3Week)} <small>мг/л·нед</small>`)}
-        ${cell('Фосфат', `${f2(b.po4Week)} <small>мг/л·нед</small>`)}
+        ${cell('Нитрат', `${f1(b.no3Week)} <small>${tstr('мг/л·нед')}</small>`)}
+        ${cell('Фосфат', `${f2(b.po4Week)} <small>${tstr('мг/л·нед')}</small>`)}
         ${cell('NO₃ : PO₄', `${f1(b.npRatio)} : 1`)}
         ${cell('Подмена до 20 мг/л', b.fChange >= 1 ? `<span class="badge-bad">${chg}</span>` : chg)}
       </div>
-      <p class="note">В корме азот и фосфор идут в отношении ~5–6 : 1 по массе, растения забирают ~7 : 1. Подмена снижает оба одинаково и соотношение не меняет — его сдвигают дозой азота или фосфата.</p>
+      <p class="note">${LANG==='en' ? `In feed, nitrogen and phosphorus come at about 5–6 : 1 by mass; plants take up about 7 : 1. A water change lowers both equally and does not change the ratio — shift it with a dose of nitrogen or phosphate.` : `В корме азот и фосфор идут в отношении ~5–6 : 1 по массе, растения забирают ~7 : 1. Подмена снижает оба одинаково и соотношение не меняет — его сдвигают дозой азота или фосфата.`}</p>
     </section>
 
     <section class="card">
-      <h2 class="ct">Сколько рыб <span class="hint">по нагрузке, не по комфорту</span></h2>
+      <h2 class="ct">${tstr('Сколько рыб')} <span class="hint">${tstr('по нагрузке, не по комфорту')}</span></h2>
       <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th>Рыба</th><th>Взрослый вес, г</th><th>По фильтру, шт</th><th>По объёму, шт</th></tr></thead>
+        <thead><tr><th>${tstr('Рыба')}</th><th>${tstr('Взрослый вес, г')}</th><th>${tstr('По фильтру, шт')}</th><th>${tstr('По объёму, шт')}</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
       <div class="warnbox" style="border-color:#e6e7ec;background:#f8f9fb;color:#5b616b">
-        <b>Это сухой математический расчёт.</b> Учтена только биологическая нагрузка на азотный цикл.
+        ${LANG==='en'
+          ? `<b>This is dry mathematics.</b> Only the biological load on the nitrogen cycle is counted.
+        Shoaling, territoriality, swimming space, cover and fish comfort are not considered.
+        The 'by filter' column is the nitrification limit, the 'by volume' column is a dense stocking of 1 g/l.
+        Both figures are an upper bound, not a recommendation.`
+          : `<b>Это сухой математический расчёт.</b> Учтена только биологическая нагрузка на азотный цикл.
         Не учитываются стайность, территориальность, размер аквариума для плавания, укрытия и комфорт рыб.
         Колонка «по фильтру» — предел нитрификации, колонка «по объёму» — плотная посадка 1 г/л.
-        Обе цифры — верхняя граница, а не рекомендация.
+        Обе цифры — верхняя граница, а не рекомендация.`}
       </div>
     </section>`;
 }
@@ -1686,18 +2165,18 @@ function renderBio(M){
 function renderTests(M){
   const r = M.fertRes;
   const fmt = v => (Math.round(v * 1000) / 1000).toString().replace('.', ',');
-  const grp = t => `<tr><td colspan="4" style="padding:16px 0 6px;font:600 10.5px/1 inherit;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)">${t}</td></tr>`;
+  const grp = t => `<tr><td colspan="4" style="padding:16px 0 6px;font:600 10.5px/1 inherit;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)">${tstr(t)}</td></tr>`;
   const rowT = ([name, v, lo, hi, unit, dec]) => {
     let st, cls, val;
     if(v == null){ st = 'нет данных'; cls = 'mut'; val = '—'; }
     else {
-      val = fmt(v) + (unit ? ` <span class="mut">${unit}</span>` : '');
+      val = fmt(v) + (unit ? ` <span class="mut">${tstr(unit)}</span>` : '');
       if(v < lo){ st = 'низко'; cls = 'badge-warn'; }
       else if(v > hi){ st = 'высоко'; cls = 'badge-bad'; }
       else { st = 'норма'; cls = 'badge-ok'; }
     }
-    const norm = lo === 0 ? `до ${fmt(hi)}` : `${fmt(lo)}–${fmt(hi)}`;
-    return `<tr><td>${name}</td><td class="num">${val}</td><td class="mut">${norm} ${unit}</td><td><span class="${cls}">${st}</span></td></tr>`;
+    const norm = lo === 0 ? (LANG==='en' ? `up to ${fmt(hi)}` : `до ${fmt(hi)}`) : `${fmt(lo)}–${fmt(hi)}`;
+    return `<tr><td>${tstr(name)}</td><td class="num">${val}</td><td class="mut">${norm} ${tstr(unit)}</td><td><span class="${cls}">${tstr(st)}</span></td></tr>`;
   };
   const T = r.TPAR;
   const recRows = r.fertRec.map(([txt, lvl]) => {
@@ -1705,59 +2184,59 @@ function renderTests(M){
     return `<li style="margin-bottom:8px"><span class="${cls}">•</span> ${txt}</li>`;
   }).join('');
   const wcut = r.WCUT.length
-    ? r.WCUT.map(([n, pct]) => `<tr><td>${n}</td><td class="num">${pct} %</td></tr>`).join('')
-    : `<tr><td colspan="2" class="mut">Ничего выводить не нужно — всё в норме или неизвестно.</td></tr>`;
+    ? r.WCUT.map(([n, pct]) => `<tr><td>${tstr(n)}</td><td class="num">${pct} %</td></tr>`).join('')
+    : `<tr><td colspan="2" class="mut">${tstr('Ничего выводить не нужно — всё в норме или неизвестно.')}</td></tr>`;
 
   $('#secFert').innerHTML = `
     <div class="two">
       <section class="card">
-        <h2 class="ct">Показатели <span class="hint">${r.okN} из ${r.knownN} в норме</span></h2>
+        <h2 class="ct">${tstr('Показатели')} <span class="hint">${r.okN} ${LANG==='en' ? 'of' : 'из'} ${r.knownN} ${LANG==='en' ? 'in range' : 'в норме'}</span></h2>
         <div style="overflow-x:auto">
         <table class="tbl">
-          <thead><tr><th>Параметр</th><th>Сейчас</th><th>Норма</th><th></th></tr></thead>
+          <thead><tr><th>${tstr('Параметр')}</th><th>${tstr('Сейчас')}</th><th>${tstr('Норма')}</th><th></th></tr></thead>
           <tbody>
             ${grp('Вода')}${T.slice(0,6).map(rowT).join('')}
             ${grp('Азот и фосфор')}${T.slice(6,10).map(rowT).join('')}
             ${grp('Минералы')}${T.slice(10).map(rowT).join('')}
           </tbody>
         </table></div>
-        <p class="note">CO₂ считается по pH и KH: CO₂ = 3 × KH × 10<sup>(7 − pH)</sup>. Пустое поле — нет теста.</p>
+        <p class="note">${LANG==='en' ? `CO₂ is calculated from pH and KH: CO₂ = 3 × KH × 10<sup>(7 − pH)</sup>. An empty field means no test.` : `CO₂ считается по pH и KH: CO₂ = 3 × KH × 10<sup>(7 − pH)</sup>. Пустое поле — нет теста.`}</p>
       </section>
 
       <section class="card">
-        <h2 class="ct">Рекомендации</h2>
+        <h2 class="ct">${tstr('Рекомендации')}</h2>
         <ul style="list-style:none;margin:6px 0 0;padding:0;font-size:13px;line-height:1.5;color:var(--tx2)">${recRows}</ul>
       </section>
     </div>
 
     <section class="card">
-      <h2 class="ct">Подмены <span class="hint">чтобы вернуть в норму</span></h2>
+      <h2 class="ct">${tstr('Подмены')} <span class="hint">${tstr('чтобы вернуть в норму')}</span></h2>
       <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th>Параметр</th><th>Подменить</th></tr></thead>
+        <thead><tr><th>${tstr('Параметр')}</th><th>${tstr('Подменить')}</th></tr></thead>
         <tbody>${wcut}</tbody>
       </table></div>
-      <p class="note">Доля от объёма, если в подменной воде этого вещества нет. Для аммиака и нитрита подмену делают сразу, не дожидаясь расчёта.</p>
+      <p class="note">${LANG==='en' ? `The share of the volume, assuming the replacement water does not contain this substance. For ammonia and nitrite, change water at once without waiting for the calculation.` : `Доля от объёма, если в подменной воде этого вещества нет. Для аммиака и нитрита подмену делают сразу, не дожидаясь расчёта.`}</p>
     </section>`;
 }
 
 function renderUdo(M){
   const r = M.fertRes, f = r.f, g = r.TGT;
   const all = [
-    ['Калиевая селитра', 'KNO₃', r.mKNO3, `+${f1(r.no3FromK)} мг/л NO₃, +${f1(r.kUsed)} K`],
-    ['Кальциевая селитра', 'Ca(NO₃)₂ · 4H₂O', r.mCaNO3, `+${f1(r.no3FromCa)} мг/л NO₃, +${f1(r.caUsed)} Ca`],
-    ['Мочевина, карбамид', 'CO(NH₂)₂', r.mUrea, `+${f1(r.no3FromUrea)} мг/л NO₃`],
-    ['Монофосфат калия', 'KH₂PO₄', r.mKH2PO4, `+${f1(r.dP)} мг/л PO₄`],
-    ['Сульфат калия', 'K₂SO₄', r.mK2SO4, 'калий до цели'],
-    ['Магнезия, сульфат магния', 'MgSO₄ · 7H₂O', r.mMgSO4, 'магний до цели'],
-    ['Микро + железо, хелат', 'CSM+B / Fe-DTPA', r.mCSM, 'железо до цели']
+    ['Калиевая селитра', 'KNO₃', r.mKNO3, LANG==='en' ? `+${f1(r.no3FromK)} mg/l NO₃, +${f1(r.kUsed)} K` : `+${f1(r.no3FromK)} мг/л NO₃, +${f1(r.kUsed)} K`],
+    ['Кальциевая селитра', 'Ca(NO₃)₂ · 4H₂O', r.mCaNO3, LANG==='en' ? `+${f1(r.no3FromCa)} mg/l NO₃, +${f1(r.caUsed)} Ca` : `+${f1(r.no3FromCa)} мг/л NO₃, +${f1(r.caUsed)} Ca`],
+    ['Мочевина, карбамид', 'CO(NH₂)₂', r.mUrea, LANG==='en' ? `+${f1(r.no3FromUrea)} mg/l NO₃` : `+${f1(r.no3FromUrea)} мг/л NO₃`],
+    ['Монофосфат калия', 'KH₂PO₄', r.mKH2PO4, LANG==='en' ? `+${f1(r.dP)} mg/l PO₄` : `+${f1(r.dP)} мг/л PO₄`],
+    ['Сульфат калия', 'K₂SO₄', r.mK2SO4, tstr('калий до цели')],
+    ['Магнезия, сульфат магния', 'MgSO₄ · 7H₂O', r.mMgSO4, tstr('магний до цели')],
+    ['Микро + железо, хелат', 'CSM+B / Fe-DTPA', r.mCSM, tstr('железо до цели')]
   ].filter(x => x[2] > 0.001);
 
   const grams = g0 => g0 < 0.01 ? '&lt; 0,01' : (g0 < 1 ? f2(g0) : f1(g0));
   const rows = all.length
     ? all.map(([n, fm, gram, what]) =>
-      `<tr><td>${n}</td><td class="mut">${fm}</td><td class="num">${grams(gram)} <span class="mut">г</span></td><td class="num">${grams(gram/3)} <span class="mut">г</span></td><td class="mut">${what}</td></tr>`).join('')
-    : `<tr><td colspan="5" class="mut">Всё в цели — вносить нечего.</td></tr>`;
+      `<tr><td>${tstr(n)}</td><td class="mut">${fm}</td><td class="num">${grams(gram)} <span class="mut">${tstr('г')}</span></td><td class="num">${grams(gram/3)} <span class="mut">${tstr('г')}</span></td><td class="mut">${what}</td></tr>`).join('')
+    : `<tr><td colspan="5" class="mut">${tstr('Всё в цели — вносить нечего.')}</td></tr>`;
 
   const deficit = [
     ['NO₃', f.no3, g.no3], ['PO₄', f.po4, g.po4], ['K', f.k, g.k],
@@ -1770,15 +2249,15 @@ function renderUdo(M){
 
   $('#secUdo').innerHTML = `
     <section class="card">
-      <h2 class="ct">Рецепт <span class="hint">на ${f0(M.waterV)} л</span></h2>
+      <h2 class="ct">${tstr('Рецепт')} <span class="hint">${LANG==='en' ? `for ${f0(M.waterV)} l` : `на ${f0(M.waterV)} л`}</span></h2>
       <p class="note" style="margin-top:0">${deficit}</p>
       <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th>В магазине</th><th>Формула</th><th>Разовая правка</th><th>На приём (3 раза в неделю)</th><th>Что даёт</th></tr></thead>
+        <thead><tr><th>${tstr('В магазине')}</th><th>${tstr('Формула')}</th><th>${tstr('Разовая правка')}</th><th>${tstr('На приём (3 раза в неделю)')}</th><th>${tstr('Что даёт')}</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
-      <p class="note">Селитры берут столько, сколько позволяет запас по калию и кальцию (потолки ${f0(Math.max(30, g.k))} и ${f0(Math.max(60, g.ca))} мг/л), остаток азота уходит мочевиной. Не хотите поднимать кальций — весь азот дайте мочевиной.</p>
-      <p class="note">Каждую соль — в отдельной бутылке, недельную массу в 500 мл, делить на 3 приёма. Фосфат не смешивать с кальцием, магнием и микро — выпадет осадок. Садовая селитра 98–99 %, добавьте 1–2 % к массе.</p>
+      <p class="note">${LANG==='en' ? `The nitrates take as much as the potassium and calcium headroom allows (ceilings ${f0(Math.max(30, g.k))} and ${f0(Math.max(60, g.ca))} mg/l), and the remaining nitrogen goes in as urea. If you do not want to raise calcium, supply all the nitrogen as urea.` : `Селитры берут столько, сколько позволяет запас по калию и кальцию (потолки ${f0(Math.max(30, g.k))} и ${f0(Math.max(60, g.ca))} мг/л), остаток азота уходит мочевиной. Не хотите поднимать кальций — весь азот дайте мочевиной.`}</p>
+      <p class="note">${LANG==='en' ? `Each salt in its own bottle, the weekly mass in 500 ml, split into 3 doses. Do not mix phosphate with calcium, magnesium or micro — it will precipitate. Garden nitrate is 98–99 %, add 1–2 % to the mass.` : `Каждую соль — в отдельной бутылке, недельную массу в 500 мл, делить на 3 приёма. Фосфат не смешивать с кальцием, магнием и микро — выпадет осадок. Садовая селитра 98–99 %, добавьте 1–2 % к массе.`}</p>
     </section>`;
 }
 
@@ -1786,36 +2265,50 @@ function renderNow(M){
   const sec = state.section || 'tank';
   let big = '', sub = '', dots = '';
   if(sec === 'tank'){
-    big = `${f0(M.waterV)} л воды`;
-    sub = `Стекло ${M.glass.w} / ${M.glass.b} мм · грунт ${f0(M.soilV(50))} л · вес ${f0(M.tankW)} кг`;
+    big = LANG==='en' ? `${f0(M.waterV)} l of water` : `${f0(M.waterV)} л воды`;
+    sub = LANG==='en'
+      ? `Glass ${M.glass.w} / ${M.glass.b} mm · substrate ${f0(M.soilV(50))} l · weight ${f0(M.tankW)} kg`
+      : `Стекло ${M.glass.w} / ${M.glass.b} мм · грунт ${f0(M.soilV(50))} л · вес ${f0(M.tankW)} кг`;
   } else if(sec === 'stand'){
-    big = `${M.n} ${pl(M.n,'секция','секции','секций')} · ${f0(M.clear)} мм`;
-    sub = `Дверцы ${f0(M.doorW)}×${f0(M.doorH)} · ${M.sheets.length} ${pl(M.sheets.length,'лист','листа','листов')} фанеры`;
+    big = LANG==='en'
+      ? `${M.n} ${M.n===1?'section':'sections'} · ${f0(M.clear)} mm`
+      : `${M.n} ${pl(M.n,'секция','секции','секций')} · ${f0(M.pitch)} мм`;
+    sub = LANG==='en'
+      ? `Doors ${f0(M.doorW)}×${f0(M.doorH)} · ${M.sheets.length} ${M.sheets.length===1?'sheet':'sheets'} of plywood`
+      : `Дверцы ${f0(M.doorW)}×${f0(M.doorH)} · ${M.sheets.length} ${pl(M.sheets.length,'лист','листа','листов')} фанеры`;
   } else if(sec === 'gear'){
-    big = `${f0(M.gear.flowMin)}–${f0(M.gear.flowMax)} л/ч`;
-    sub = `Реальный поток · свет ${f0(M.gear.lmMin)}–${f0(M.gear.lmMax)} лм · обогрев до ${f0(Math.max(25, Math.round(M.gear.heatMax/25)*25))} Вт`;
+    big = LANG==='en' ? `${f0(M.gear.flowMin)}–${f0(M.gear.flowMax)} l/h` : `${f0(M.gear.flowMin)}–${f0(M.gear.flowMax)} л/ч`;
+    sub = LANG==='en'
+      ? `Real flow · light ${f0(M.gear.lmMin)}–${f0(M.gear.lmMax)} lm · heater up to ${f0(Math.max(25, Math.round(M.gear.heatMax/25)*25))} W`
+      : `Реальный поток · свет ${f0(M.gear.lmMin)}–${f0(M.gear.lmMax)} лм · обогрев до ${f0(Math.max(25, Math.round(M.gear.heatMax/25)*25))} Вт`;
   } else if(sec === 'bio'){
-    big = `${f1(M.bioRes.capTAN)} г TAN/сут`;
-    sub = `Загрузка ${Math.round(M.bioRes.load*100)} % · рыба до ${f1(M.bioRes.fishCap/1000)} кг`;
+    big = LANG==='en' ? `${f1(M.bioRes.capTAN)} g TAN/day` : `${f1(M.bioRes.capTAN)} г TAN/сут`;
+    sub = LANG==='en'
+      ? `Load ${Math.round(M.bioRes.load*100)} % · fish up to ${f1(M.bioRes.fishCap/1000)} kg`
+      : `Загрузка ${Math.round(M.bioRes.load*100)} % · рыба до ${f1(M.bioRes.fishCap/1000)} кг`;
   } else if(sec === 'fert' || sec === 'udo'){
     const r = M.fertRes;
     if(sec === 'fert'){
-      big = `${r.okN} из ${r.knownN} в норме`;
-      sub = r.okN === r.knownN ? 'Все известные показатели в эталоне' : `${r.knownN - r.okN} вне нормы — смотрите рекомендации`;
+      big = LANG==='en' ? `${r.okN} of ${r.knownN} in range` : `${r.okN} из ${r.knownN} в норме`;
+      sub = LANG==='en'
+        ? (r.okN === r.knownN ? 'All known parameters are on target' : `${r.knownN - r.okN} out of range — see the recommendations`)
+        : (r.okN === r.knownN ? 'Все известные показатели в эталоне' : `${r.knownN - r.okN} вне нормы — смотрите рекомендации`);
     } else {
       const nSalts = [r.mKNO3, r.mCaNO3, r.mUrea, r.mKH2PO4, r.mK2SO4, r.mMgSO4, r.mCSM].filter(v => v > 0.001).length;
-      big = nSalts ? `${nSalts} ${pl(nSalts,'соль','соли','солей')} в рецепте` : 'Ничего вносить не нужно';
+      big = LANG==='en'
+        ? (nSalts ? `${nSalts} ${nSalts===1?'salt':'salts'} in the recipe` : 'Nothing to add')
+        : (nSalts ? `${nSalts} ${pl(nSalts,'соль','соли','солей')} в рецепте` : 'Ничего вносить не нужно');
       const d = [];
       if(r.dN > 0.01) d.push(`NO₃ +${f1(r.dN)}`);
       if(r.dP > 0.01) d.push(`PO₄ +${f1(r.dP)}`);
-      sub = d.length ? d.join(' · ') + ' до цели' : 'Всё на цели';
+      sub = d.length ? d.join(' · ') + (LANG==='en' ? ' to target' : ' до цели') : (LANG==='en' ? 'Everything is on target' : 'Всё на цели');
     }
     const bad = r.TPAR.filter(v => v[1] != null && (v[1] < v[2] || v[1] > v[3]));
     dots = bad.length
-      ? bad.slice(0,6).map(([n,v,lo,hi]) => `<span class="dot ${v < lo ? 'warn' : 'bad'}"><i></i>${n.replace(' (расчёт)','')}</span>`).join('')
-      : `<span class="dot ok"><i></i>всё в норме</span>`;
+      ? bad.slice(0,6).map(([n,v,lo,hi]) => `<span class="dot ${v < lo ? 'warn' : 'bad'}"><i></i>${tstr(n.replace(' (расчёт)',''))}</span>`).join('')
+      : `<span class="dot ok"><i></i>${LANG==='en' ? 'all in range' : 'всё в норме'}</span>`;
   }
-  $('#cardNow').innerHTML = `<div class="nk">Сейчас</div><div class="big">${big}</div><div class="sub">${sub}</div>${dots ? `<div class="dots">${dots}</div>` : ''}`;
+  $('#cardNow').innerHTML = `<div class="nk">${t("now_lbl")}</div><div class="big">${big}</div><div class="sub">${sub}</div>${dots ? `<div class="dots">${dots}</div>` : ''}`;
 }
 
 function setSection(sec){
@@ -1850,22 +2343,15 @@ function setSection(sec){
   $('#kpis').classList.toggle('hide', sec==='fert' || sec==='udo');
   $('#sideSpec').classList.toggle('hide', sec!=='stand');
   $('#cardStand').classList.toggle('hide', sec!=='stand');
+  document.querySelector('.side').classList.toggle('merge', sec === 'stand');
   $('#cardBio').classList.toggle('hide', sec!=='bio');
-  const HINTS = {
-    tank: 'Стекло, грунт и вес по размерам аквариума.',
-    stand: 'Корпус, раскрой фанеры и порядок сборки.',
-    gear: 'Фильтр, свет, аэрация и обогрев под объём воды.',
-    bio: 'Сколько азота перерабатывает фильтр и сколько рыбы это кормит.',
-    fert: 'Ваши показатели против эталона травника.',
-    udo: 'Сколько и каких солей добавить до цели.'
-  };
-  $('#seghint').textContent = HINTS[sec] || '';
+  $('#seghint').textContent = t('h_' + (sec === 'fert' ? 'test' : sec));
   if(MODEL){ renderKpis(MODEL); renderNow(MODEL); }
 }
 
 const SAVE_IDS = ['inL','inD','inH','inHS','inSheet','inMedia','inMV','inTemp','inProt','inRate','inFish',
   'inNO3','inPO4','inK','inCa','inMg','inFe','inPH','inKH','inGH','inNH3','inNO2','inCu','inTDS','inEC',
-  'inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe'];
+  'inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe','inDoors'];
 function saveState(){
   try{
     const o = { __color: state.color };
@@ -1914,7 +2400,24 @@ function renderAll(){
     mg:  clamp(+$('#inGMg').value || 0, 0, 100),
     fe:  clamp(+$('#inGFe').value || 0, 0, 2)
   };
-  MODEL = build(L, D, Ht, H, SW, SH, bio, fert, goal);
+  const selD = $('#inDoors');
+  const doorWant = +selD.value || 0;
+  MODEL = build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant);
+  /* список вариантов строится после расчёта: нижняя граница зависит от пролёта */
+  const sig = MODEL.dMin + '-' + MODEL.dMax + LANG;
+  if(selD.dataset.max !== sig){
+    const keep = +selD.value;
+    let opts = `<option value="0">${t('opt_auto')}</option>`;
+    for(let i=MODEL.dMin;i<=MODEL.dMax;i++) opts += `<option value="${i}">${i}</option>`;
+    selD.innerHTML = opts;
+    selD.dataset.max = sig;
+    selD.dataset.lang = LANG;
+    const fits = keep >= MODEL.dMin && keep <= MODEL.dMax;
+    selD.value = fits ? String(keep) : '0';
+    if(!fits) MODEL = build(L, D, Ht, H, SW, SH, bio, fert, goal, 0);
+  }
+  $('#doorField').classList.toggle('hide', L < 800);
+  $('#doorHint').textContent = L >= 800 ? `${t('door_def')} ${MODEL.doorSug}` : '';
   renderKpis(MODEL);
   renderSide(MODEL);
   renderTank(MODEL);
@@ -1927,6 +2430,8 @@ function renderAll(){
   renderTests(MODEL);
   renderUdo(MODEL);
   setSection(state.section);
+  translateDom(document.querySelector('.main'));
+  translateDom(document.querySelector('.side'));
   saveState();
 }
 
@@ -1951,6 +2456,7 @@ let tmr=null;
   });
 });
 $('#inHS').addEventListener('change', renderAll);
+$('#inDoors').addEventListener('change', renderAll);
 ['inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe'].forEach(id=>{
   document.getElementById(id).addEventListener('input', ()=>{ clearTimeout(tmr); tmr = setTimeout(renderAll, 130); });
 });
@@ -1976,6 +2482,13 @@ if(['tumba','frame','front','side','detail'].includes(hashTab)){
   state.section = hashTab;
 }
 
+document.querySelectorAll('#lang button').forEach(b=>b.onclick=()=>{
+  LANG = b.dataset.l;
+  try { localStorage.setItem('aqua-lang', LANG); } catch(e){}
+  applyLang();
+  renderAll();
+});
+
 $('#segs').querySelectorAll('button').forEach(b=>b.onclick=()=>{
   setSection(b.dataset.s);
   history.replaceState(null,'','#'+b.dataset.s);
@@ -1991,7 +2504,12 @@ try{
   if(qp.get('color')==='black'){ state.color='black'; $('#colors').querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.c==='black'))); }
 }catch(e){}
 
+try {
+  const qpL = new URLSearchParams(location.search).get('lang');
+  if(qpL === 'en' || qpL === 'ru'){ LANG = qpL; localStorage.setItem('aqua-lang', LANG); }
+} catch(e){}
 loadState();
+applyLang();
 renderAll();
 </script>
 </body>
