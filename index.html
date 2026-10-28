@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4f5f7">
 <title>Калькулятор аквариумиста — стекло, тумба, вода, удобрения</title>
 <meta name="description" content="Расчёт аквариума: толщина стекла и грунт, вес, тумба с раскроем фанеры, фильтр и свет, бионагрузка, тесты воды и рецепт удобрений.">
 <meta property="og:type" content="website">
@@ -19,7 +20,9 @@
   --shadow:0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
   --mono:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",monospace;
 }
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+button,select,input{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 body{
   margin:0;color:var(--tx);background:var(--bg);
   font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -40,7 +43,7 @@ body{
 
 /* ---------- сетка ---------- */
 .grid{display:grid;grid-template-columns:342px minmax(0,1fr);gap:20px;align-items:start}
-@media (max-width:1080px){.grid{grid-template-columns:1fr}.side{position:static!important}}
+@media (max-width:1080px){.grid{grid-template-columns:1fr}.side{position:static!important;max-height:none;overflow:visible;padding-right:0}}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
 .card + .card{margin-top:16px}
@@ -71,7 +74,7 @@ body{
 .side.merge #cardStand{padding-top:8px}
 .two.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:1200px){.two.three{grid-template-columns:1fr 1fr}}
-@media (max-width:900px){.two{grid-template-columns:1fr}}
+@media (max-width:900px){.two,.two.three{grid-template-columns:1fr}}
 .ct{margin:0 0 14px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);font-weight:650;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .ct .hint{text-transform:none;letter-spacing:0;font-weight:400;color:var(--tx3);font-size:12px}
 
@@ -202,6 +205,62 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
 .ftr{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);color:var(--tx3);font-size:12px;line-height:1.6;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .warnbox{border:1px solid #f0dfb8;background:#fffaf0;color:#8a6420;border-radius:12px;padding:11px 13px;font-size:12.5px;line-height:1.5;margin-top:12px}
 .warnbox b{color:#6f4f14}
+/* ---------- мобильная версия ---------- */
+@media (max-width:720px){
+  .wrap{padding:12px calc(12px + env(safe-area-inset-right)) calc(44px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))}
+  .hdr{padding:12px 13px;border-radius:14px;gap:10px;margin-bottom:12px}
+  .brand{gap:10px;min-width:0}
+  .logo{width:38px;height:38px;border-radius:11px}
+  .hdr h1{font-size:17px;line-height:1.25}
+  .hdr p{font-size:10px;letter-spacing:.04em}
+  .lang button{padding:5px 9px;font-size:11.5px}
+  .grid{gap:12px}
+  .card{padding:13px;border-radius:14px}
+  .card + .card{margin-top:12px}
+  .segs{position:relative;gap:18px;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;margin-bottom:14px;scroll-snap-type:x proximity}
+  .segs::-webkit-scrollbar{display:none}
+  .segs button{flex:0 0 auto;font-size:14px;padding:11px 0 10px;scroll-snap-align:start}
+  .segs button.on::after{display:none}
+  .segs button.on{box-shadow:inset 0 -2px 0 var(--tx)}
+  .seghint{font-size:12.5px;margin:-4px 0 12px}
+  .kpis{gap:8px;margin-bottom:12px}
+  .kpi{padding:10px 11px;border-radius:12px}
+  .kpi .k{font-size:9.5px;letter-spacing:.07em}
+  .kpi .v{font-size:19px}
+  .kpi .s{font-size:10px}
+  .vtabs{flex-wrap:wrap;padding:8px 9px 0}
+  .vtabs button{font-size:12px;padding:9px 11px}
+  .stage{padding:10px 10px 2px}
+  .vcap{padding:8px 12px 12px;font-size:12px}
+  .two{gap:12px}
+  .two.three{grid-template-columns:1fr}
+  .ct{font-size:11px;margin-bottom:11px}
+  .ct .hint{font-size:11.5px}
+  .inp input{padding:12px}
+  select{font-size:16px;padding-top:13px;padding-bottom:13px}
+  .presets button{min-height:32px;padding:7px 9px}
+  .sw{min-height:44px;padding:10px}
+  .btn{min-height:40px;padding:10px 13px;font-size:12.5px}
+  .btnrow .btn{flex:1 1 auto;justify-content:center}
+  .tbl{font-size:12px}
+  .tbl th{font-size:9.5px;padding:8px}
+  .tbl td{padding:8px}
+  .sheets{grid-template-columns:1fr;gap:10px}
+  .sheet{padding:8px}
+  .legend{font-size:11px;gap:8px 12px}
+  .steps li{padding-left:42px}
+  .steps p{font-size:12.5px}
+  .warnbox{font-size:12px}
+  .ftr{margin-top:20px;gap:10px}
+}
+@media (max-width:380px){
+  .hdr p{display:none}
+  .hdr h1{font-size:16px}
+  .logo{width:34px;height:34px}
+  .kpi{padding:9px}
+  .kpi .v{font-size:17px}
+  .kpi .s{font-size:9.5px}
+}
 @media print{body{background:#fff}.side,.vtabs,.btnrow{display:none}.card,.hdr{box-shadow:none;border-color:#ddd}}
 </style>
 </head>
@@ -2318,6 +2377,15 @@ function renderNow(M){
 function setSection(sec){
   state.section = sec;
   $('#segs').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.s===sec));
+  /* на узком экране прокручиваем ленту разделов к активной вкладке */
+  const segsEl = $('#segs');
+  const segOn = segsEl.querySelector('button.on');
+  if(segOn && segsEl.scrollWidth > segsEl.clientWidth + 1){
+    const l = segOn.offsetLeft, r = l + segOn.offsetWidth;
+    if(l < segsEl.scrollLeft || r > segsEl.scrollLeft + segsEl.clientWidth){
+      segsEl.scrollLeft = Math.max(0, l - (segsEl.clientWidth - segOn.offsetWidth)/2);
+    }
+  }
   $('#secTank').classList.toggle('hide', sec!=='tank');
   $('#secStand').classList.toggle('hide', sec!=='stand');
   $('#secGear').classList.toggle('hide', sec!=='gear');
