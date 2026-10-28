@@ -1194,25 +1194,29 @@ function drawIso(M, o){
     items.push(it); return it;
   };
 
-  /* слои: 10 задняя · 20 дно · 30 стойки · 40 полки · 50 вкладная · 55 кромки стоек · 60 дверцы · 70 накладная */
+  /* слои: 10 задняя · 20 дно · 30… правая грань стоек и полки вперемешку по глубине
+     (30/31/32/33…: стойка, полка, стойка, полка…) · 45 передняя грань стоек ·
+     50 вкладная · 55 правая боковина · 60 дверцы · 70 накладная */
   bx(K.T, M.Lc-K.T, M.D-K.T, M.D, M.zBotTop, M.zU, CL.back, 10);
   bx(0, M.Lc, K.T, M.D, M.zBot, M.zBotTop, CL.bottom, 20);
-  /* правая боковина — самая ближняя, её рисуем после полок */
+  /* у стойки две видимые грани: широкая правая — между полками по глубине,
+     узкая передняя — после полок. правая боковина — самая ближняя, её рисуем после полок */
   M.uprights.forEach((u,idx)=>{
     const isRight = idx === M.uprights.length-1;
     const h = u.kind==='side' ? M.zU : M.zIn0;
-    bx(u.x0,u.x1,K.T,M.D,M.zBotTop,h,u.kind==='double'?CL.part:CL.side, isRight ? 55 : 30);
+    const cs = u.kind==='double' ? CL.part : CL.side;
+    if(isRight){
+      bx(u.x0,u.x1,K.T,M.D,M.zBotTop,h,cs,55);
+    } else {
+      /* правая грань — между полкой слева и полкой справа:
+         левая полка остаётся за стойкой, правая — перед ней */
+      bx(u.x0,u.x1,K.T,M.D,M.zBotTop,h,cs,30+idx*2,{only:'right'});
+      bx(u.x0,u.x1,K.T,K.T,M.zBotTop,h,cs,45,{only:'front'});
+    }
   });
   /* полки и вкладная крышка прижаты справа к стойке — правую грань не рисуем */
-  M.bays.forEach(b=>bx(b.x0+2,b.x1-2,K.T+30,M.D-K.T,M.shelfZ0,M.shelfZ1,CL.shelf,40,{noRight:true}));
+  M.bays.forEach((b,i)=>bx(b.x0+2,b.x1-2,K.T+30,M.D-K.T,M.shelfZ0,M.shelfZ1,CL.shelf,31+i*2,{noRight:true}));
   bx(K.T, M.Lc-K.T, K.T, M.D-K.T, M.zIn0, M.zU, CL.intop, 50, {noRight:true});
-  /* передняя кромка и передняя часть правой грани стоек — поверх полок, но ниже дверец */
-  M.uprights.forEach((u,idx)=>{
-    if(idx === M.uprights.length-1) return;
-    const h = u.kind==='side' ? M.zU : M.zIn0;
-    bx(u.x0,u.x1,K.T,K.T+30,M.zBotTop,h,u.kind==='double'?CL.part:CL.side,56,{noTop:true});
-  });
-
   const ez = o.explode || 0;
   if(o.doors) M.doors.forEach(d=>bx(d.x0,d.x1,0,K.T,M.doorZ0,M.doorZ1,CL.door,60));
   bx(0, M.L, 0, M.D, M.zOut+ez, M.zTop+ez, CL.top, 70);
@@ -1242,9 +1246,9 @@ function drawIso(M, o){
     const {x0,x1,y0,y1,z0,z1,cs}=it;
     const A=P(x0,y0,z0), B=P(x1,y0,z0), Cc=P(x1,y0,z1), Dd=P(x0,y0,z1);
     const E=P(x1,y1,z0), F=P(x1,y1,z1), G=P(x0,y1,z1);
-    out += poly([A,B,Cc,Dd], cs[0], CL.edge, .7);
-    if(!it.strip && !it.noRight) out += poly([B,E,F,Cc], cs[1], CL.edge, .7);
-    if(!it.strip && !it.noTop) out += poly([Dd,Cc,F,G], cs[2], CL.edge, .7);
+    if(it.only !== 'right') out += poly([A,B,Cc,Dd], cs[0], CL.edge, .7);
+    if(it.only !== 'front' && !it.noRight) out += poly([B,E,F,Cc], cs[1], CL.edge, .7);
+    if(it.only !== 'front' && !it.noTop) out += poly([Dd,Cc,F,G], cs[2], CL.edge, .7);
   }
 
   if(o.tank){
