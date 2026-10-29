@@ -308,9 +308,18 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
           <label for="inD"><span data-i18n="f_depth">Глубина</span> <b data-i18n="u_mm">мм</b></label>
           <div class="inp"><input id="inD" type="number" value="500" min="250" max="1200" step="10"><em data-i18n="u_mm">мм</em></div>
         </div>
-        <div class="field" style="margin-bottom:4px">
+        <div class="field" style="margin-bottom:10px">
           <label for="inH"><span data-i18n="f_height">Высота</span> <b data-i18n="u_mm">мм</b></label>
           <div class="inp"><input id="inH" type="number" value="500" min="200" max="1200" step="10"><em data-i18n="u_mm">мм</em></div>
+        </div>
+        <div class="field" id="soilField" style="margin-bottom:4px">
+          <label for="inSoil"><span data-i18n="f_soil">Слой грунта</span> <b data-i18n="u_cm">см</b></label>
+          <select id="inSoil">
+            <option value="0">0</option>
+            <option value="30">3</option>
+            <option value="50" selected>5</option>
+            <option value="70">7</option>
+          </select>
         </div>
         <div class="presets" id="presets"></div>
         
@@ -468,6 +477,7 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
       </div>
       <p class="seghint" id="seghint"></p>
       <div class="kpis" id="kpis"></div>
+      <p class="note" id="kpiNote" style="margin:-4px 0 14px"></p>
       <div id="secTank"></div>
       <div id="secStand">
         <section class="card viewer">
@@ -577,7 +587,7 @@ const I18N = {
     h_udo:'Сколько и каких солей добавить до цели.',
     card_aqua:'Аквариум', card_stand:'Тумба', card_filter:'Фильтр', card_water:'Вода',
     hint_empty:'пусто = нет теста', card_np:'Азот и фосфор', card_min:'Минералы', card_goal:'Цели',
-    f_len:'Длина', f_depth:'Глубина', f_height:'Высота', f_standH:'Высота тумбы', f_doors:'Дверцы', f_sheet:'Лист',
+    f_len:'Длина', f_depth:'Глубина', f_height:'Высота', f_soil:'Слой грунта', f_standH:'Высота тумбы', f_doors:'Дверцы', f_sheet:'Лист',
     f_color:'Цвет', f_beige:'Бежевый', f_black:'Чёрный', f_media:'Материал', f_vol:'Объём',
     f_temp:'Температура', f_protein:'Белок корма', f_rate:'Кормление', f_fish:'Рыба',
     f_ph:'pH', f_kh:'KH', f_gh:'GH', f_tds:'TDS', f_ec:'EC', f_nh3:'NH₃ / NH₄',
@@ -589,7 +599,7 @@ const I18N = {
     page_short:'Калькулятор аквариумиста',
     page_desc:'Расчёт аквариума: толщина стекла и грунт, вес, тумба с раскроем фанеры, фильтр и свет, бионагрузка, тесты воды и рецепт удобрений.',
     page_desc_short:'Стекло, грунт и вес аквариума, тумба с раскроем фанеры, фильтр и свет, бионагрузка, тесты воды, рецепт удобрений.',
-    u_mm:'мм', u_l:'л', u_g:'г', u_mgl:'мг/л', u_pctmass:'% массы',
+    u_mm:'мм', u_cm:'см', u_l:'л', u_g:'г', u_mgl:'мг/л', u_pctmass:'% массы',
     opt_auto:'авто', opt_sponge:'Губка 30 ppi', opt_k1:'K1 статичный', opt_k1f:'K1 кипящий слой',
     opt_rings:'Керамические кольца', opt_matrix:'Матрикс / Biohome', opt_wool:'Синтепон, мочалки'
   },
@@ -604,7 +614,7 @@ const I18N = {
     h_udo:'How much of which salt to add to reach the target.',
     card_aqua:'Aquarium', card_stand:'Stand', card_filter:'Filter', card_water:'Water',
     hint_empty:'empty = no test', card_np:'Nitrogen & phosphate', card_min:'Minerals', card_goal:'Targets',
-    f_len:'Length', f_depth:'Depth', f_height:'Height', f_standH:'Stand height', f_doors:'Doors', f_sheet:'Sheet',
+    f_len:'Length', f_depth:'Depth', f_height:'Height', f_soil:'Substrate layer', f_standH:'Stand height', f_doors:'Doors', f_sheet:'Sheet',
     f_color:'Colour', f_beige:'Beige', f_black:'Black', f_media:'Media', f_vol:'Volume',
     f_temp:'Temperature', f_protein:'Feed protein', f_rate:'Feeding', f_fish:'Fish',
     f_ph:'pH', f_kh:'KH', f_gh:'GH', f_tds:'TDS', f_ec:'EC', f_nh3:'NH₃ / NH₄',
@@ -616,7 +626,7 @@ const I18N = {
     page_short:'Aquarium Calculator',
     page_desc:'Aquarium calculation: glass thickness and substrate, weight, a plywood-cut stand, filter and light, biological load, water tests and a fertilizer recipe.',
     page_desc_short:'Glass, substrate and weight, a plywood-cut stand, filter and light, biological load, water tests, a fertilizer recipe.',
-    u_mm:'mm', u_l:'l', u_g:'g', u_mgl:'mg/l', u_pctmass:'% of body weight',
+    u_mm:'mm', u_cm:'cm', u_l:'l', u_g:'g', u_mgl:'mg/l', u_pctmass:'% of body weight',
     opt_auto:'auto', opt_sponge:'Sponge 30 ppi', opt_k1:'K1 static', opt_k1f:'K1 fluidized',
     opt_rings:'Ceramic rings', opt_matrix:'Matrix / Biohome', opt_wool:'Filter wool, sponges'
   }
@@ -741,7 +751,7 @@ function applyLang(){
 /* =========================================================
    МОДЕЛЬ
    ========================================================= */
-function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant){
+function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant, soilD){
   L = Math.round(L); D = Math.round(D); Ht = Math.round(Ht); H = Math.round(H);
   SW = SW || 2440; SH = SH || 1220;
 
@@ -774,16 +784,22 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant){
     ['Пропант', 0.8],
     ['Лава', 0.7]
   ];
-  const soilD  = 50;                                   // мм, по умолчанию
+  soilD = soilD == null ? 50 : clamp(Math.round(soilD), 0, 100);
   const soilV  = d => innerL * innerD * d / 1e6;       // л
   const waterV = innerL * innerD * Math.max(0, hw - soilD) / 1e6;
   const glassM = ((2*L*Ht + 2*D*Ht) * gW + L*D*gB) / 1e9 * 2500;
   const soilM  = soilV(soilD) * SOILS[1][1];
 
+  /* максимум для стекла и тумбы — как раньше: 5 см грунта + 10 % */
+  const soilDDesign = 50;
+  const waterVDesign = innerL * innerD * Math.max(0, hw - soilDDesign) / 1e6;
+  const soilMDesign = soilV(soilDDesign) * SOILS[1][1];
+  const tankWDesign = waterVDesign + glassM + soilMDesign;
+
   const liters  = L * D * Ht / 1e6;
   const wWater  = waterV;
   const tankW   = waterV + glassM + soilM;
-  const wDesign = tankW * 1.1;
+  const wDesign = tankWDesign * 1.1;
   const q       = wDesign * K.G / L;   // Н/мм
 
   /* ---------- стеклянные детали: шов и размеры ---------- */
@@ -1098,6 +1114,7 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant){
              beta: betaEff, sig: sigAct, sf: sfGlass, safety: SAFETY, sigAllow: SIG_A },
     glassParts,
     hw, waterV, glassM, soilM, soilD, soilV, SOILS, tankW, innerL, innerD, gW, gB,
+    soilDDesign, waterVDesign, soilMDesign, tankWDesign,
     bioRes,
     fertRes,
     gear: {
@@ -1584,12 +1601,15 @@ function renderKpis(M){
   let cards;
   if(sec === 'tank'){
     const g = M.glass;
+    const soilTitle = M.soilD > 0
+      ? `${LANG==='en' ? 'Substrate' : 'Грунт'} ${f0(M.soilD/10)} ${tstr('см')}`
+      : (LANG==='en' ? 'No substrate' : 'Без грунта');
     cards = [
-      ['Объём воды', `${f0(M.waterV)}<small>${tstr('л')}</small>`, LANG==='en' ? `by dimensions ${f0(M.liters)} l` : `по габаритам ${f0(M.liters)} л`, true],
+      ['Объём воды', `${f0(M.waterV)} / ${f0(M.liters)}<small>${tstr('л')}</small>`, LANG==='en' ? 'calculated / gross' : 'расчётный / габаритный', true],
       ['Стекло', `${g.w} / ${g.b}<small>${tstr('мм')}</small>`, tstr('стенки / дно'), false],
-      ['Грунт 5 см', `${f0(M.soilV(50))}<small>${tstr('л')}</small>`, `${f0(M.soilM)} ${tstr('кг')}`, false],
-      ['Вес', `${f0(M.tankW)}<small>${tstr('кг')}</small>`, tstr('вода, стекло, грунт'), false],
-      ['С запасом', `${f0(M.wDesign)}<small>${tstr('кг')}</small>`, '+10 %', false],
+      [soilTitle, `${f0(M.soilV(M.soilD))}<small>${tstr('л')}</small>`, `${f0(M.soilM)} ${tstr('кг')}`, false],
+      ['Вес', `${f0(M.tankW)}<small>${tstr('кг')}</small>`, LANG==='en' ? 'actual' : 'фактический', false],
+      ['С запасом', `${f0(M.wDesign)}<small>${tstr('кг')}</small>`, LANG==='en' ? 'max for loads, +10 %' : 'макс. для нагрузок, +10 %', false],
       ['Запас по стеклу', `×${f1(g.sf)}`, tstr('норма 3,8'), false]
     ];
   } else if(sec === 'gear'){
@@ -1636,6 +1656,20 @@ function renderKpis(M){
   $('#kpis').innerHTML = cards.map(([k,v,s,acc])=>
     `<div class="kpi${acc?' acc':''}"><div class="k">${tstr(k)}</div><div class="v">${v}</div><div class="s">${tstr(s)}</div></div>`
   ).join('');
+  const kpiNote = document.getElementById('kpiNote');
+  if(kpiNote){
+    kpiNote.style.display = sec === 'tank' ? '' : 'none';
+    if(sec === 'tank'){
+      const soilTxt = M.soilD > 0
+        ? (LANG==='en' ? `${f0(M.soilD/10)} cm of substrate` : `слое ${f0(M.soilD/10)} см`)
+        : (LANG==='en' ? 'no substrate' : 'без грунта');
+      kpiNote.innerHTML = LANG==='en'
+        ? `Volume and weight are actual with ${soilTxt}; glass and stand are calculated with the maximum margin: 5 cm substrate + 10 %.`
+        : `Объём и вес — фактические ${M.soilD > 0 ? 'при ' + soilTxt : soilTxt}; стекло и тумба считаются по максимальному запасу: 5 см грунта + 10 %.`;
+    } else {
+      kpiNote.innerHTML = '';
+    }
+  }
 }
 
 function renderSide(M){
@@ -2109,7 +2143,7 @@ function renderTank(M){
           ${cell('С запасом', `${f0(M.wDesign)} <small>${tstr('кг')}</small>`)}
           ${cell('На литр', `${f1(M.tankW/Math.max(1,M.waterV))} <small>${tstr('кг')}</small>`)}
         </div>
-        <p class="note">${LANG==='en' ? 'This weight goes into the stand calculation.' : 'Этот вес уходит в расчёт тумбы.'}</p>
+        <p class="note">${LANG==='en' ? '“Total” is the actual weight at the selected substrate layer; “with margin” is the maximum used for the stand.' : '«Итого» — фактический вес при выбранном слое; «с запасом» — максимальный для расчёта тумбы.'}</p>
       </section>
     </div>
 
@@ -2644,13 +2678,14 @@ function setSection(sec){
   $('#kpis').classList.toggle('hide', sec==='fert' || sec==='udo');
   $('#sideSpec').classList.toggle('hide', sec!=='stand');
   $('#cardStand').classList.toggle('hide', sec!=='stand');
+  $('#soilField').classList.toggle('hide', sec === 'stand');
   document.querySelector('.side').classList.toggle('merge', sec === 'stand');
   $('#cardBio').classList.toggle('hide', sec!=='bio');
   $('#seghint').textContent = t('h_' + (sec === 'fert' ? 'test' : sec));
   if(MODEL){ renderKpis(MODEL); renderNow(MODEL); }
 }
 
-const SAVE_IDS = ['inL','inD','inH','inHS','inSheet','inMedia','inMV','inTemp','inProt','inRate','inFish',
+const SAVE_IDS = ['inL','inD','inH','inSoil','inHS','inSheet','inMedia','inMV','inTemp','inProt','inRate','inFish',
   'inNO3','inPO4','inK','inCa','inMg','inFe','inPH','inKH','inGH','inNH3','inNO2','inCu','inTDS','inEC',
   'inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe','inDoors'];
 function saveState(){
@@ -2678,6 +2713,9 @@ function renderAll(){
   const D  = clamp(+$('#inD').value || 500, 300, 1200);
   const Ht = clamp(+$('#inH').value || 500, 200, 1200);
   const H  = +$('#inHS').value || 900;
+  const soilEl = $('#inSoil');
+  const soilVal = soilEl ? +soilEl.value : 50;
+  const soilD = Number.isFinite(soilVal) ? clamp(soilVal, 0, 100) : 50;
   const [SW, SH] = $('#inSheet').value.split(',').map(Number);
   const bio = {
     media: $('#inMedia').value,
@@ -2703,7 +2741,7 @@ function renderAll(){
   };
   const selD = $('#inDoors');
   const doorWant = +selD.value || 0;
-  MODEL = build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant);
+  MODEL = build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant, soilD);
   /* список вариантов строится после расчёта: нижняя граница зависит от пролёта */
   const sig = MODEL.dMin + '-' + MODEL.dMax + LANG;
   if(selD.dataset.max !== sig){
@@ -2715,7 +2753,7 @@ function renderAll(){
     selD.dataset.lang = LANG;
     const fits = keep >= MODEL.dMin && keep <= MODEL.dMax;
     selD.value = fits ? String(keep) : '0';
-    if(!fits) MODEL = build(L, D, Ht, H, SW, SH, bio, fert, goal, 0);
+    if(!fits) MODEL = build(L, D, Ht, H, SW, SH, bio, fert, goal, 0, soilD);
   }
   $('#doorField').classList.toggle('hide', L < 800);
   $('#doorHint').textContent = L >= 800 ? `${t('door_def')} ${MODEL.doorSug}` : '';
@@ -2757,6 +2795,7 @@ let tmr=null;
   });
 });
 $('#inHS').addEventListener('change', renderAll);
+$('#inSoil').addEventListener('change', renderAll);
 $('#inDoors').addEventListener('change', renderAll);
 ['inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe'].forEach(id=>{
   document.getElementById(id).addEventListener('input', ()=>{ clearTimeout(tmr); tmr = setTimeout(renderAll, 130); });
@@ -2801,6 +2840,7 @@ try{
   if(qp.get('d')) $('#inD').value = qp.get('d');
   if(qp.get('h')) $('#inH').value = qp.get('h');
   if(qp.get('H')) $('#inHS').value = qp.get('H');
+  if(qp.get('soil')) $('#inSoil').value = qp.get('soil');
   if(qp.get('sheet')) $('#inSheet').value = qp.get('sheet');
   if(qp.get('color')==='black'){ state.color='black'; $('#colors').querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.c==='black'))); }
 }catch(e){}
