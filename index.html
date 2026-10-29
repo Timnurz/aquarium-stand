@@ -2555,10 +2555,8 @@ function renderNow(M){
   const sec = state.section || 'tank';
   let big = '', sub = '', dots = '';
   if(sec === 'tank'){
-    big = LANG==='en' ? `${f0(M.waterV)} l of water` : `${f0(M.waterV)} л воды`;
-    sub = LANG==='en'
-      ? `Glass ${M.glass.w} / ${M.glass.b} mm · substrate ${f0(M.soilV(50))} l · weight ${f0(M.tankW)} kg`
-      : `Стекло ${M.glass.w} / ${M.glass.b} мм · грунт ${f0(M.soilV(50))} л · вес ${f0(M.tankW)} кг`;
+    big = LANG==='en' ? `${f0(M.waterV)} l` : `${f0(M.waterV)} л`;
+    sub = '';
   } else if(sec === 'stand'){
     big = LANG==='en'
       ? `${M.n} ${M.n===1?'section':'sections'} · ${f0(M.clear)} mm`
@@ -2598,7 +2596,7 @@ function renderNow(M){
       ? bad.slice(0,6).map(([n,v,lo,hi]) => `<span class="dot ${v < lo ? 'warn' : 'bad'}"><i></i>${tstr(n.replace(' (расчёт)',''))}</span>`).join('')
       : `<span class="dot ok"><i></i>${LANG==='en' ? 'all in range' : 'всё в норме'}</span>`;
   }
-  $('#cardNow').innerHTML = `<div class="nk">${t("now_lbl")}</div><div class="big">${big}</div><div class="sub">${sub}</div>${dots ? `<div class="dots">${dots}</div>` : ''}`;
+  $('#cardNow').innerHTML = `<div class="nk">${sec === 'tank' ? tstr('Объём') : t("now_lbl")}</div><div class="big">${big}</div>${sub ? `<div class="sub">${sub}</div>` : ''}${dots ? `<div class="dots">${dots}</div>` : ''}`;
 }
 
 function setSection(sec){
