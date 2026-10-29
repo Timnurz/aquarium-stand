@@ -2655,8 +2655,13 @@ function setSection(sec){
   const udoBox = $('#udoInputs');
   const mainEl = document.querySelector('.main');
   const onIn = (sec === 'fert' || sec === 'udo');
-  if(sec === 'fert') mainEl.insertBefore(udoBox, $('#secFert'));
-  else if(sec === 'udo') mainEl.insertBefore(udoBox, $('#secUdo'));
+  if(sec === 'fert'){
+    const ref = $('#secFert');
+    if(udoBox.nextElementSibling !== ref) mainEl.insertBefore(udoBox, ref);
+  } else if(sec === 'udo'){
+    const ref = $('#secUdo');
+    if(udoBox.nextElementSibling !== ref) mainEl.insertBefore(udoBox, ref);
+  }
   udoBox.classList.toggle('hide', !onIn);
   udoBox.classList.toggle('three', onIn);
   udoBox.classList.toggle('udo', sec === 'udo');
