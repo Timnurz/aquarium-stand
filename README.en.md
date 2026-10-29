@@ -7,9 +7,6 @@
 A single HTML page with no server and no dependencies: enter your tank dimensions and get glass thickness, substrate, total weight, a stand with a plywood cutting plan, equipment sizing, biological load, water tests and fertilizer recipes. It works offline, switches between Russian and English, and has a mobile layout.
 
 ![Aquarium Calculator](screenshot.png)
-
-## A range of minimalist planted aquariums
-
 ![A range of minimalist planted aquariums](<Ряд минималистичных аквариумов с растениями.png>)
 
 The calculator is built for a series of small planted tanks, from nano to large. The presets already include a range of minimalist planted aquariums:
@@ -29,7 +26,7 @@ For each option the calculator covers glass, stand, filter, light, CO₂, biolog
 
 ## What is new
 
-- **Top-50 popular fish** from the [Tetra list](https://blog.tetra.net/ru/ru/50-samyh-populyarnyh-akvariumnyh-rybok-s-nazvaniyami-i-foto): adult weight, recommended feeding percentage, cart and total feed.
+- **Top-50 popular fish** : adult weight, recommended feeding percentage, cart and total feed.
 - **Fish cart**: quantity → total weight → feed in grams; the “Fish” and “Feeding” fields in the Filter block update automatically but stay editable.
 - **40 filters** in the reference table: canisters, hang-on-back and internal, including Aquael Fan 1/2/3 Plus, Aquael Versamax, Tetra EasyCrystal, Eheim Liberty, AquaClear and Sunsun.
 - **Filter type** with type-specific real flow: 55 % of the datasheet for canisters, 75 % for hang-on-back, 80 % for internal.
