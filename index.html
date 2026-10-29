@@ -75,6 +75,11 @@ body{
 .two.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:1200px){.two.three{grid-template-columns:1fr 1fr}}
 @media (max-width:900px){.two,.two.three{grid-template-columns:1fr}}
+.udo-col{display:contents}
+#udoInputs.udo{grid-template-columns:1fr 1fr;align-items:start}
+#udoInputs.udo .udo-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+#udoInputs.udo .udo-col .card{margin:0}
+#secUdo{margin-top:16px}
 .ct{margin:0 0 14px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);font-weight:650;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .ct .hint{text-transform:none;letter-spacing:0;font-weight:400;color:var(--tx3);font-size:12px}
 
@@ -172,6 +177,8 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
 .tbl .sw{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
 .tbl .tot td{border-top:1px solid var(--line2);font-weight:650;background:var(--soft)}
 .tbl .mut{color:var(--tx3);font-size:12px}
+.cart-in{width:64px;padding:5px 7px;font:600 12px/1 var(--mono);border:1px solid var(--line2);border-radius:8px;background:var(--soft);color:var(--tx);text-align:right}
+.cart-in:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(77,107,254,.14)}
 
 /* ---------- раскрой ---------- */
 .sheets{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px;margin-top:16px}
@@ -234,6 +241,8 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
   .vcap{padding:8px 12px 12px;font-size:12px}
   .two{gap:12px}
   .two.three{grid-template-columns:1fr}
+  #udoInputs.udo{grid-template-columns:1fr}
+  #udoInputs.udo .udo-col{display:contents}
   .ct{font-size:11px;margin-bottom:11px}
   .ct .hint{font-size:11.5px}
   .inp input{padding:12px}
@@ -377,11 +386,11 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
         </div>
         <div class="field">
           <label for="inRate"><span data-i18n="f_rate">Кормление</span> <b data-i18n="u_pctmass">% массы</b></label>
-          <div class="inp"><input id="inRate" type="number" value="2" min="0.5" max="5" step="0.5"><em>%</em></div>
+          <div class="inp"><input id="inRate" type="number" value="2" min="0.5" max="5" step="0.1"><em>%</em></div>
         </div>
         <div class="field" style="margin-bottom:2px">
           <label for="inFish"><span data-i18n="f_fish">Рыба</span> <b data-i18n="u_g">г</b></label>
-          <div class="inp"><input id="inFish" type="number" value="300" min="10" max="10000" step="10"><em data-i18n="u_g">г</em></div>
+          <div class="inp"><input id="inFish" type="number" value="300" min="1" max="10000" step="1"><em data-i18n="u_g">г</em></div>
         </div>
       </section>
 
@@ -473,7 +482,10 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
       <div id="secGear"></div>
       <div id="secBio"></div>
       <div id="secFert"></div>
-      <div id="udoInputs" class="two hide"></div>
+      <div id="udoInputs" class="two hide">
+        <div class="udo-col" id="udoCol1"></div>
+        <div class="udo-col" id="udoCol2"></div>
+      </div>
       <div id="secUdo"></div>
     </main>
   </div>
@@ -663,12 +675,25 @@ const EN_MAP = {
   '0,8–1 Вт на литр, кратно 25':'0.8–1 W per litre, in steps of 25','Подмена воды':'Water change',
   '10–20 % в неделю':'10–20 % per week','для большинства тропических рыб':'for most tropical fish',
   'Фильтры':'Filters','паспортные данные':'datasheet data','Бренд':'Brand','Модель':'Model',
+  'Тип':'Type','Канистра':'Canister','Рюкзачок':'Hang-on-back','Внутренний':'Internal',
   'Паспорт, л/ч':'Datasheet, l/h','Реально, л/ч':'Real, l/h','Мощность, Вт':'Power, W','Засыпка, л':'Media, l',
   'Порядок запуска':'Startup order','Вода и грунт':'Water and substrate','Оборудование':'Equipment',
   'Запуск бактерий':'Bacteria startup',
   'Гуппи':'Guppy','Неон':'Neon tetra','Данио':'Zebra danio','Тетра':'Tetra','Моллинезия':'Molly',
   'Меченосец':'Swordtail','Барбус':'Barb','Гурами':'Gourami','Петушок':'Betta','Скалярия':'Angelfish',
   'Анциструс':'Bristlenose','Цихлида':'Cichlid','Золотая рыбка':'Goldfish','Дискус':'Discus',
+  'Барбусы':'Barbs','Тернеция':'Black skirt tetra','Акары':'Acara','Рыба-попугай':'Parrot cichlid',
+  'Коридорас':'Corydoras','Пецилия':'Platy','Астронотус':'Oscar','Неоны':'Neon tetras',
+  'Рыба-клоун':'Clownfish','Цихлазомы':'Cichlasoma','Боции':'Loaches','Лялиус':'Dwarf gourami',
+  'Тетраодон':'Puffer','Телескоп':'Telescope goldfish','Апистограмма':'Apistogramma',
+  'Сиамский водорослеед':'Siamese algae eater','Птеригоплихт':'Plecostomus','Цихлазома северум':'Severum',
+  'Вуалехвост':'Fantail goldfish','Глофиш (GloFish)':'GloFish','Макропод':'Paradise fish',
+  'Торакатум':'Hoplo catfish','Лабео':'Labeo','Данио-рерио':'Zebra danio','Барбус суматранский':'Tiger barb',
+  'Хромис-красавец':'Jewel cichlid','Пельвикахромис пульхер':'German blue ram','Акара бирюзовая':'Green terror',
+  'Радужницы':'Rainbowfish','Комета':'Comet goldfish','Моллинезия черная':'Black molly',
+  'Голубой дельфин':'Blue dolphin cichlid','Апистограмма Рамирези':'Ram cichlid','Гурами мраморный':'Marbled gourami',
+  'Синодонтис':'Synodontis','Гурами жемчужный':'Pearl gourami','Акантофтальмус':'Kuhli loach',
+  'Гуппи Эндлера':"Endler's guppy",'Тетры':'Tetras','Псевдотрофеусы':'Pseudotropheus',
   'Аммиак':'Ammonia','% массы':'% of body weight','без растений и подмен':'without plants or water changes',
   'по нагрузке, не по комфорту':'by load, not by comfort',
   'Взрослый вес, г':'Adult weight, g','По фильтру, шт':'By filter, pcs','По объёму, шт':'By volume, pcs',
@@ -911,7 +936,7 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant){
                            ph:7, kh:4, gh:null, nh3:null, no2:null, tds:null, ec:null, cu:null}, fert||{});
   const n0 = v => (v == null ? 0 : v);
   const TGT  = Object.assign({ no3:20, po4:1.5, k:20, ca:30, mg:10, fe:0.1 }, goal||{});
-  const MAXK = Math.max(30, TGT.k), MAXCA = Math.max(60, TGT.ca);
+  const kCap = Math.max(0, TGT.k), caCap = Math.max(0, TGT.ca);
   const ghRaw = f.gh != null ? f.gh : ((f.ca != null || f.mg != null) ? n0(f.ca)/7.1 + n0(f.mg)/4.3 : null);
   const ghMeas = ghRaw == null ? null : Math.round(ghRaw*10)/10;
   const co2raw = (f.ph != null && f.kh != null) ? 3 * f.kh * Math.pow(10, 7 - f.ph) : null;
@@ -938,12 +963,18 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant){
   const inRng = v => v[1] != null && v[1] >= v[2] && v[1] <= v[3];
   const known = TPAR.filter(v => v[1] != null);
   const okN   = known.filter(inRng).length;
-  const WCUT = TPAR.filter(v => v[1] != null && v[1] > v[3] && v[3] > 0)
+  const baseCut = TPAR.filter(v => v[1] != null && v[1] > v[3] && v[3] > 0)
     .map(v => [v[0], Math.min(95, Math.round((v[1] - v[3])/v[1]*100))]);
+  const cutNames = new Set(baseCut.map(v => v[0]));
+  if(f.k != null && f.k > TGT.k + 0.01 && !cutNames.has('K'))
+    baseCut.push(['K', Math.min(95, Math.round((f.k - TGT.k)/Math.max(f.k, 0.01)*100))]);
+  if(f.ca != null && f.ca > TGT.ca + 0.01 && !cutNames.has('Ca'))
+    baseCut.push(['Ca', Math.min(95, Math.round((f.ca - TGT.ca)/Math.max(f.ca, 0.01)*100))]);
+  const WCUT = baseCut;
 
   const dN = Math.max(0, TGT.no3 - n0(f.no3));
-  const kFree  = Math.max(0, MAXK - n0(f.k));
-  const caFree = Math.max(0, MAXCA - n0(f.ca));
+  const kFree  = Math.max(0, kCap - n0(f.k));
+  const caFree = Math.max(0, caCap - n0(f.ca));
   const no3FromK  = Math.min(dN, kFree / 0.387 * 0.613);
   const kUsed     = no3FromK / 0.613 * 0.387;
   const no3FromCa = Math.min(dN - no3FromK, caFree / 0.17 * 0.525);
@@ -961,6 +992,29 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant){
   const mMgSO4  = Math.max(0, TGT.mg - n0(f.mg)) * waterV / 0.099 / 1000;
   const mCaCl2  = 0;
   const mCSM    = Math.max(0, TGT.fe - n0(f.fe)) * waterV / 0.07 / 1000;
+
+  /* что уйдёт побочно и что получится в итоге */
+  const kFromK2SO4 = mK2SO4 * 1000 * 0.448 / waterV;
+  const kSide = kUsed + kFromP;
+  const caSide = caUsed;
+  const so4 = (mK2SO4 * 0.552 + mMgSO4 * 0.39) * 1000 / waterV;
+  const finalK = n0(f.k) + kSide + kFromK2SO4;
+  const finalCa = n0(f.ca) + caSide;
+  const finalNo3 = n0(f.no3) + no3FromK + no3FromCa + no3FromUrea;
+  const finalPo4 = n0(f.po4) + dP;
+  const finalMg = n0(f.mg) + mMgSO4 * 1000 * 0.099 / waterV;
+  const finalFe = n0(f.fe) + mCSM * 1000 * 0.07 / waterV;
+  const highK = n0(f.k) > kCap + 0.01;
+  const highCa = n0(f.ca) > caCap + 0.01;
+
+  /* мочевина при гидролизе даёт NH₃/NH₄⁺; доля свободного NH₃ зависит от pH */
+  const tempC = (bio && bio.t) ? +bio.t : 25;
+  const phU = f.ph != null ? +f.ph : 7;
+  const pKa = 0.09018 + 2729.92 / (tempC + 273.15);
+  const fNH3 = 1 / (1 + Math.pow(10, pKa - phU));
+  const tanUrea = no3FromUrea / 4.43;
+  const nh3Mass = tanUrea * fNH3 * 17/14;
+  const nh4Mass = tanUrea * (1 - fNH3) * 18/14;
 
   const fertRec = [];
   const miss = TPAR.filter(v => v[1] == null).map(v => tstr(v[0]));
@@ -983,14 +1037,26 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant){
   if(ghMeas != null && ghMeas < 4)  fertRec.push([tr('GH below 4 — soft water, calcium and magnesium at the minimum.', 'GH ниже 4 — мягкая вода, кальция и магния на минимуме.'), 'warn']);
   if(ghMeas != null && ghMeas > 14) fertRec.push([tr('GH above 14 — hard water, Ca and Mg are already in surplus, do not add.', 'GH выше 14 — жёсткая вода, Ca и Mg уже с запасом, не добавлять.'), 'warn']);
   if(f.fe != null && f.fe < 0.05) fertRec.push([tr('Iron below 0.05 mg/l — interveinal chlorosis on young leaves.', 'Железо ниже 0,05 мг/л — межжилковый хлороз на молодых листьях.'), 'warn']);
-  if(dN > 0 && n0(f.k) >= MAXK)     fertRec.push([tr('Potassium is at the limit — supply nitrogen without potassium nitrate.', 'Калий на пределе — азот даём не калиевой селитрой.'), 'warn']);
-  if(dN > 0 && no3FromUrea > 0)     fertRec.push([tr(`Part of the nitrogen (${f0(no3FromUrea)} mg/l) will come from urea: both nitrates have hit the ceiling.`, `Часть азота (${f0(no3FromUrea)} мг/л) уйдёт мочевиной: обе селитры упёрлись в потолок.`), 'warn']);
+  if(dN > 0.01 && highK && highCa){
+    fertRec.push([tr('K and Ca are already above target — use urea for nitrogen; only a water change lowers K/Ca.', 'K и Ca уже выше цели — азот даём мочевиной; снизить K/Ca можно только подменой.'), 'warn']);
+  } else if(dN > 0.01 && highK){
+    fertRec.push([tr('K is above target — no potassium nitrate; nitrogen comes from calcium nitrate/urea.', 'K выше цели — калиевую селитру не используем; азот — кальциевой селитрой/мочевиной.'), 'warn']);
+  } else if(dN > 0.01 && highCa){
+    fertRec.push([tr('Ca is above target — no calcium nitrate; nitrogen comes from potassium nitrate/urea.', 'Ca выше цели — кальциевую селитру не используем; азот — калиевой селитрой/мочевиной.'), 'warn']);
+  } else if(dN > 0.01 && no3FromUrea > 0.01){
+    fertRec.push([tr(`Part of the nitrogen (${f0(no3FromUrea)} mg/l) goes in as urea: K and Ca are already at target.`, `Часть азота (${f0(no3FromUrea)} мг/л) уйдёт мочевиной: K и Ca уже на цели.`), 'warn']);
+  }
+  if((highK || highCa) && dN <= 0.01){
+    fertRec.push([tr('K/Ca are above target — fertilizers cannot lower them; a water change is the way.', 'K/Ca выше цели — удобрениями не снизить, нужна подмена.'), 'warn']);
+  }
   if(miss.length) fertRec.push([tr(`No tests: ${miss.join(', ')}. These parameters are unverified.`, `Нет тестов: ${miss.join(', ')}. Эти параметры не проверены.`), 'warn']);
   if(!fertRec.length) fertRec.push([tr('All parameters are on target — keep them with dosing, not water changes.', 'Все показатели в эталоне — держите дозами, а не подменами.'), 'ok']);
 
   const fertRes = {
     f, TGT, gh: ghMeas, co2, ratioNP, dN, dP, mKNO3, mCaNO3, mUrea, mKH2PO4, kTotal, mK2SO4, mMgSO4, mCaCl2, mCSM,
-    no3FromK, no3FromCa, no3FromUrea, caUsed, kUsed, fertRec, TPAR, okN, knownN: known.length, WCUT, miss
+    no3FromK, no3FromCa, no3FromUrea, caUsed, kUsed, kSide, caSide, so4, finalK, finalCa, finalNo3, finalPo4, finalMg, finalFe, highK, highCa,
+    nh3Mass, nh4Mass, tanUrea, fNH3, phU, tempC,
+    fertRec, TPAR, okN, knownN: known.length, WCUT, miss
   };
 
   /* ---------- биология ---------- */
@@ -1193,6 +1259,19 @@ const PALETTE = {
   }
 };
 const PAL = ['#4d6bfe','#0fa37f','#e0883b','#a855c8','#d9547a','#2f9cb5','#8a9b2e','#c25e2e','#6f7fd8','#c9a227'];
+
+/* постоянные рецепты концентратов: 0,5 л раствора, навеска в граммах */
+const STOCK = [
+  { name:'Калиевая селитра', formula:'KNO₃', g:50 },
+  { name:'Кальциевая селитра', formula:'Ca(NO₃)₂ · 4H₂O', g:50 },
+  { name:'Мочевина, карбамид', formula:'CO(NH₂)₂', g:50 },
+  { name:'Монофосфат калия', formula:'KH₂PO₄', g:50 },
+  { name:'Сульфат калия', formula:'K₂SO₄', g:40 },
+  { name:'Магнезия, сульфат магния', formula:'MgSO₄ · 7H₂O', g:50 },
+  { name:'Микро + железо, хелат', formula:'CSM+B / Fe-DTPA', g:5 }
+];
+const STOCK_BY = {};
+STOCK.forEach(s => { STOCK_BY[s.formula] = s; });
 
 let CTR = [0,0];
 
@@ -1497,6 +1576,7 @@ function drawDetail(M){
    ИНТЕРФЕЙС
    ========================================================= */
 const state = { section:'tank', tab:'tumba', color:'beige' };
+const fishCart = {};
 let MODEL = null;
 
 function renderKpis(M){
@@ -2071,26 +2151,56 @@ function renderGear(M){
   const g = M.gear, V = M.waterV;
   /* паспортные данные; засыпка — типовой объём камеры */
   const FILTERS = [
-    ['Tetra','EX 600 Plus',600,8,'2–3',2.5],
-    ['Tetra','EX 800 Plus',790,10.5,'3–4',3.5],
-    ['Tetra','EX 1000 Plus',1000,13,'4–5',4.5],
-    ['Tetra','EX 1200 Plus',1200,16,'5–6',5.5],
-    ['Tetra','EX 1500 Plus',1500,20,'6–7',6.5],
-    ['Aquael','Ultramax 1000',1000,10,'5,7',5.7],
-    ['Aquael','Ultramax 1500',1500,16,'7–8',7.6],
-    ['Aquael','Ultramax 2000',2000,24,'9–10',9.5],
-    ['Aquael','Turbo Filter 500',500,5,'0,5',0.5],
-    ['Sunsun','HW-602B',500,6,'2–3',2.5],
-    ['Sunsun','HW-603B',800,12,'3–4',3.5],
-    ['Sunsun','HW-302',1000,18,'4–5',5],
-    ['Sunsun','HW-303B',1400,35,'6–7',7],
-    ['Sunsun','HW-304B',2000,55,'8–9',9]
+    /* канистры */
+    ['Tetra','Канистра','EX 600 Plus',600,8,'2–3',2.5],
+    ['Tetra','Канистра','EX 800 Plus',790,10.5,'3–4',3.5],
+    ['Tetra','Канистра','EX 1000 Plus',1000,13,'4–5',4.5],
+    ['Tetra','Канистра','EX 1200 Plus',1200,16,'5–6',5.5],
+    ['Tetra','Канистра','EX 1500 Plus',1500,20,'6–7',6.5],
+    ['Tetra','Рюкзачок','EasyCrystal 250',400,4.5,'0,4',0.4],
+    ['Tetra','Рюкзачок','EasyCrystal 400',600,6,'0,6',0.6],
+    ['Tetra','Внутренний','IN 400 Plus',380,4,'0,3',0.3],
+    ['Tetra','Внутренний','IN 600 Plus',580,6,'0,5',0.5],
+    ['Tetra','Внутренний','IN 800 Plus',780,8,'0,7',0.7],
+    ['Aquael','Канистра','Ultramax 1000',1000,10,'5,7',5.7],
+    ['Aquael','Канистра','Ultramax 1500',1500,16,'7–8',7.6],
+    ['Aquael','Канистра','Ultramax 2000',2000,24,'9–10',9.5],
+    ['Aquael','Рюкзачок','Versamax 1',400,5.5,'0,5',0.5],
+    ['Aquael','Рюкзачок','Versamax 2',600,8,'0,9',0.9],
+    ['Aquael','Рюкзачок','Versamax 3',1000,12,'1,3',1.3],
+    ['Aquael','Внутренний','Fan 1 Plus',320,4.5,'0,3',0.3],
+    ['Aquael','Внутренний','Fan 2 Plus',450,6,'0,5',0.5],
+    ['Aquael','Внутренний','Fan 3 Plus',700,8,'0,7',0.7],
+    ['Aquael','Внутренний','Turbo Filter 500',500,5,'0,5',0.5],
+    ['Aquael','Внутренний','Turbo Filter 1000',1000,9,'0,8',0.8],
+    ['Eheim','Рюкзачок','Liberty 75',380,5,'0,3',0.3],
+    ['Eheim','Рюкзачок','Liberty 130',600,7,'0,5',0.5],
+    ['Eheim','Рюкзачок','Liberty 200',760,10,'0,8',0.8],
+    ['Eheim','Внутренний','Pick Up 60',300,4,'0,3',0.3],
+    ['Eheim','Внутренний','Pick Up 160',500,6,'0,5',0.5],
+    ['AquaClear','Рюкзачок','20',400,6,'0,5',0.5],
+    ['AquaClear','Рюкзачок','30',600,8,'0,8',0.8],
+    ['AquaClear','Рюкзачок','50',800,10,'1,0',1.0],
+    ['Sunsun','Канистра','HW-602B',500,6,'2–3',2.5],
+    ['Sunsun','Канистра','HW-603B',800,12,'3–4',3.5],
+    ['Sunsun','Канистра','HW-302',1000,18,'4–5',5],
+    ['Sunsun','Канистра','HW-303B',1400,35,'6–7',7],
+    ['Sunsun','Канистра','HW-304B',2000,55,'8–9',9],
+    ['Sunsun','Рюкзачок','HBL-701',300,3,'0,3',0.3],
+    ['Sunsun','Рюкзачок','HBL-702',500,5,'0,5',0.5],
+    ['Sunsun','Рюкзачок','HBL-801',800,8,'0,8',0.8],
+    ['Sunsun','Внутренний','HJ-311',300,3,'0,3',0.3],
+    ['Sunsun','Внутренний','HJ-611',400,4,'0,4',0.4],
+    ['Sunsun','Внутренний','HJ-711',600,6,'0,6',0.6]
   ];
-  const fRows = FILTERS.map(([br,md,flow,w,vol,mid],i)=>{
+  const fRows = FILTERS.map(([br,type,md,flow,w,vol,mid],i)=>{
     const prev = FILTERS[i-1];
     const brand = (!prev || prev[0] !== br)
       ? `<td rowspan="${FILTERS.filter(f=>f[0]===br).length}">${br}</td>` : '';
-    return `<tr>${brand}<td>${md}</td><td class="num">${f0(flow)}</td><td class="num">${f0(Math.round(flow*0.55))}</td><td class="num">${String(w).replace(".",",")}</td><td class="num"><button class="mv" data-mv="${mid}">${vol}</button></td></tr>`;
+    const loss = type === 'Канистра' ? 0.55 : (type === 'Рюкзачок' ? 0.75 : 0.8);
+    const dec = v => LANG === 'en' ? String(v) : String(v).replace('.', ',');
+    const volTxt = v => LANG === 'en' ? String(v).replace(/,/g, '.') : String(v);
+    return `<tr>${brand}<td>${tstr(type)}</td><td>${md}</td><td class="num">${f0(flow)}</td><td class="num">${f0(Math.round(flow*loss))}</td><td class="num">${dec(w)}</td><td class="num"><button class="mv" data-mv="${mid}">${volTxt(vol)}</button></td></tr>`;
   }).join('');
   const row = (name, val, note) => `<tr><td>${tstr(name)}</td><td class="num">${val}</td><td class="mut">${tstr(note)}</td></tr>`;
   const heat = Math.max(25, Math.round(g.heatMax/25)*25);
@@ -2118,10 +2228,10 @@ function renderGear(M){
       <h2 class="ct">${tstr('Фильтры')} <span class="hint">${tstr('паспортные данные')}</span></h2>
       <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th>${tstr('Бренд')}</th><th>${tstr('Модель')}</th><th>${tstr('Паспорт, л/ч')}</th><th>${tstr('Реально, л/ч')}</th><th>${tstr('Мощность, Вт')}</th><th>${tstr('Засыпка, л')}</th></tr></thead>
+        <thead><tr><th>${tstr('Бренд')}</th><th>${tstr('Тип')}</th><th>${tstr('Модель')}</th><th>${tstr('Паспорт, л/ч')}</th><th>${tstr('Реально, л/ч')}</th><th>${tstr('Мощность, Вт')}</th><th>${tstr('Засыпка, л')}</th></tr></thead>
         <tbody>${fRows}</tbody>
       </table></div>
-      <p class="note">${LANG==='en' ? `Datasheet — zero head without media. 'Real' — 55 % of the datasheet: with a sponge, ceramics and a metre of hose a canister loses about half, and small models even more. Media — the typical chamber volume by the number of baskets; click a figure to put it into the biology calculation.` : `Паспорт — нулевой напор без наполнителя. «Реально» — 55 % от паспорта: с губкой, керамикой и метром шланга канистра теряет примерно половину, у мелких моделей и больше. Засыпка — типовой объём камеры по числу кассет, нажмите на цифру, чтобы подставить её в расчёт биологии.`}</p>
+      <p class="note">${LANG==='en' ? `Datasheet — zero head without media. 'Real' is 55 % of the datasheet for canisters, 75 % for hang-on-back and 80 % for internal filters: with a sponge, ceramics and a hose a canister loses about half, and small models even more. Media — the typical chamber volume; click a figure to put it into the biology calculation.` : `Паспорт — нулевой напор без наполнителя. «Реально» — 55 % от паспорта для канистр, 75 % для рюкзачков и 80 % для внутренних фильтров: с губкой, керамикой и шлангом канистра теряет примерно половину, у мелких моделей и больше. Засыпка — типовой объём камеры, нажмите на цифру, чтобы подставить её в расчёт биологии.`}</p>
     </section>
 
     <section class="card">
@@ -2143,16 +2253,45 @@ function renderBio(M){
   const b = M.bioRes;
   const cell = (k,v) => `<div><dt>${tstr(k)}</dt><dd>${v}</dd></div>`;
   const FISH = [
-    ['Гуппи',2],['Неон',1],['Данио',2],['Тетра',2],['Моллинезия',6],['Меченосец',5],
-    ['Барбус',5],['Гурами',8],['Петушок',3],['Скалярия',20],['Анциструс',25],
-    ['Цихлида',40],['Золотая рыбка',60],['Дискус',150]
+    ['Петушок',3,1.2],['Скалярия',20,0.8],['Барбусы',5,1.2],['Данио',2,1.5],['Анциструс',25,0.5],
+    ['Тернеция',3,1.5],['Моллинезия',6,1.2],['Гуппи',2,1.5],['Акары',200,0.6],['Рыба-попугай',150,0.6],
+    ['Коридорас',6,1.2],['Пецилия',5,1.2],['Астронотус',250,0.5],['Неоны',1,1.0],['Рыба-клоун',10,1.0],
+    ['Цихлазомы',100,0.6],['Меченосец',5,1.2],['Золотая рыбка',60,0.7],['Боции',10,1.0],['Гурами',8,1.0],
+    ['Лялиус',3,1.5],['Тетраодон',10,1.0],['Телескоп',80,0.7],['Апистограмма',3,1.5],
+    ['Сиамский водорослеед',20,0.8],['Дискус',150,0.8],['Птеригоплихт',250,0.5],['Цихлазома северум',120,0.6],
+    ['Вуалехвост',80,0.7],['Глофиш (GloFish)',3,1.5],['Макропод',5,1.2],['Торакатум',15,1.0],['Лабео',25,1.0],
+    ['Данио-рерио',2,1.5],['Барбус суматранский',5,1.2],['Хромис-красавец',30,0.8],
+    ['Пельвикахромис пульхер',3,1.5],['Акара бирюзовая',150,0.6],['Радужницы',15,1.0],['Комета',50,0.7],
+    ['Моллинезия черная',6,1.2],['Голубой дельфин',50,0.7],['Апистограмма Рамирези',3,1.5],
+    ['Гурами мраморный',8,1.0],['Синодонтис',30,0.8],['Гурами жемчужный',8,1.0],['Акантофтальмус',10,1.0],
+    ['Гуппи Эндлера',1,1.5],['Тетры',2,1.5],['Псевдотрофеусы',20,1.0]
   ];
   const volCap = M.waterV * 1;   // 1 г/л — плотная посадка
-  const rows = FISH.map(([n,w]) => {
+  let totalWeight = 0, totalFood = 0, totalPieces = 0;
+  FISH.forEach(([n,w,pct],i) => {
+    const q = fishCart[i] || 0;
+    totalWeight += q*w;
+    totalFood += q*w*pct/100;
+    totalPieces += q;
+  });
+  const avgPct = totalWeight ? totalFood/totalWeight*100 : 0;
+  const foodFmt = v => v <= 0 ? '0' : (v < 1 ? f2(v) : (v < 10 ? f1(v) : f0(v)));
+  const rows = FISH.map(([n,w,pct],i) => {
     const nf = Math.floor(b.fishCap / w);
     const nv = Math.floor(volCap / w);
-    return `<tr><td>${tstr(n)}</td><td class="num">${w}</td><td class="num">${f0(nf)}</td><td class="num">${f0(nv)}</td></tr>`;
+    const q = fishCart[i] || 0;
+    const food = q*w*pct/100;
+    return `<tr><td>${tstr(n)}</td><td class="num">${w}</td><td class="num">${f1(pct)} %</td><td class="num">${f0(nf)}</td><td class="num">${f0(nv)}</td><td class="num"><input class="cart-in" type="number" inputmode="numeric" min="0" max="999" step="1" value="${q}" data-i="${i}" aria-label="${tstr(n)}"></td><td class="num">${foodFmt(food)}</td></tr>`;
   }).join('');
+  const totals = `<tfoot><tr class="tot">
+    <td>${tstr('Итого')}</td>
+    <td class="num">${f0(totalWeight)}</td>
+    <td class="num">${f1(avgPct)} %</td>
+    <td class="num">—</td>
+    <td class="num">—</td>
+    <td class="num">${f0(totalPieces)}</td>
+    <td class="num">${foodFmt(totalFood)}</td>
+  </tr></tfoot>`;
   const loadPct = Math.round(b.load*100);
   const loadCls = b.load > 1 ? 'badge-bad' : (b.load > 0.7 ? 'badge-warn' : 'badge-ok');
   const loadTxt = b.load > 1
@@ -2208,9 +2347,13 @@ function renderBio(M){
       <h2 class="ct">${tstr('Сколько рыб')} <span class="hint">${tstr('по нагрузке, не по комфорту')}</span></h2>
       <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th>${tstr('Рыба')}</th><th>${tstr('Взрослый вес, г')}</th><th>${tstr('По фильтру, шт')}</th><th>${tstr('По объёму, шт')}</th></tr></thead>
+        <thead><tr><th>${tstr('Рыба')}</th><th>${LANG==='en'?'Weight, g':'Вес, г'}</th><th>${LANG==='en'?'Feed, % body':'Корм, % массы'}</th><th>${tstr('По фильтру, шт')}</th><th>${tstr('По объёму, шт')}</th><th>${LANG==='en'?'In cart, pcs':'В корзине, шт'}</th><th>${LANG==='en'?'Total, g feed':'Итог, г корма'}</th></tr></thead>
         <tbody>${rows}</tbody>
+        ${totals}
       </table></div>
+      <p class="note">${LANG==='en'
+        ? 'Total = pcs × weight × percent / 100 per day. Percentages are a guide: they depend on temperature, age and food. The cart updates the “Fish” and “Feeding” fields in the Filter block; both stay editable. Adult weight is a guide. Clownfish is marine, shown as a reference load only.'
+        : 'Итог = шт × вес × процент / 100 в сутки. Проценты — ориентир: зависят от температуры, возраста и корма. Корзина обновляет поля «Рыба» и «Кормление» в блоке «Фильтр»; оба поля остаются редактируемыми. Вес взрослой особи — ориентир. Рыба-клоун — морская, в пресном расчёте приведена справочно.'}</p>
       <div class="warnbox" style="border-color:#e6e7ec;background:#f8f9fb;color:#5b616b">
         ${LANG==='en'
           ? `<b>This is dry mathematics.</b> Only the biological load on the nitrogen cycle is counted.
@@ -2223,6 +2366,25 @@ function renderBio(M){
         Обе цифры — верхняя граница, а не рекомендация.`}
       </div>
     </section>`;
+
+  $('#secBio').querySelectorAll('.cart-in').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const i = +inp.dataset.i;
+      const q = Math.max(0, Math.min(999, Math.round(+inp.value || 0)));
+      fishCart[i] = q;
+      let tw = 0, tf = 0;
+      FISH.forEach(([n,w,pct],j) => {
+        const c = fishCart[j] || 0;
+        tw += c*w;
+        tf += c*w*pct/100;
+      });
+      if(tw > 0){
+        $('#inFish').value = String(Math.round(tw));
+        $('#inRate').value = (tf/tw*100).toFixed(1);
+      }
+      renderAll();
+    });
+  });
 }
 
 function renderTests(M){
@@ -2273,7 +2435,7 @@ function renderTests(M){
     </div>
 
     <section class="card">
-      <h2 class="ct">${tstr('Подмены')} <span class="hint">${tstr('чтобы вернуть в норму')}</span></h2>
+      <h2 class="ct">${tstr('Подмены')} <span class="hint">${LANG==='en'?'to norm or target':'к норме или цели'}</span></h2>
       <div style="overflow-x:auto">
       <table class="tbl">
         <thead><tr><th>${tstr('Параметр')}</th><th>${tstr('Подменить')}</th></tr></thead>
@@ -2296,9 +2458,17 @@ function renderUdo(M){
   ].filter(x => x[2] > 0.001);
 
   const grams = g0 => g0 < 0.01 ? '&lt; 0,01' : (g0 < 1 ? f2(g0) : f1(g0));
+  const ML = LANG==='en' ? 'ml' : 'мл';
+  const mlPart = (g, formula) => {
+    const st = STOCK_BY[formula];
+    if(!st) return '';
+    const v = g / (st.g / 0.5) * 1000;
+    const t = v < 0.1 ? f2(v) : (v < 10 ? f1(v) : f0(v));
+    return ` / ${t} <span class="mut">${ML}</span>`;
+  };
   const rows = all.length
     ? all.map(([n, fm, gram, what]) =>
-      `<tr><td>${tstr(n)}</td><td class="mut">${fm}</td><td class="num">${grams(gram)} <span class="mut">${tstr('г')}</span></td><td class="num">${grams(gram/3)} <span class="mut">${tstr('г')}</span></td><td class="mut">${what}</td></tr>`).join('')
+      `<tr><td>${tstr(n)}</td><td class="mut">${fm}</td><td class="num">${grams(gram)} <span class="mut">${tstr('г')}</span>${mlPart(gram, fm)}</td><td class="num">${grams(gram/3)} <span class="mut">${tstr('г')}</span>${mlPart(gram/3, fm)}</td><td class="mut">${what}</td></tr>`).join('')
     : `<tr><td colspan="5" class="mut">${tstr('Всё в цели — вносить нечего.')}</td></tr>`;
 
   const deficit = [
@@ -2310,18 +2480,75 @@ function renderUdo(M){
     return `<span style="margin-right:14px;white-space:nowrap">${n}: <b class="${cls}">${d > 0.001 ? '+' : ''}${f1(d)}</b></span>`;
   }).join('');
 
+  const kCls = r.finalK > r.TGT.k + 0.01 ? 'badge-warn' : 'badge-ok';
+  const caCls = r.finalCa > r.TGT.ca + 0.01 ? 'badge-warn' : 'badge-ok';
+  const nh3Cls = r.nh3Mass > 0.05 ? 'badge-warn' : 'badge-ok';
+  const ammoniaRows = r.mUrea > 0.001 ? `
+        <tr><td>NH₃ (${LANG==='en'?'free':'свободный'})</td><td class="num"><b class="${nh3Cls}">+${f2(r.nh3Mass)}</b></td><td class="num">—</td><td class="num">—</td></tr>
+        <tr><td>NH₄⁺</td><td class="num">+${f2(r.nh4Mass)}</td><td class="num">—</td><td class="num">—</td></tr>
+        <tr><td>NH₃ + NH₄ (TAN)</td><td class="num">+${f2(r.tanUrea)} <small>N</small></td><td class="num">—</td><td class="num">—</td></tr>` : '';
+  const sideHtml = `<div style="overflow-x:auto;margin-top:12px">
+    <table class="tbl">
+      <thead><tr><th>${LANG==='en'?'Side substance':'Побочное вещество'}</th><th>${LANG==='en'?'Adds, mg/l':'Внесёт, мг/л'}</th><th>${LANG==='en'?'Final':'Итог'}</th><th>${LANG==='en'?'Target':'Цель'}</th></tr></thead>
+      <tbody>
+        <tr><td>K</td><td class="num">+${f1(r.kSide)}</td><td class="num"><b class="${kCls}">${f1(r.finalK)}</b></td><td class="num">${f1(r.TGT.k)}</td></tr>
+        <tr><td>Ca</td><td class="num">+${f1(r.caSide)}</td><td class="num"><b class="${caCls}">${f1(r.finalCa)}</b></td><td class="num">${f1(r.TGT.ca)}</td></tr>
+        <tr><td>SO₄</td><td class="num">+${f1(r.so4)}</td><td class="num">—</td><td class="num">—</td></tr>
+        ${ammoniaRows}
+      </tbody>
+    </table></div>`;
+  const sideNote = (r.kSide < 0.01 && r.caSide < 0.01 && r.so4 < 0.01 && r.mUrea <= 0.001)
+    ? (r.mCSM > 0.001
+        ? `<p class="note">${LANG==='en' ? 'Micro/iron also adds other trace elements (B, Mn, Mo, etc.) — not calculated.' : 'Микро/железо дополнительно даёт другие микроэлементы (B, Mn, Mo и др.) — не рассчитываются.'}</p>`
+        : `<p class="note">${LANG==='en' ? 'No side substances — this recipe adds only the target element.' : 'Побочных веществ нет — рецепт даёт только целевой элемент.'}</p>`)
+    : '';
+  const ammoniaNote = r.mUrea > 0.001
+    ? `<p class="note">${LANG==='en'
+        ? `Urea hydrolyses to NH₃/NH₄⁺. At pH ${f1(r.phU)} and ${f0(r.tempC)} °C free NH₃ is ${f2(r.fNH3*100)} % of TAN, the rest is NH₄⁺. Nitrification then converts them to NO₃.${r.nh3Mass > 0.05 ? ' Free NH₃ is above 0.05 mg/l — dangerous; add urea in small portions.' : ''}`
+        : `Мочевина при гидролизе даёт NH₃/NH₄⁺. При pH ${f1(r.phU)} и ${f0(r.tempC)} °C на свободный NH₃ приходится ${f2(r.fNH3*100)} % TAN, остальное — NH₄⁺. Дальше нитрификация переводит их в NO₃.${r.nh3Mass > 0.05 ? ' Свободный NH₃ выше 0,05 мг/л — опасно; вносите мочевину малыми порциями.' : ''}`}</p>`
+    : '';
+  const overK = r.finalK > r.TGT.k + 0.01, overCa = r.finalCa > r.TGT.ca + 0.01;
+  const overNote = (overK || overCa)
+    ? `<p class="note">${LANG==='en'
+        ? (overK && overCa ? 'K and Ca are above target — fertilizers cannot lower them; a water change is the way.' : overK ? 'K is above target — fertilizers cannot lower it; a water change is the way.' : 'Ca is above target — fertilizers cannot lower it; a water change is the way.')
+        : (overK && overCa ? 'K и Ca выше цели — удобрениями не снизить, нужна подмена.' : overK ? 'K выше цели — удобрениями не снизить, нужна подмена.' : 'Ca выше цели — удобрениями не снизить, нужна подмена.')}</p>`
+    : '';
+
+  /* постоянный справочник концентратов: не зависит от текущего расчёта */
+  const stockRows = STOCK.map(s => `<tr>
+      <td><b>${tstr(s.name)}</b></td>
+      <td class="mut">${s.formula}</td>
+      <td class="num">${f1(0.5)} ${LANG==='en'?'l':'л'} / ${f0(s.g)} ${LANG==='en'?'g':'г'}</td>
+      <td class="num">${f0(s.g/0.5)} ${LANG==='en'?'g/l':'г/л'}</td>
+    </tr>`).join('');
+  const stockHtml = `<section class="card">
+      <h2 class="ct">${LANG==='en'?'Stock recipes':'Рецепты концентратов'} <span class="hint">${LANG==='en'?'0.5 l · fixed':'0,5 л · постоянные'}</span></h2>
+      <p class="note" style="margin-top:0">${LANG==='en'
+        ? 'Amounts are per 0.5 l of ready solution. The ml doses are in the table above. All recipes are fixed and do not depend on the current calculation.'
+        : 'Навеска — на 0,5 л готового раствора. Дозы в мл — в таблице выше. Все рецепты постоянные и не зависят от текущего расчёта.'}</p>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>${LANG==='en'?'Salt':'Соль'}</th><th>${LANG==='en'?'Formula':'Формула'}</th><th>${LANG==='en'?'Per 0.5 l':'На 0,5 л'}</th><th>${LANG==='en'?'Concentration':'Концентрация'}</th></tr></thead>
+        <tbody>${stockRows}</tbody>
+      </table></div>
+      <p class="note">${LANG==='en'
+        ? 'Keep each salt in its own bottle (0.5–0.75 l): never mix phosphate with calcium, magnesium or micro. Use distilled or RO water; macro solutions keep for several months, iron and micro for about a month, urea for 1–2 weeks. Stir until fully dissolved, shake before dosing. Garden nitrate is 98–99 %, add 1–2 % to the mass.'
+        : 'Каждую соль — в отдельной бутылке (0,5–0,75 л): фосфат нельзя смешивать с кальцием, магнием и микро. Готовить на дистиллированной или осмотической воде; макро-растворы хранятся несколько месяцев, железо и микро — около месяца, мочевина — 1–2 недели. Размешивать до полного растворения, перед дозой взбалтывать. Садовая селитра 98–99 %, добавьте 1–2 % к массе.'}</p>
+    </section>`;
+
   $('#secUdo').innerHTML = `
     <section class="card">
       <h2 class="ct">${tstr('Рецепт')} <span class="hint">${LANG==='en' ? `for ${f0(M.waterV)} l` : `на ${f0(M.waterV)} л`}</span></h2>
       <p class="note" style="margin-top:0">${deficit}</p>
+      <p class="note">${LANG==='en' ? `The doses in the table are grams of dry salt / ml of stock solution. Fixed stock recipes are below.` : `В таблице — граммы сухой соли / мл готового раствора. Ниже — постоянные рецепты концентратов.`}</p>
       <div style="overflow-x:auto">
       <table class="tbl">
-        <thead><tr><th>${tstr('В магазине')}</th><th>${tstr('Формула')}</th><th>${tstr('Разовая правка')}</th><th>${tstr('На приём (3 раза в неделю)')}</th><th>${tstr('Что даёт')}</th></tr></thead>
+        <thead><tr><th>${tstr('В магазине')}</th><th>${tstr('Формула')}</th><th>${tstr('Разовая правка')}, ${LANG==='en'?'g / ml':'г / мл'}</th><th>${tstr('На приём (3 раза в неделю)')}, ${LANG==='en'?'g / ml':'г / мл'}</th><th>${tstr('Что даёт')}</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
-      <p class="note">${LANG==='en' ? `The nitrates take as much as the potassium and calcium headroom allows (ceilings ${f0(Math.max(30, g.k))} and ${f0(Math.max(60, g.ca))} mg/l), and the remaining nitrogen goes in as urea. If you do not want to raise calcium, supply all the nitrogen as urea.` : `Селитры берут столько, сколько позволяет запас по калию и кальцию (потолки ${f0(Math.max(30, g.k))} и ${f0(Math.max(60, g.ca))} мг/л), остаток азота уходит мочевиной. Не хотите поднимать кальций — весь азот дайте мочевиной.`}</p>
-      <p class="note">${LANG==='en' ? `Each salt in its own bottle, the weekly mass in 500 ml, split into 3 doses. Do not mix phosphate with calcium, magnesium or micro — it will precipitate. Garden nitrate is 98–99 %, add 1–2 % to the mass.` : `Каждую соль — в отдельной бутылке, недельную массу в 500 мл, делить на 3 приёма. Фосфат не смешивать с кальцием, магнием и микро — выпадет осадок. Садовая селитра 98–99 %, добавьте 1–2 % к массе.`}</p>
-    </section>`;
+      ${sideHtml}${sideNote}${overNote}${ammoniaNote}
+      <p class="note">${LANG==='en' ? `The nitrates take only up to the potassium and calcium targets (${f0(g.k)} and ${f0(g.ca)} mg/l); any remaining nitrogen goes in as urea. If you do not want to raise calcium, supply all nitrogen as urea.` : `Селитры берут только до целей по калию и кальцию (${f0(g.k)} и ${f0(g.ca)} мг/л); остаток азота уходит мочевиной. Не хотите поднимать кальций — весь азот дайте мочевиной.`}</p>
+    </section>
+    ${stockHtml}`;
 }
 
 function renderNow(M){
@@ -2400,11 +2627,15 @@ function setSection(sec){
   else if(sec === 'udo') mainEl.insertBefore(udoBox, $('#secUdo'));
   udoBox.classList.toggle('hide', !onIn);
   udoBox.classList.toggle('three', onIn);
+  udoBox.classList.toggle('udo', sec === 'udo');
   if(onIn){
-    ['cardWater','cardNP','cardMin','cardGoal'].forEach(id => {
+    const col1 = $('#udoCol1'), col2 = $('#udoCol2');
+    ['cardWater','cardNP','cardMin'].forEach(id => {
       const el = document.getElementById(id);
-      if(el && el.parentElement !== udoBox) udoBox.appendChild(el);
+      if(el && el.parentElement !== col1) col1.appendChild(el);
     });
+    const goalEl = document.getElementById('cardGoal');
+    if(goalEl && goalEl.parentElement !== col2) col2.appendChild(goalEl);
     udoBox.querySelectorAll('.f-extra').forEach(el => el.classList.toggle('hide', sec !== 'fert'));
   }
   $('#cardWater').classList.toggle('hide', sec !== 'fert');
@@ -2456,7 +2687,7 @@ function renderAll(){
     t: +$('#inTemp').value || 25,
     prot: clamp(+$('#inProt').value || 40, 20, 60),
     rate: clamp(+$('#inRate').value || 2, 0.5, 5),
-    fish: clamp(+$('#inFish').value || 300, 10, 10000)
+    fish: clamp(+$('#inFish').value || 300, 1, 10000)
   };
   const numIn = id => { const el = document.getElementById(id); return (el && el.value !== '') ? +el.value : null; };
   const fert = {
