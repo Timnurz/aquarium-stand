@@ -42,6 +42,12 @@ Pick a preset in one click, then change length, depth, height and substrate laye
 - Plywood cutting plan per sheet, parts count, assembly order and hardware.
 - The calculation uses the maximum tank weight, not the selected substrate layer.
 
+**Hardware.** 5×70, 4×30 and 3.5×16 screws; Ø5×16 shelf pins; NO-10 furniture feet; 110° overlay hinges; spacers for the overlay top; PVA D3 glue.
+
+**Tools.** Drill/driver with PH2/PZ2 bits; Ø3, Ø4, Ø5 drill bits and a Ø35 Forstner bit; countersink; 3/4/5 mm hex keys; mallet, clamps, square, tape measure, pencil and level; sander or 120/180 sanding block; primer and paint or oil, brush/roller, tray and masking tape; wood filler if parts are painted; respirator and gloves.
+
+**Assembly order.** Cutting → drilling → carcass → back panel → top → shelves → feet → doors → finishing → check.
+
 ## Equipment
 
 **Inputs.** Water volume comes from the Aquarium tab; choose a filter and press “Media” to put its volume into the biology calculation.

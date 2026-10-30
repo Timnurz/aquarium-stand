@@ -42,10 +42,23 @@ body{
 .tags span{font-size:11.5px;letter-spacing:.04em;color:var(--tx2);border:1px solid var(--line2);border-radius:999px;padding:6px 12px;background:var(--soft)}
 
 /* ---------- сетка ---------- */
-.grid{display:grid;grid-template-columns:342px minmax(0,1fr);gap:20px;align-items:start}
-@media (max-width:1080px){.grid{grid-template-columns:1fr}.side{position:static!important;max-height:none;overflow:visible;padding-right:0}}
+.grid{display:grid;grid-template-columns:342px minmax(0,1fr);gap:20px;align-items:start;min-width:0;width:100%}
+.main{min-width:0;width:100%}
+@media (max-width:1080px){
+  html,body{max-width:100%;overflow-x:hidden}
+  .grid{display:flex;flex-direction:column;gap:16px;align-items:stretch;width:100%;min-width:0}
+  .main{display:contents}
+  .segs,.seghint,.kpis,#kpiNote,
+  #secTank,#secStand,#secGear,#secBio,#secFert,#udoInputs,#secUdo{width:100%;min-width:0}
+  .segs{order:1}
+  .seghint{order:2}
+  .side{order:3;width:100%;min-width:0;position:static!important;max-height:none!important;overflow:visible!important;padding-right:0;height:auto}
+  .kpis{order:4}
+  #kpiNote{order:5}
+  #secTank,#secStand,#secGear,#secBio,#secFert,#udoInputs,#secUdo{order:6}
+}
 
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px;min-width:0}
 .card + .card{margin-top:16px}
 
 /* ---------- разделы ---------- */
@@ -202,6 +215,8 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
 .steps h5{margin:3px 0 4px;font-size:14px;font-weight:650}
 .steps p{margin:0;color:var(--tx2);font-size:13px;line-height:1.55}
 .steps p b{color:var(--tx);font-weight:650}
+.tools{margin:0;padding-left:20px;color:var(--tx2);font-size:13px;line-height:1.6}
+.tools li{margin:0 0 5px}
 
 /* ---------- мелочи ---------- */
 .chk{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
@@ -265,6 +280,7 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
   .legend{font-size:11px;gap:8px 12px}
   .steps li{padding-left:42px}
   .steps p{font-size:12.5px}
+  .tools{font-size:12.5px}
   .warnbox{font-size:12px}
   .ftr{margin-top:20px;gap:10px}
 }
@@ -665,7 +681,7 @@ const EN_MAP = {
   'Рецепт':'Recipe','В магазине':'Store name','Формула':'Formula','Разовая правка':'One-off',
   'На приём (3 раза в неделю)':'Per dose (3×/week)','Что даёт':'Provides',
   'Тумба':'Cabinet','Каркас':'Frame','Спереди':'Front','Сбоку':'Side','Узел полки':'Shelf detail','авто':'auto',
-  'Готовый вид':'Finished view','Фурнитура':'Hardware','Сборка':'Assembly',
+  'Готовый вид':'Finished view','Фурнитура':'Hardware','Сборка':'Assembly','Инструменты':'Tools',
   'по габаритам':'by dimensions','стенки / дно':'walls / bottom','вода, стекло, грунт':'water, glass, substrate',
   'норма 3,8':'factor 3.8','3–5 объёмов':'3–5 volumes','20–35 лм/л':'20–35 lm/l','0,3–0,5 Вт/л':'0.3–0.5 W/l',
   '0,5–1 на 100 л':'0.5–1 per 100 l','0,8–1 Вт/л':'0.8–1 W/l','в неделю':'per week','нитрификация':'nitrification',
@@ -1861,10 +1877,17 @@ function renderAsm(M){
   ];
 
   const purpose = (en, ru) => LANG==='en' ? en : ru;
+  const tools = [
+    purpose('Drill/driver with PH2/PZ2 bits','Шуруповерт/дрель-шуруповерт, биты PH2/PZ2'),
+    purpose('Drill bits Ø3, Ø4, Ø5; Forstner Ø35; countersink','Сверла Ø3, Ø4, Ø5; Форстнер Ø35; зенкер'),
+    purpose('Hex keys 3/4/5 mm','Шестигранники 3/4/5 мм'),
+    purpose('Mallet, clamps, square, tape measure, pencil, level','Киянка, струбцины, угольник, рулетка, карандаш, уровень'),
+    purpose('Sander or sanding block 120/180','Шлифмашина или шлифовальная губка 120/180'),
+    purpose('Primer and paint or oil; brush/roller, tray, masking tape','Грунт и краска или масло; кисть/валик, лоток, малярный скотч'),
+    purpose('Wood filler if parts are painted; respirator and gloves','Шпаклевка по дереву, если детали окрашиваются; респиратор и перчатки')
+  ];
   $('#asmCard').innerHTML = `
-    <h2 class="ct">${tstr('Сборка')}</h2>
-    <ol class="steps">${steps.map(([h,p])=>`<li><h5>${tstr(h)}</h5><p>${p}</p></li>`).join('')}</ol>
-    <h2 class="ct" style="margin-top:26px">${tstr('Фурнитура')}</h2>
+    <h2 class="ct">${tstr('Фурнитура')}</h2>
     <div style="overflow-x:auto">
     <table class="tbl">
       <thead><tr><th>${tstr('Позиция')}</th><th>${tstr('Кол-во')}</th><th>${tstr('Назначение')}</th></tr></thead>
@@ -1879,9 +1902,14 @@ function renderAsm(M){
         <tr><td>${purpose('PVA glue D3','Клей ПВА Д3')}</td><td class="num">1</td><td class="mut">${purpose('all joints','все соединения')}</td></tr>
       </tbody>
     </table></div>
+    <h2 class="ct" style="margin-top:26px">${tstr('Инструменты')}</h2>
+    <ul class="tools">${tools.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <h2 class="ct" style="margin-top:26px">${tstr('Сборка')}</h2>
+    <ol class="steps">${steps.map(([h,p])=>`<li><h5>${tstr(h)}</h5><p>${p}</p></li>`).join('')}</ol>
     <div class="warnbox" style="border-color:#e6e7ec;background:#f8f9fb;color:#5b616b">
       ${purpose('Uprights carry the weight in compression; the fasteners only resist shear. Put a 5–10 mm mat under the aquarium.','Стойки передают вес сжатием, крепёж держит только от сдвига. Под аквариум — подложка 5–10 мм.')}
     </div>`;
+
 }
 
 function renderView(M){
