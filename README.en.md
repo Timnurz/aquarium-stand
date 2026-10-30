@@ -6,7 +6,6 @@
 
 A single HTML page with no server, build step or dependencies. Enter the tank dimensions and get glass, substrate, weight, a stand with a plywood cutting plan, equipment sizing, biological load, water tests and fertilizer recipes. It works offline, on a phone, and saves your inputs.
 
-This is the first public version: the project is new, so this README is not a changelog — it describes what already works.
 
 ![Aquarium Calculator](screenshot.png)
 
@@ -16,11 +15,11 @@ The calculator covers one aquarium and one stand. It suits planted tanks from na
 
 ![A range of minimalist planted aquariums](<Ряд минималистичных аквариумов с растениями.png>)
 
-Pick a preset in one click, then change length, depth, height, substrate layer and the number of doors.
+Pick a preset in one click, then change length, depth, height and substrate layer; the number of doors is set on the Stand tab.
 
 ## Aquarium
 
-**Inputs.** Tank length, depth and height; substrate layer 0 / 3 / 5 / 7 cm; number of stand doors for tanks 800 mm and longer; a preset.
+**Inputs.** Tank length, depth and height; substrate layer 0 / 3 / 5 / 7 cm; a preset.
 
 **Outputs.**
 
@@ -34,7 +33,7 @@ Pick a preset in one click, then change length, depth, height, substrate layer a
 
 ## Stand
 
-**Inputs.** Stand height, plywood sheet size, number of doors; the view can be switched.
+**Inputs.** Stand height, plywood sheet size and number of doors; the view can be switched.
 
 **Outputs.**
 
@@ -135,13 +134,12 @@ https://timnurz.github.io/aquarium-stand/?l=1500&d=500&h=600&H=900&soil=50#fert
 
 ## License
 
-Do whatever you want: use it, change it, sell stands.
+The project may be used, modified and distributed freely. It is provided “as is”, without warranty: the author is not liable for calculation results or built structures.
 
----
+Personal and commercial use is allowed. A link to the source is appreciated but not required.
 
-### Development
+## Development
 
-1. Edit `aquarium-stand.html` locally.
-2. Run `publish.ps1` — it copies the source to `site/index.html`.
-3. There is no `site` folder in the repository: the contents of `site` are the GitHub Pages root. Upload `index.html`, `README.md`, `README.en.md`, `screenshot.png` and `Ряд минималистичных аквариумов с растениями.png` to the repository root.
-4. GitHub Pages rebuilds within a minute.
+The source is `aquarium-stand.html`. To publish, run `publish.ps1`; it copies the file to `site/index.html`. Upload the contents of `site/` — `index.html`, `README.md`, `README.en.md`, `screenshot.png` and the planted-aquariums image — to the repository root. GitHub Pages updates automatically after the commit.
+
+For a local check, open `index.html` in a browser.
