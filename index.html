@@ -117,6 +117,12 @@ select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(77,107,254,.14);b
 .presets button{background:var(--soft);border:1px solid var(--line2);color:var(--tx2);border-radius:9px;padding:5px 8px;font:500 11px/1.4 var(--mono);cursor:pointer;transition:.14s}
 .presets button:hover{border-color:var(--acc);color:var(--acc-dk);background:var(--acc-soft)}
 .note{margin:12px 0 0;font-size:12px;color:var(--tx3);line-height:1.5}
+.spec{font-size:13px;line-height:1.65;color:var(--tx2)}
+.spec p{margin:0 0 10px}
+.spec p:last-child{margin-bottom:0}
+.spec b{color:var(--tx)}
+.spec code{display:inline-block;max-width:100%;background:var(--soft);border:1px solid var(--line);border-radius:5px;padding:2px 6px;font:12px/1.45 var(--mono);color:var(--tx);overflow-wrap:anywhere}
+.spec h3{font-size:14px;line-height:1.4;margin:18px 0 6px;color:var(--tx)}
 
 .swatches{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .sw{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line2);background:var(--soft);border-radius:12px;padding:9px 11px;cursor:pointer;font-size:13px;color:var(--tx2);transition:.15s}
@@ -572,8 +578,14 @@ function chooseSections(Lc, spanMax){
    ЯЗЫК
    ========================================================= */
 let LANG = 'ru';
-try { LANG = localStorage.getItem('aqua-lang') || 'ru'; } catch(e){}
-if(LANG !== 'en') LANG = 'ru';
+let savedLang = null;
+try { savedLang = localStorage.getItem('aqua-lang'); } catch(e){}
+if(savedLang === 'en' || savedLang === 'ru'){
+  LANG = savedLang;
+} else {
+  const navLang = (typeof navigator !== 'undefined' && ((navigator.languages && navigator.languages[0]) || navigator.language)) || '';
+  LANG = navLang ? (/^ru\b/i.test(navLang) ? 'ru' : 'en') : 'ru';
+}
 
 const I18N = {
   ru: {
@@ -2113,6 +2125,82 @@ function renderTank(M){
     return `<tr><td>${tstr(name)}<span class="mut"> · ${f1(rho)} ${tstr('кг/л')}</span></td>${cells}</tr>`;
   }).join('');
 
+  const specHtml = LANG === 'en' ? `<p><b>How to read.</b> Below is the full glass calculation. First the meaning and assumptions, then the formulas. Dimensions are in mm, stresses in MPa, masses in kg. Symbols: L, D, Ht — external length, depth and height; t<sub>w</sub> — wall thickness; t<sub>b</sub> — bottom thickness; h<sub>w</sub> — water level; s<sub>s</sub> — seam; β — shape coefficient; σ — stress; n — safety factor.</p>
+
+<h3>1. Water and dimensions.</h3><p> Water level h<sub>w</sub> = max(120, Ht − 30) mm. The 30 mm is freeboard: water must not reach the rim. Internal dimensions: L<sub>i</sub> = L − 2t<sub>w</sub>, D<sub>i</sub> = D − 2t<sub>w</sub>. Water pressure grows with depth, so the calculation uses h<sub>w</sub>, not the full height Ht. Densities: glass 2500 kg/m³, water 1000 kg/m³, substrate from the table; g = 9.81 m/s².</p>
+
+<h3>2. Where the stress comes from.</h3><p> The wall is treated as a plate supported on three sides: the bottom and the two side edges. The longer the span and the deeper the water, the greater the bending moment. The bending strength of sheet glass is σ<sub>b</sub> = 40 MPa. The safety factor n = 3.8 is an engineering margin: it covers the error of the empirical formula, load unevenness and ageing; it is not a manufacturer's datasheet. Allowable stress σ<sub>a</sub> = 40 / 3.8 = 10.53 MPa = 10.53·10<sup>6</sup> Pa. Empirical coefficient β<sub>0</sub> = 0.15. Required thickness without reinforcement:</p>
+<p><code>s<sub>0</sub> = (L/1000) · √(β<sub>0</sub> · 1000 · g · (h<sub>w</sub>/1000) / σ<sub>a</sub>) · 1000</code></p>
+<p>With rim bracing and cross-braces: β = β<sub>0</sub> · k<sub>r</sub> · k<sub>b</sub>, k<sub>r</sub> = 0.8, k<sub>b</sub> = 0.7. Then s<sub>req</sub> is the same formula with β. Actual stress at the selected t<sub>w</sub>:</p>
+<p><code>σ = β · 1000 · g · (h<sub>w</sub>/1000) · (L/1000)<sup>2</sup> / (t<sub>w</sub>/1000)<sup>2</sup></code></p>
+<p>σ is in Pa; divide by 10<sup>6</sup> for MPa. Actual safety n<sub>f</sub> = 40 / σ. If n<sub>f</sub> &lt; 3.8, the thickness is insufficient. Glass deflection is not calculated separately in this model: the criterion is stress.</p>
+
+<h3>3. Thickness selection.</h3><p> Standard thickness series: 4, 5, 6, 8, 10, 12, 15, 19, 24 mm; thinner sheets are not considered. t<sub>w</sub> is the first value ≥ s<sub>req</sub>. t<sub>b</sub> is the first ≥ max(t<sub>w</sub> + 2, s<sub>req</sub> + 2). Why the bottom is thicker: the walls stand on it, the lower seam is more loaded and the bending moment near the bottom is higher. Why a series rather than an arbitrary number: sheet glass is made in standard thicknesses. If s<sub>req</sub> > 24 mm, the calculation is capped at 24 mm — a technologist is needed.</p>
+
+<h3>4. Rim bracing, cross-braces, partitions.</h3><p> Rim bracing is a 60 mm strip around the top perimeter; it is enabled when L > 800 mm or h<sub>w</sub> > 400 mm: two strips front/back and two at the sides. Cross-braces are transverse 60 mm braces; they are enabled when L ≥ 900 mm, count n<sub>b</sub> = max(1, round(L/700) − 1). They tie the top and reduce the design span, hence k<sub>r</sub> = 0.8 and k<sub>b</sub> = 0.7. Internal partitions are not part of the model: they do not affect thickness selection; their mass and local loads are calculated separately.</p>
+
+<h3>5. Seam and parts.</h3><p> Seam s<sub>s</sub>: 1.5 mm for t<sub>w</sub> ≤ 8; 2 mm for t<sub>w</sub> ≤ 12; 2.5 mm for t<sub>w</sub> > 12; 3 mm when L ≥ 2000 or Ht ≥ 700. The seam depends on glass thickness and size: a thicker sheet and a larger tank need a wider silicone layer. Parts: bottom L × D; sides D × (Ht − t<sub>b</sub>); front and back (L − 2t<sub>w</sub> − 2s<sub>s</sub>) × (Ht − t<sub>b</sub>). The seam is already deducted from the front/back width; do not subtract it again. Wall height is Ht minus bottom thickness.</p>
+
+<h3>6. Weight.</h3><p> Glass mass: m<sub>g</sub> = ((2LHt + 2DHt)t<sub>w</sub> + LD·t<sub>b</sub>) · 10<sup>−9</sup> · 2500. This is an upper estimate: the seam and edges are not deducted. Water volume: V<sub>w</sub> = L<sub>i</sub>D<sub>i</sub>(h<sub>w</sub> − h<sub>s</sub>) · 10<sup>−6</sup> l; water mass equals V<sub>w</sub> in kg. Substrate: V<sub>s</sub> = L<sub>i</sub>D<sub>i</sub>h<sub>s</sub> · 10<sup>−6</sup> l, m<sub>s</sub> = V<sub>s</sub>ρ<sub>s</sub>. Actual weight M = m<sub>g</sub> + V<sub>w</sub> + m<sub>s</sub>. For loads M<sub>design</sub> = 1.1 · M(5 cm substrate) — the maximum; glass and stand use M<sub>design</sub> even when another layer is selected. The 10 % covers hardware, reinforcement and uneven load.</p>
+
+<h3>7. Tolerances and limits.</h3><p> This is an engineering estimate, not a manufacturer's datasheet. Included: safety factor 3.8; +10 % weight; nominal thickness; 30 mm freeboard. Not included: impact and thermal loads, edge quality, silicone strength, sheet thickness tolerance, internal partitions and water dynamics. For L > 1500 mm, have the calculation checked by a glass workshop.</p>
+
+<h3>8. Example 1200 × 500 × 500.</h3><p> The same steps on concrete numbers.</p>
+<table class="tbl" style="margin-top:10px">
+<thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>h<sub>w</sub></td><td>470 mm</td></tr>
+<tr><td>β</td><td>0.084</td></tr>
+<tr><td>s<sub>0</sub> / s<sub>req</sub></td><td>9.73 / 7.28 mm</td></tr>
+<tr><td>t<sub>w</sub> / t<sub>b</sub></td><td>8 / 10 mm</td></tr>
+<tr><td>σ / n<sub>f</sub></td><td>8.71 MPa / ×4.59</td></tr>
+<tr><td>Seam</td><td>1.5 mm</td></tr>
+<tr><td>Rim bracing / cross-braces</td><td>yes / 1</td></tr>
+<tr><td>Front and back</td><td>1181 × 490 mm</td></tr>
+<tr><td>Side</td><td>500 × 490 mm</td></tr>
+<tr><td>Glass / water / substrate</td><td>49 / 241 / 43 kg</td></tr>
+<tr><td>M / M<sub>design</sub></td><td>333 / 366 kg</td></tr>
+</tbody></table>
+
+<h3>9. Calculation order.</h3><p> 1) h<sub>w</sub>; 2) β and s<sub>0</sub>/s<sub>req</sub>; 3) t<sub>w</sub>/t<sub>b</sub>; 4) seam and parts; 5) masses; 6) M and M<sub>design</sub>. If length or water height changes, all steps are recalculated; the thickness may move to the next standard value.</p>` : `<p><b>Как читать.</b> Ниже — полный расчёт стекла. Сначала смысл и допущения, затем формулы. Размеры в мм, напряжения в МПа, массы в кг. Обозначения: L, D, Ht — наружные длина, глубина и высота; t<sub>w</sub> — толщина стенки; t<sub>b</sub> — толщина дна; h<sub>w</sub> — уровень воды; s<sub>ш</sub> — шов; β — коэффициент формы; σ — напряжение; n — запас.</p>
+
+<h3>1. Вода и размеры.</h3><p> Уровень воды h<sub>w</sub> = max(120, Ht − 30) мм. 30 мм — свободный борт: вода не должна доходить до кромки. Внутренние размеры: L<sub>i</sub> = L − 2t<sub>w</sub>, D<sub>i</sub> = D − 2t<sub>w</sub>. Вода давит на стенку тем сильнее, чем глубже, поэтому в расчёт идёт h<sub>w</sub>, а не полная высота Ht. Плотности: стекло 2500 кг/м³, вода 1000 кг/м³, грунт — по таблице; g = 9,81 м/с².</p>
+
+<h3>2. Откуда напряжение.</h3><p> Стенка рассматривается как пластина, опёртая по трём сторонам: низ и две боковые кромки. Чем длиннее пролёт и глубже вода, тем больше изгибающий момент. Предел изгиба листового стекла σ<sub>изг</sub> = 40 МПа. Запас n = 3,8 — инженерный: он покрывает неточность эмпирической формулы, неравномерность нагрузки и старение; это не паспорт производителя. Допускаемое напряжение σ<sub>доп</sub> = 40 / 3,8 = 10,53 МПа = 10,53·10<sup>6</sup> Па. Эмпирический коэффициент β<sub>0</sub> = 0,15. Требуемая толщина без усиления:</p>
+<p><code>s<sub>без</sub> = (L/1000) · √(β<sub>0</sub> · 1000 · g · (h<sub>w</sub>/1000) / σ<sub>доп</sub>) · 1000</code></p>
+<p>С отбортовкой и стяжками: β = β<sub>0</sub> · k<sub>отб</sub> · k<sub>стяж</sub>, k<sub>отб</sub> = 0,8, k<sub>стяж</sub> = 0,7. Тогда s<sub>нуж</sub> — та же формула с β. Фактическое напряжение при выбранной t<sub>w</sub>:</p>
+<p><code>σ = β · 1000 · g · (h<sub>w</sub>/1000) · (L/1000)<sup>2</sup> / (t<sub>w</sub>/1000)<sup>2</sup></code></p>
+<p>σ получается в Па; в МПа — делить на 10<sup>6</sup>. Фактический запас n<sub>ф</sub> = 40 / σ. Если n<sub>ф</sub> &lt; 3,8, толщина недостаточна. Прогиб стекла в этой модели отдельно не считается: критерий — напряжение.</p>
+
+<h3>3. Выбор толщины.</h3><p> Ряд стандартных толщин: 4, 5, 6, 8, 10, 12, 15, 19, 24 мм; более тонкие листы не рассматриваются. t<sub>w</sub> — первый элемент ряда ≥ s<sub>нуж</sub>. t<sub>b</sub> — первый ≥ max(t<sub>w</sub> + 2, s<sub>нуж</sub> + 2). Почему дно толще: на нём лежат стенки, нижний шов нагружен сильнее, а изгибающий момент у дна больше. Почему ряд, а не произвольное число: листовое стекло выпускается стандартных толщин. Если s<sub>нуж</sub> > 24 мм, расчёт упирается в 24 мм — нужен технолог.</p>
+
+<h3>4. Отбортовка, стяжки, перегородки.</h3><p> Отбортовка — полоса 60 мм по верхнему периметру; включается при L > 800 мм или h<sub>w</sub> > 400 мм: две полосы спереди/сзади и две по бокам. Стяжки — поперечные распорки 60 мм; включаются при L ≥ 900 мм, количество n<sub>с</sub> = max(1, round(L/700) − 1). Они стягивают верх и уменьшают расчётный пролёт, поэтому k<sub>отб</sub> = 0,8 и k<sub>стяж</sub> = 0,7. Внутренние перегородки в модель не входят: они не участвуют в выборе толщины; их масса и локальные нагрузки считаются отдельно.</p>
+
+<h3>5. Шов и детали.</h3><p> Шов s<sub>ш</sub>: 1,5 мм при t<sub>w</sub> ≤ 8; 2 мм при t<sub>w</sub> ≤ 12; 2,5 мм при t<sub>w</sub> > 12; 3 мм при L ≥ 2000 или Ht ≥ 700. Шов зависит от толщины стекла и размера: чем толще лист и больше аквариум, тем шире слой силикона. Детали: дно L × D; боковины D × (Ht − t<sub>b</sub>); передняя и задняя (L − 2t<sub>w</sub> − 2s<sub>ш</sub>) × (Ht − t<sub>b</sub>). Шов уже вычтен из ширины передней/задней; не вычитайте его повторно. Высота стенки — Ht минус толщина дна.</p>
+
+<h3>6. Вес.</h3><p> Масса стекла: m<sub>g</sub> = ((2LHt + 2DHt)t<sub>w</sub> + LD·t<sub>b</sub>) · 10<sup>−9</sup> · 2500. Это верхняя оценка: шов и кромки не вычитаются. Объём воды: V<sub>w</sub> = L<sub>i</sub>D<sub>i</sub>(h<sub>w</sub> − h<sub>s</sub>) · 10<sup>−6</sup> л; масса воды численно равна V<sub>w</sub> в кг. Грунт: V<sub>s</sub> = L<sub>i</sub>D<sub>i</sub>h<sub>s</sub> · 10<sup>−6</sup> л, m<sub>s</sub> = V<sub>s</sub>ρ<sub>s</sub>. Фактический вес M = m<sub>g</sub> + V<sub>w</sub> + m<sub>s</sub>. Для нагрузок M<sub>расч</sub> = 1,1 · M(5 см грунта) — максимум; стекло и тумба считаются по M<sub>расч</sub>, даже если выбран другой слой. 10 % — запас на крепёж, арматуру и неравномерность.</p>
+
+<h3>7. Допуски и ограничения.</h3><p> Это инженерная оценка, не паспорт производителя. Учитываются: запас 3,8; +10 % веса; номинальная толщина; 30 мм свободного борта. Не учитываются: ударные и температурные нагрузки, качество кромки, прочность силикона, отклонение толщины листа, внутренние перегородки и динамика воды. Для L > 1500 мм расчёт нужно проверить у технолога.</p>
+
+<h3>8. Пример 1200 × 500 × 500.</h3><p> Ниже — те же шаги на конкретных числах.</p>
+<table class="tbl" style="margin-top:10px">
+<thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+<tbody>
+<tr><td>h<sub>w</sub></td><td>470 мм</td></tr>
+<tr><td>β</td><td>0,084</td></tr>
+<tr><td>s<sub>без</sub> / s<sub>нуж</sub></td><td>9,73 / 7,28 мм</td></tr>
+<tr><td>t<sub>w</sub> / t<sub>b</sub></td><td>8 / 10 мм</td></tr>
+<tr><td>σ / n<sub>ф</sub></td><td>8,71 МПа / ×4,59</td></tr>
+<tr><td>Шов</td><td>1,5 мм</td></tr>
+<tr><td>Отбортовка / стяжки</td><td>да / 1</td></tr>
+<tr><td>Передняя и задняя</td><td>1181 × 490 мм</td></tr>
+<tr><td>Боковина</td><td>500 × 490 мм</td></tr>
+<tr><td>Стекло / вода / грунт</td><td>49 / 241 / 43 кг</td></tr>
+<tr><td>M / M<sub>расч</sub></td><td>333 / 366 кг</td></tr>
+</tbody></table>
+
+<h3>9. Порядок расчёта.</h3><p> 1) h<sub>w</sub>; 2) β и s<sub>без</sub>/s<sub>нуж</sub>; 3) t<sub>w</sub>/t<sub>b</sub>; 4) шов и детали; 5) массы; 6) M и M<sub>расч</sub>. Если меняется длина или высота воды, все пункты пересчитываются; толщина может измениться на следующую стандартную.</p>`;
+
   $('#secTank').innerHTML = `
     <section class="card viewer">
       <div class="stage">${drawTank(M)}</div>
@@ -2178,6 +2266,11 @@ function renderTank(M){
         <tbody>${soilRows}</tbody>
       </table></div>
       <p class="note">${LANG==='en' ? `Bottom area ${(M.innerL*M.innerD/1e6).toFixed(2)} m². Bulk weight is approximate and depends on grain size and moisture.` : `Площадь дна ${(M.innerL*M.innerD/1e6).toFixed(2)} м². Насыпной вес — ориентировочный, зависит от фракции и влажности.`}</p>
+    </section>
+
+    <section class="card">
+      <h2 class="ct">${LANG==='en' ? 'Glass calculation specification' : 'Спецификация расчёта стекла'} <span class="hint">${LANG==='en' ? 'detailed' : 'подробно'}</span></h2>
+      <div class="spec">${specHtml}</div>
     </section>`;
 }
 

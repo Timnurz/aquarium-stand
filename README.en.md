@@ -4,89 +4,115 @@
 
 **[Open the calculator →](https://timnurz.github.io/aquarium-stand/)**
 
-A single HTML page with no server and no dependencies: enter your tank dimensions and get glass thickness, substrate, total weight, a stand with a plywood cutting plan, equipment sizing, biological load, water tests and fertilizer recipes. It works offline, switches between Russian and English, and has a mobile layout.
+A single HTML page with no server, build step or dependencies. Enter the tank dimensions and get glass, substrate, weight, a stand with a plywood cutting plan, equipment sizing, biological load, water tests and fertilizer recipes. It works offline, on a phone, and saves your inputs.
+
+This is the first public version: the project is new, so this README is not a changelog — it describes what already works.
 
 ![Aquarium Calculator](screenshot.png)
+
+## What it is for
+
+The calculator covers one aquarium and one stand. It suits planted tanks from nano to large: there are 8 presets, from 600 × 300 × 300 to 2400 × 600 × 700.
+
 ![A range of minimalist planted aquariums](<Ряд минималистичных аквариумов с растениями.png>)
 
-The calculator is built for a series of small planted tanks, from nano to large. The presets already include a range of minimalist planted aquariums:
+Pick a preset in one click, then change length, depth, height, substrate layer and the number of doors.
 
-| Dimensions, mm | Scenario |
-|---|---|
-| 600 × 300 × 300 | nano planted tank, one section |
-| 800 × 350 × 400 | small planted tank |
-| 1000 × 400 × 500 | medium planted tank |
-| 1200 × 500 × 500 | classic 120 cm |
-| 1500 × 500 × 600 | large planted tank |
-| 1800 × 600 × 600 | extra large |
-| 2000 × 600 × 700 | very large |
-| 2400 × 600 × 700 | maximum preset |
+## Aquarium
 
-For each option the calculator covers glass, stand, filter, light, CO₂, biological load and fertilizers. Pick a preset in one click, then change any dimension.
+**Inputs.** Tank length, depth and height; substrate layer 0 / 3 / 5 / 7 cm; number of stand doors for tanks 800 mm and longer; a preset.
 
-## What is new
+**Outputs.**
 
-- **Top-50 popular fish** : adult weight, recommended feeding percentage, cart and total feed.
-- **Fish cart**: quantity → total weight → feed in grams; the “Fish” and “Feeding” fields in the Filter block update automatically but stay editable.
-- **40 filters** in the reference table: canisters, hang-on-back and internal, including Aquael Fan 1/2/3 Plus, Aquael Versamax, Tetra EasyCrystal, Eheim Liberty, AquaClear and Sunsun.
-- **Filter type** with type-specific real flow: 55 % of the datasheet for canisters, 75 % for hang-on-back, 80 % for internal.
-- **Fertilizers in grams and millilitres**: the main recipe shows the ready-solution dose next to the dry-salt mass.
-- **Fixed stock recipes**: 0.5 l of solution, 50 g of macro salts, 40 g of potassium sulfate, 5 g of micro; concentrations 100 / 80 / 10 g/l.
-- **Two-column fertilizer layout**: “Nitrogen and phosphorus” + “Minerals” on the left, “Targets” on the right; the “Recipe” is full width below.
-- **Side substances**: K, Ca, SO₄ and, for urea, NH₃, NH₄⁺ and TAN with a pH/temperature split.
-- **K and Ca targets**: nitrates are added only up to the target; if K or Ca is already above it, nitrogen goes in as urea and a water change is suggested.
-- **Frame isometric view**: the wide right face of an upright is drawn before the shelves and the narrow front face after them, so shelves and uprights no longer show through each other.
-- **Mobile layout**: compact spacing, scrollable tabs, one-column tables and cutting plans, iPhone safe areas.
+- Wall and bottom thickness with a safety factor of 3.8; rim bracing and cross-braces; glass parts, seam and dimensions.
+- Gross volume from external dimensions and calculated water volume with glass and the selected substrate layer.
+- Actual weight for the selected layer and maximum weight for loads: 5 cm substrate + 10 %.
+- Mass of glass, water and substrate; substrate table for 3 / 5 / 7 cm.
+- At the bottom — a glass calculation specification: formulas, coefficients and a 1200 × 500 × 500 example.
 
-## Six tabs
+**How to read it.** Glass and stand always use the maximum weight, even when another layer is selected. The other tabs use the calculated water volume for the selected layer. This keeps the stand conservative while equipment and biology use the actual water volume.
 
-| Tab | What it shows |
-|---|---|
-| **Aquarium** | Glass thickness with a safety factor, rim bracing and cross-braces, number of stand doors, substrate table (volume and weight for 3 / 5 / 7 cm), total weight broken down by parts |
-| **Stand** | Isometric view, frame, front and side views, shelf detail, top panel deflection check, plywood cutting plan per sheet, assembly order and hardware |
-| **Equipment** | Filter sized by real flow, light in lumens, aeration, heating, reference table of 40 filter models (canisters, hang-on-back, internal), cycling order |
-| **Biology** | Biofilter capacity by media surface area, feed and fish limit, nitrate and phosphate accumulation, top-50 fish with weight, feeding percentage, cart and totals |
-| **Tests** | 15 water parameters against reference ranges, CO₂ from pH and KH, threshold-based recommendations, water changes to norm and to target |
-| **Fertilizers** | Salt recipe in grams and ml, fixed 0.5 l stock solutions, side K/Ca/SO₄, ammonia and ammonium from urea |
+## Stand
 
-## How to use
+**Inputs.** Stand height, plywood sheet size, number of doors; the view can be switched.
 
-1. Enter tank length, depth and height — or pick a preset from the range above.
-2. For tanks 800 mm and longer, choose the number of stand doors (a sensible default is filled in: 3 for 1.2 m).
-3. On the Stand tab set the height and the plywood sheet size.
-4. On the Equipment tab choose filter type and model; the “Media” button fills the media volume into the biology calculation.
-5. On the Biology tab add fish to the cart. The total weight and weighted average feeding percentage are copied into the “Fish” and “Feeding” fields of the Filter block.
-6. On the Tests tab set current values and targets. Water changes are calculated both to the norm and to your target.
-7. On the Fertilizers tab get salt grams, ready-solution millilitres and side substances.
+**Outputs.**
 
-Everything else recalculates automatically. Your inputs and language choice are stored in the browser, so they are still there on your next visit. The interface switches between Russian and English with the **RU | EN** button in the header.
+- Isometric view, frame, front and side views, shelf detail.
+- Top panel deflection check: allowable deflection 3 mm, stress 8 MPa, plywood modulus 6 GPa.
+- Plywood cutting plan per sheet, parts count, assembly order and hardware.
+- The calculation uses the maximum tank weight, not the selected substrate layer.
 
-## What is calculated and how
+## Equipment
 
-- **Glass** — a plate supported on three sides. Bending strength 40 MPa, safety factor 3.8. Rim bracing reduces load by 20 %, a cross-brace by 30 %.
-- **Stand top** — a simply supported beam. Allowable deflection 3 mm, allowable stress 8 MPa, plywood modulus 6 GPa.
-- **Weight** — water is the volume minus glass and substrate, substrate is counted by bulk density, plus 10 % margin.
-- **Filter** — 3–5 tank volumes per hour of real flow. In the reference table real flow is 55 % of the datasheet for canisters, 75 % for hang-on-back and 80 % for internal filters.
-- **Biology** — media surface area × 0.45 g of nitrogen per m² per day; 48 mg of nitrogen per gram of feed at 40 % protein; temperature factor Q₁₀ = 2.
-- **Fish and feed** — per fish: `quantity × weight × percentage / 100`; total weight is the sum of `quantity × weight`; the average percentage is weighted by weight. The cart updates the “Fish” and “Feeding” fields in the filter.
-- **CO₂** — derived from pH and carbonate hardness.
-- **Fertilizers** — salt stoichiometry: potassium nitrate is 61 % nitrate, monopotassium phosphate 70 % phosphate, magnesium sulfate 10 % magnesium.
-- **Potassium and calcium** — nitrates are used only up to the K and Ca targets. If a value is already above target, the corresponding nitrate is not used and the remaining nitrogen goes in as urea.
-- **Stock solutions** — 0.5 l of solution; 50 g for macro salts, 40 g for potassium sulfate, 5 g for micro. Concentrations 100 / 80 / 10 g/l; millilitres = grams / concentration × 1000.
-- **Side substances** — K, Ca and SO₄ are calculated from the salts. For urea the calculator reports TAN (ammonia + ammonium nitrogen), and the split into free NH₃ and NH₄⁺ from pH and temperature via pKa.
-- **Water changes** — a fraction of the volume, assuming the replacement water contains none of the substance. K and Ca targets are handled separately even when the general norm is not exceeded.
+**Inputs.** Water volume comes from the Aquarium tab; choose a filter and press “Media” to put its volume into the biology calculation.
 
-## What it does not do
+**Outputs.**
 
-- Glass thickness is an engineering estimate, not a manufacturer's specification. For tanks longer than 1.5 m, check it with a glass workshop.
-- CO₂ is calculated assuming no other buffers in the water.
-- Water changes assume the replacement water contains none of the substance being diluted.
-- The fish table is based on nitrogen load only — no schooling needs, territory or comfort. It is an upper bound, not a recommendation.
-- Adult weight and feeding percentages in the top-50 are guides. The Tetra list contains both broad groups and specific variants; the table keeps the article order. Clownfish is marine and is included for reference only.
+- Filter by real flow: 3–5 tank volumes per hour.
+- Reference table of 40 models: canisters, hang-on-back and internal. Real flow: 55 % of the datasheet for canisters, 75 % for hang-on-back, 80 % for internal.
+- Light: 20–35 lm/l and 0.3–0.5 W/l LED.
+- Aeration: 0.5–1 l/min per 100 l.
+- Heater: 0.8–1 W/l, in steps of 25 W.
+- Baseline water change in the KPI: 10–20 % per week; the actual value is on the Biology tab.
+- Startup order.
+
+## Biology
+
+**Inputs.** Filter media and volume, temperature, feed protein, feeding percentage and fish weight.
+
+**Outputs.**
+
+- Media surface area and biofilter capacity in g TAN per day.
+- Feed and fish limit from the filter; actual load.
+- NO₃ and PO₄ accumulation without plants, NO₃ : PO₄ ratio and the water change needed to hold 20 mg/l.
+- Top-50 popular fish table: adult weight, feeding percentage, filter and volume limits.
+- Cart: quantity → total weight → feed in grams; a totals row. The cart updates the “Fish” and “Feeding” fields in the Filter block, but they stay editable.
+
+**Important.** This is a nitrogen-load calculation only — no schooling, territory or comfort. Plants and denitrification are not modelled.
+
+## Tests
+
+**Inputs.** Water parameters: pH, KH, GH, NH₃/NH₄, NO₂, NO₃, PO₄, K, Ca, Mg, Fe, Cu, TDS and EC; targets for NO₃, PO₄, K, Ca, Mg and Fe.
+
+**Outputs.**
+
+- Deviation from the planted-tank reference and threshold-based recommendations.
+- CO₂ from pH and KH.
+- Water changes to the norm and to your target; K and Ca are handled separately even when the general norm is not exceeded.
+- Targets that are then used on the Fertilizers tab.
+
+## Fertilizers
+
+**Inputs.** Current tests and targets. On this tab they are arranged in two columns: “Nitrogen and phosphorus” + “Minerals” on the left, “Targets” on the right; the “Recipe” is full width below them.
+
+**Outputs.**
+
+- Salt recipe in grams: KNO₃, Ca(NO₃)₂, urea, KH₂PO₄, K₂SO₄, MgSO₄, CSM.
+- Ready-solution doses in ml next to the grams.
+- Fixed stock solutions: 0.5 l; 50 g of macro salts, 40 g K₂SO₄, 5 g micro; 100 / 80 / 10 g/l.
+- Side substances: K, Ca and SO₄; for urea — NH₃, NH₄⁺ and TAN with a pH/temperature split.
+- Potassium and calcium: nitrates are added only up to the target; if K or Ca is already above it, nitrogen goes in as urea and a water change is suggested.
+- Stock shelf life.
+
+## General principles
+
+- **One page.** No server or dependencies; download `index.html` and open it offline.
+- **Language.** On first open RU or EN follows the browser/device language; a manual choice with **RU | EN** is remembered. `?lang=ru` or `?lang=en` forces it.
+- **Saving.** Inputs are stored in the browser's `localStorage`.
+- **Mobile layout.** Compact spacing, scrollable tabs, one-column tables and cutting plans, iPhone safe areas.
+- **Connections.** Dimensions and substrate update all tabs; the fish cart updates the filter fields; tests feed the fertilizer targets.
+
+## Limitations
+
+- Glass thickness is an engineering estimate, not a manufacturer's datasheet; for tanks longer than 1.5 m, have it checked by a glass workshop.
+- CO₂ assumes no other buffers; water changes assume replacement water contains none of the substance.
+- The fish table is an upper nitrogen bound, not a compatibility recommendation.
+- Top-50 weights and feeding percentages are guides; clownfish is marine and shown for reference only.
 - Filter specifications are typical datasheet values; real flow depends on media, hose and head height.
-- Stock shelf life depends on water and storage. Guide: macro several months, iron and micro about a month, urea 1–2 weeks.
-- Ammonia and ammonium from urea are a hydrolysis potential; the toxicity model and nitrification rate are not calculated.
-- Plants and denitrification are not modelled, so real values are usually lower than calculated.
+- Stock shelf life depends on water and storage conditions.
+- Ammonia and ammonium from urea are a hydrolysis potential, not a toxicity model.
+- Internal partitions are not modelled; plants and denitrification are not included.
 
 ## Run locally
 
@@ -95,16 +121,17 @@ Download `index.html` and open it by double-clicking — it works offline.
 Parameters can be passed in the URL:
 
 ```
-https://timnurz.github.io/aquarium-stand/?l=1500&d=500&h=600&H=900#fert
+https://timnurz.github.io/aquarium-stand/?l=1500&d=500&h=600&H=900&soil=50#fert
 ```
 
 - `l`, `d`, `h` — tank length, depth and height, mm
 - `H` — stand height, mm
+- `soil=50` — substrate layer, mm: 0 / 30 / 50 / 70
 - `sheet=2440,1220` — plywood sheet size
 - `color=black` — black finish
 - after `#` — tab: `tank`, `stand`, `gear`, `bio`, `fert`, `udo`
 - stand sub-tabs: `#tumba`, `#frame`, `#front`, `#side`, `#detail`
-- `lang=en` — open in English right away
+- `lang=ru` or `lang=en` — force the language
 
 ## License
 
@@ -112,7 +139,7 @@ Do whatever you want: use it, change it, sell stands.
 
 ---
 
-### For the author: how to update the site
+### Development
 
 1. Edit `aquarium-stand.html` locally.
 2. Run `publish.ps1` — it copies the source to `site/index.html`.
