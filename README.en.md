@@ -4,7 +4,7 @@
 
 **[Open the calculator →](https://timnurz.github.io/aquarium-stand/)**
 
-A single HTML page with no server, build step or dependencies. Enter the tank dimensions and get glass, substrate, weight, a stand with a plywood cutting plan, equipment sizing, biological load, water tests and fertilizer recipes. It works offline, on a phone, and saves your inputs.
+A single HTML page with no server, build step or dependencies. Enter the tank dimensions and get glass, substrate, weight, a stand with a cutting plan for the selected board, equipment sizing, biological load, water tests and fertilizer recipes. It works offline, on a phone, and saves your inputs.
 
 
 ![Aquarium Calculator](screenshot.png)
@@ -33,20 +33,34 @@ Pick a preset in one click, then change length, depth, height and substrate laye
 
 ## Stand
 
-**Inputs.** Stand height, plywood sheet size and number of doors; the view can be switched.
+**Inputs.** Stand height; carcass material (plywood, chipboard, MDF); thickness 16 or 18 mm; carcass and door edge banding 0.4 / 1 / 2 mm for chipboard; construction (solid or modular); doors per module; glued composite top; sheet size; total number of doors.
 
 **Outputs.**
 
+- With one door (for example 60 × 30 × 30), the solid/modular selector is hidden: there is only one module and no difference.
+- Invalid “doors per module” choices are hidden: if a module is overloaded, the calculator reduces the doors per module instead of showing a warning. If only one choice remains, the selector itself is hidden.
+- In each module the sides are the same panels as the outer sides; the uprights stand on the bottom and the inset top fits between them.
 - Isometric view, frame, front and side views, shelf detail.
-- Top panel deflection check: allowable deflection 3 mm, stress 8 MPa, plywood modulus 6 GPa.
-- Plywood cutting plan per sheet, parts count, assembly order and hardware.
+- Top panel deflection check: allowable deflection 3 mm; stress and modulus depend on the material.
+- Cutting plan per sheet: cut size excludes edge banding; banding is added to visible edges only.
+- Solid or modular carcass: modules of 1–3 doors, the overlay top is always one piece. A warning appears if the top does not fit the sheet.
+- Identical parts from different modules are grouped into one row, without “module 1 / module 2”.
+- The bottom is banded on three sides in a solid stand; in a modular one the outer modules get front + outer side, the middle modules front only.
+- The inset top is banded on the front edge only; the other three sides are drilled in the end. A solid carcass also gets face holes under the uprights.
+- The side is drilled in the end at the bottom (onto the overlay bottom) and in the face at the top (under the inset top).
+- Separate selectors for carcass edge banding and door edge banding.
+- Below the cutting plan there are drilling schemes for every part: 32 mm system (confirmat + dowel 32 mm apart, pairs every 352 mm), Ø35 hinge cup in doors and edge banding as a wavy line. A hole in the end is a dash, the mating hole in the face is a circle.
+- The bottom has face holes only, on three sides; in a solid stand there are extra rows at the partitions. No holes in the end of the bottom.
+- Parts count, assembly order and hardware.
+- The back panel is always counted as a stiffening connection (factor 0.55). The top is not treated as a composite by default: there is a shadow gap between the overlay and inset tops.
+- If both top layers are glued or continuously connected, enable “glued, composite” (factor 0.35).
 - The calculation uses the maximum tank weight, not the selected substrate layer.
 
-**Hardware.** 5×70, 4×30 and 3.5×16 screws; Ø5×16 shelf pins; NO-10 furniture feet; 110° overlay hinges; spacers for the overlay top; PVA D3 glue.
+**Hardware.** 5×70, 4×30 and 3.5×16 screws; Ø5×16 shelf pins; NO-10 furniture feet; 110° overlay hinges, 2 per door; spacers for the overlay top; PVA D3 glue; module connectors for the modular version.
 
-**Tools.** Drill/driver with PH2/PZ2 bits; Ø3, Ø4, Ø5 drill bits and a Ø35 Forstner bit; countersink; 3/4/5 mm hex keys; mallet, clamps, square, tape measure, pencil and level; sander or 120/180 sanding block; primer and paint or oil, brush/roller, tray and masking tape; wood filler if parts are painted; respirator and gloves.
+**Tools.** Drill/driver with PH2/PZ2 bits; Ø3, Ø4, Ø5 drill bits and a Ø35 Forstner bit; countersink; 3/4/5 mm hex keys; mallet, clamps, square, tape measure, pencil and level; iron/heat gun, edge trimmer and edge glue; sander or 120/180 sanding block; primer and paint or oil, brush/roller, tray and masking tape; wood filler if parts are painted; respirator and gloves.
 
-**Assembly order.** Cutting → drilling → carcass → back panel → top → shelves → feet → doors → finishing → check.
+**Assembly order.** Cutting → drilling → edge banding (chipboard) → module assembly (modular version) → joining modules → carcass → back panel → top → shelves on shelf pins → feet → doors → finishing → check.
 
 ## Equipment
 
@@ -117,6 +131,7 @@ Pick a preset in one click, then change length, depth, height and substrate laye
 - Filter specifications are typical datasheet values; real flow depends on media, hose and head height.
 - Stock shelf life depends on water and storage conditions.
 - Ammonia and ammonium from urea are a hydrolysis potential, not a toxicity model.
+- The 0.55 back-panel and 0.35 composite-top factors are engineering estimates of composite action, not a glued-joint calculation.
 - Internal partitions are not modelled; plants and denitrification are not included.
 
 ## Run locally
@@ -132,7 +147,7 @@ https://timnurz.github.io/aquarium-stand/?l=1500&d=500&h=600&H=900&soil=50#fert
 - `l`, `d`, `h` — tank length, depth and height, mm
 - `H` — stand height, mm
 - `soil=50` — substrate layer, mm: 0 / 30 / 50 / 70
-- `sheet=2440,1220` — plywood sheet size
+- `sheet=2440,1220` — board sheet size
 - `color=black` — black finish
 - after `#` — tab: `tank`, `stand`, `gear`, `bio`, `fert`, `udo`
 - stand sub-tabs: `#tumba`, `#frame`, `#front`, `#side`, `#detail`
