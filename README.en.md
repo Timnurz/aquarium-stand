@@ -48,6 +48,8 @@ Pick a preset in one click, then change length, depth, height and substrate laye
 - The bottom is banded on three sides in a solid stand; in a modular one the outer modules get front + outer side, the middle modules front only.
 - The inset top is banded on the front edge only; the other three sides are drilled in the end. A solid carcass also gets face holes under the uprights.
 - The side is drilled in the end at the bottom (onto the overlay bottom) and in the face at the top (under the inset top).
+- Internal uprights: both ends plus the rear end for the inset back panel.
+- Back panel: ends at the bottom and sides, face at the top, plus face holes by the number of uprights.
 - Separate selectors for carcass edge banding and door edge banding.
 - Below the cutting plan there are drilling schemes for every part: 32 mm system (confirmat + dowel 32 mm apart, pairs every 352 mm), Ø35 hinge cup in doors and edge banding as a wavy line. A hole in the end is a dash, the mating hole in the face is a circle.
 - The bottom has face holes only, on three sides; in a solid stand there are extra rows at the partitions. No holes in the end of the bottom.
