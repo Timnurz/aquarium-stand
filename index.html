@@ -407,13 +407,6 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
           </select>
         </div>
         <div class="field">
-          <label for="inComp"><span data-i18n="f_comp">Столешница</span></label>
-          <select id="inComp">
-            <option value="0" selected data-i18n="opt_comp_no">не склеена</option>
-            <option value="1" data-i18n="opt_comp_yes">склеена, композит</option>
-          </select>
-        </div>
-        <div class="field">
           <label for="inSheet"><span data-i18n="f_sheet">Лист</span> <b data-i18n="u_mm">мм</b></label>
           <select id="inSheet">
             <option value="2440,1220" selected>2440 × 1220 · 4×8 ft</option>
@@ -1951,191 +1944,652 @@ function wavyLine(x1,y1,x2,y2,amp,step){
 const edgeSides = mode => ({all:4, front_lr:3, front_l:2, front_r:2, front:1}[mode] || 0);
 const fmtDim = v => Math.abs(v - Math.round(v)) < 0.05 ? f0(v) : f1(v);
 
-function drillCard(p,M){
-  const W=900, H=360, maxW=780, maxH=230;
-  const sc=Math.min(maxW/Math.max(p.w,1), maxH/Math.max(p.h,1));
-  const rw=Math.max(24, p.w*sc), rh=Math.max(24, p.h*sc);
-  const ox=(W-rw)/2, oy=40+(maxH-rh)/2;
-  const X=mm=>ox+mm*sc, Y=mm=>oy+mm*sc;
-  const pcs = LANG==='en' ? 'pcs' : 'шт';
-  let out='';
-  out += `<rect x="${ox.toFixed(1)}" y="${oy.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}" fill="#f8f4ec" stroke="#7d6a50" stroke-width="1.2" rx="2"/>`;
-  /* dimensions */
-  out += `<text x="${(ox+rw/2).toFixed(1)}" y="${(oy-8).toFixed(1)}" text-anchor="middle" font-size="14" font-family="Consolas,monospace" fill="#5e5141">${f0(p.w)}</text>`;
-  out += `<text transform="rotate(-90 ${(ox+rw+14).toFixed(1)} ${(oy+rh/2).toFixed(1)})" x="${(ox+rw+14).toFixed(1)}" y="${(oy+rh/2).toFixed(1)}" text-anchor="middle" font-size="14" font-family="Consolas,monospace" fill="#5e5141">${f0(p.h)}</text>`;
-  /* edge banding */
-  if(p.edgeMode==='all'){
-    out += wavyLine(ox,oy,ox+rw,oy)+wavyLine(ox+rw,oy,ox+rw,oy+rh)+wavyLine(ox+rw,oy+rh,ox,oy+rh)+wavyLine(ox,oy+rh,ox,oy);
-  } else if(p.edgeMode){
-    const front = ()=>wavyLine(ox,oy+rh,ox+rw,oy+rh);
-    if(p.edgeMode==='front_lr'){ out += front()+wavyLine(ox,oy,ox,oy+rh)+wavyLine(ox+rw,oy,ox+rw,oy+rh); }
-    else if(p.edgeMode==='front_l'){ out += front()+wavyLine(ox,oy,ox,oy+rh); }
-    else if(p.edgeMode==='front_r'){ out += front()+wavyLine(ox+rw,oy,ox+rw,oy+rh); }
-    else if(p.edgeMode==='front'){ out += front(); }
-  }
-  /* bottom: no holes in the end; all holes are in the face, 3 sides,
-     plus rows at internal partitions in a solid carcass */
-  if(p.role==='bottom'){
-    const cps=[], dps=[];
-    const seq=L=>{
-      for(let d=32; d<=L/2; d+=352){ cps.push(d, L-d); dps.push(d+32, L-(d+32)); }
-    };
-    const uniq=a=>Array.from(new Set(a.map(v=>Math.round(v)))).filter(v=>v>=0 && v<=Math.max(p.w,p.h));
-    const face=(x,y,kind)=>{
-      if(kind==='c') return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="#fff" stroke="#7d6a50" stroke-width=".9"/><path d="M${(x-1.6).toFixed(1)},${(y-1.6).toFixed(1)}L${(x+1.6).toFixed(1)},${(y+1.6).toFixed(1)}M${(x+1.6).toFixed(1)},${(y-1.6).toFixed(1)}L${(x-1.6).toFixed(1)},${(y+1.6).toFixed(1)}" stroke="#7d6a50" stroke-width=".7"/>`;
-      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.3" fill="#fff" stroke="#7d6a50" stroke-width=".9"/>`;
-    };
-    const drawRow=(fix,vals,vertical)=>{
-      const cs=uniq(vals.c), ds=uniq(vals.d);
-      cs.forEach(v=>out += vertical ? face(fix,Y(v),'c') : face(X(v),fix,'c'));
-      ds.forEach(v=>out += vertical ? face(fix,Y(v),'d') : face(X(v),fix,'d'));
-    };
-    /* left and right edges, along depth */
-    cps.length=0; dps.length=0; seq(p.h);
-    drawRow(ox+7,{c:cps,d:dps},true);
-    drawRow(ox+rw-7,{c:cps,d:dps},true);
-    /* back edge, along length */
-    cps.length=0; dps.length=0; seq(p.w);
-    drawRow(oy+7,{c:cps,d:dps},false);
-    /* internal partitions in a solid bottom */
-    if(!M.modular){
-      M.uprights.filter(u=>u.kind!=='side').forEach(u=>{
-        const x=X((u.x0+u.x1)/2);
-        cps.length=0; dps.length=0; seq(p.h);
-        uniq(cps).forEach(v=>out+=face(x,Y(v),'c'));
-        uniq(dps).forEach(v=>out+=face(x,Y(v),'d'));
-      });
+/* ===================== присадка: модель отверстий и карты ===================== */
+﻿/* =========================================================================
+   ПРИСАДКА v2 — модель отверстий, проверка коллизий, карта детали
+   -------------------------------------------------------------------------
+   Узел описывается ОДИН раз: точка на оси каркаса + направление + толщины.
+   Оба отверстия пары строятся из одной точки и лежат на одной оси, поэтому
+   пара сходится по построению. Позиция вдоль ребра (t) — параметр узла;
+   решатель двигает узел целиком, пока его ось не перестанет пересекаться
+   с чужими осями.
+   ========================================================================= */
+(function (global) {
+'use strict';
+
+/* ---------- векторы ---------- */
+const v3 = (x, y, z) => ({ x: x, y: y, z: z });
+const add = (a, b) => v3(a.x + b.x, a.y + b.y, a.z + b.z);
+const mul = (a, k) => v3(a.x * k, a.y * k, a.z * k);
+const sub = (a, b) => v3(a.x - b.x, a.y - b.y, a.z - b.z);
+const dot = (a, b) => a.x * b.x + a.y * b.y + a.z * b.z;
+const len = a => Math.sqrt(dot(a, a));
+const AX = { x: v3(1, 0, 0), y: v3(0, 1, 0), z: v3(0, 0, 1) };
+
+/* расстояние между отрезками p1q1 и p2q2 */
+function segDist(p1, q1, p2, q2) {
+  const d1 = sub(q1, p1), d2 = sub(q2, p2), r = sub(p1, p2);
+  const a = dot(d1, d1), e = dot(d2, d2), f = dot(d2, r);
+  const EPS = 1e-9;
+  let s, t;
+  if (a <= EPS && e <= EPS) return len(r);
+  if (a <= EPS) { s = 0; t = Math.max(0, Math.min(1, f / e)); }
+  else {
+    const c = dot(d1, r);
+    if (e <= EPS) { t = 0; s = Math.max(0, Math.min(1, -c / a)); }
+    else {
+      const b = dot(d1, d2), den = a * e - b * b;
+      s = den !== 0 ? Math.max(0, Math.min(1, (b * f - c * e) / den)) : 0;
+      t = (b * s + f) / e;
+      if (t < 0) { t = 0; s = Math.max(0, Math.min(1, -c / a)); }
+      else if (t > 1) { t = 1; s = Math.max(0, Math.min(1, (b - c) / a)); }
     }
-  /* cup holes in doors */
-  } else if(p.role==='door'){
-    const ys = [100, p.h-100];
-    const cx = X(22), rr = Math.max(4, 17.5*sc);
-    ys.forEach((yy,i)=>{
-      const cy = Y(yy);
-      out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}" fill="#fff" stroke="#7d6a50" stroke-width="1"/>`;
-      out += `<path d="M${(cx-rr*0.7).toFixed(1)},${cy.toFixed(1)}L${(cx+rr*0.7).toFixed(1)},${cy.toFixed(1)}M${cx.toFixed(1)},${(cy-rr*0.7).toFixed(1)}L${cx.toFixed(1)},${(cy+rr*0.7).toFixed(1)}" stroke="#7d6a50" stroke-width=".8"/>`;
-      if(i===0) out += `<text x="${(cx+rr+4).toFixed(1)}" y="${(cy+3).toFixed(1)}" font-size="8" font-family="Consolas,monospace" fill="#7d6a50">Ø35</text>`;
-    });
-    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'Ø35 cup, 22 mm from edge':'чашка Ø35, 22 мм от кромки'}</text>`;
-  } else if(p.role==='intop'){
-    /* front edge is banded; the other three sides are drilled in the end.
-       In a solid carcass there are also face holes under the internal uprights. */
-    const seq=L=>{
-      const c=[], d=[];
-      for(let x=32; x<=L/2; x+=352){ c.push(x, L-x); d.push(x+32, L-(x+32)); }
-      const uniq=a=>Array.from(new Set(a.map(v=>Math.round(v)))).filter(v=>v>=0 && v<=L);
-      return {c:uniq(c), d:uniq(d)};
-    };
-    const dashX=(x,y,len)=>out += `<line x1="${(x-len/2).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+len/2).toFixed(1)}" y2="${y.toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
-    const dashY=(x,y,len)=>out += `<line x1="${x.toFixed(1)}" y1="${(y-len/2).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y+len/2).toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
-    /* left and right ends: long = confirmat, short = dowel */
-    const hh=seq(p.h), ww=seq(p.w);
-    hh.c.forEach(v=>{ dashX(ox, Y(v), 8); dashX(ox+rw, Y(v), 8); });
-    hh.d.forEach(v=>{ dashX(ox, Y(v), 4); dashX(ox+rw, Y(v), 4); });
-    /* back end */
-    ww.c.forEach(v=>{ dashY(X(v), oy, 8); });
-    ww.d.forEach(v=>{ dashY(X(v), oy, 4); });
-    /* solid: face holes under internal uprights */
-    if(!M.modular){
-      M.uprights.filter(u=>u.kind!=='side').forEach(u=>{
-        const x=X((u.x0+u.x1)/2);
-        [32, p.h-32].forEach(y=>{
-          out += `<circle cx="${x.toFixed(1)}" cy="${Y(y).toFixed(1)}" r="2.6" fill="#fff" stroke="#7d6a50" stroke-width=".9"/>`;
-        });
-      });
-    }
-    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'3 sides in the end; 32 / 32 / 352 mm':'3 стороны в торец; 32 / 32 / 352 мм'}${M.modular ? '' : (LANG==='en'?' + face under uprights':' + пласти под стойки')}</text>`;
-  } else if(p.role==='side'){
-    /* side: bottom end -> bottom (dashes), top -> inset top (face circles) */
-    const seq=L=>{
-      const c=[], d=[];
-      for(let x=32; x<=L/2; x+=352){ c.push(x, L-x); d.push(x+32, L-(x+32)); }
-      const uniq=a=>Array.from(new Set(a.map(v=>Math.round(v)))).filter(v=>v>=0 && v<=L);
-      return {c:uniq(c), d:uniq(d)};
-    };
-    const dash=(x,y,len)=>out += `<line x1="${(x-len/2).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+len/2).toFixed(1)}" y2="${y.toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
-    const hh=seq(p.h);
-    /* bottom end — only one end, holes in the end */
-    hh.c.forEach(v=>dash(ox, Y(v), 8));
-    hh.d.forEach(v=>dash(ox, Y(v), 4));
-    /* top — mating holes in the face for the inset top */
-    const fx=ox+rw-10;
-    const face=(x,y,kind)=>{
-      if(kind==='c') return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.8" fill="#fff" stroke="#7d6a50" stroke-width=".9"/><path d="M${(x-1.7).toFixed(1)},${(y-1.7).toFixed(1)}L${(x+1.7).toFixed(1)},${(y+1.7).toFixed(1)}M${(x+1.7).toFixed(1)},${(y-1.7).toFixed(1)}L${(x-1.7).toFixed(1)},${(y+1.7).toFixed(1)}" stroke="#7d6a50" stroke-width=".7"/>`;
-      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" fill="#fff" stroke="#7d6a50" stroke-width=".9"/>`;
-    };
-    hh.c.forEach(v=>out += face(fx, Y(v), 'c'));
-    hh.d.forEach(v=>out += face(fx, Y(v), 'd'));
-    /* back — inset back panel, so holes are in the side face */
-    const ww=seq(p.w);
-    ww.c.forEach(v=>out += face(X(v), oy+9, 'c'));
-    ww.d.forEach(v=>out += face(X(v), oy+9, 'd'));
-    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'bottom: end; top/back: face':'низ: торец; верх и зад: пласть'}</text>`;
-  } else if(p.role==='part'){
-    /* internal upright: both ends are drilled in the end */
-    const seq=L=>{
-      const c=[], d=[];
-      for(let x=32; x<=L/2; x+=352){ c.push(x, L-x); d.push(x+32, L-(x+32)); }
-      const uniq=a=>Array.from(new Set(a.map(v=>Math.round(v)))).filter(v=>v>=0 && v<=L);
-      return {c:uniq(c), d:uniq(d)};
-    };
-    const dash=(x,y,len)=>out += `<line x1="${(x-len/2).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+len/2).toFixed(1)}" y2="${y.toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
-    const hh=seq(p.h);
-    hh.c.forEach(v=>{ dash(ox, Y(v), 8); dash(ox+rw, Y(v), 8); });
-    hh.d.forEach(v=>{ dash(ox, Y(v), 4); dash(ox+rw, Y(v), 4); });
-    /* rear end: holes into the end for the inset back panel */
-    const dashY=(x,y,len)=>out += `<line x1="${x.toFixed(1)}" y1="${(y-len/2).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y+len/2).toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
-    const ww=seq(p.w);
-    ww.c.forEach(v=>dashY(X(v), oy, 8));
-    ww.d.forEach(v=>dashY(X(v), oy, 4));
-    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'both ends + rear end: long confirmat / short dowel':'оба торца + задний торец: длинный конфирмат / короткий шкант'}</text>`;
-  } else if(p.role==='back'){
-    /* back: bottom end (dashes) + face holes at the top under the inset top */
-    const seq=L=>{
-      const c=[], d=[];
-      for(let x=32; x<=L/2; x+=352){ c.push(x, L-x); d.push(x+32, L-(x+32)); }
-      const uniq=a=>Array.from(new Set(a.map(v=>Math.round(v)))).filter(v=>v>=0 && v<=L);
-      return {c:uniq(c), d:uniq(d)};
-    };
-    const dash=(x,y,len)=>out += `<line x1="${x.toFixed(1)}" y1="${(y-len/2).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y+len/2).toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
-    const ww=seq(p.w);
-    ww.c.forEach(v=>dash(X(v), oy+rh, 8));
-    ww.d.forEach(v=>dash(X(v), oy+rh, 4));
-    /* left and right ends into the sides */
-    const hh=seq(p.h);
-    const dashX=(x,y,len)=>out += `<line x1="${(x-len/2).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+len/2).toFixed(1)}" y2="${y.toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
-    hh.c.forEach(v=>{ dashX(ox, Y(v), 8); dashX(ox+rw, Y(v), 8); });
-    hh.d.forEach(v=>{ dashX(ox, Y(v), 4); dashX(ox+rw, Y(v), 4); });
-    ww.c.forEach(v=>out += `<circle cx="${X(v).toFixed(1)}" cy="${(oy+9).toFixed(1)}" r="2.7" fill="#fff" stroke="#7d6a50" stroke-width=".9"/><path d="M${(X(v)-1.6).toFixed(1)},${(oy+7.4).toFixed(1)}L${(X(v)+1.6).toFixed(1)},${(oy+10.6).toFixed(1)}M${(X(v)+1.6).toFixed(1)},${(oy+7.4).toFixed(1)}L${(X(v)-1.6).toFixed(1)},${(oy+10.6).toFixed(1)}" stroke="#7d6a50" stroke-width=".7"/>`);
-    ww.d.forEach(v=>out += `<circle cx="${X(v).toFixed(1)}" cy="${(oy+9).toFixed(1)}" r="2.3" fill="#fff" stroke="#7d6a50" stroke-width=".9"/>`);
-    /* face holes by number of uprights */
-    const stands = M.modular ? 2 : M.uprights.length;
-    const xs = M.modular
-      ? [32, p.w-32]
-      : M.uprights.map(u=>Math.max(32, Math.min(p.w-32, (u.x0+u.x1)/2 - M.T)));
-    const yMid = oy + rh/2;
-    xs.forEach(x=>{
-      out += `<circle cx="${X(x).toFixed(1)}" cy="${yMid.toFixed(1)}" r="2.8" fill="#fff" stroke="#7d6a50" stroke-width=".9"/><path d="M${(X(x)-1.7).toFixed(1)},${(yMid-1.7).toFixed(1)}L${(X(x)+1.7).toFixed(1)},${(yMid+1.7).toFixed(1)}M${(X(x)+1.7).toFixed(1)},${(yMid-1.7).toFixed(1)}L${(X(x)-1.7).toFixed(1)},${(yMid+1.7).toFixed(1)}" stroke="#7d6a50" stroke-width=".7"/>`;
-    });
-    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?`bottom/sides: end; top: face; uprights: ${stands}`:`низ и бока: торец; верх: пласть; стоек: ${stands}`}</text>`;
-  } else if(p.role==='shelf'){
-    /* shelf pins in the face */
-    [[32,32],[p.w-32,32],[32,p.h-32],[p.w-32,p.h-32]].forEach(([x,y])=>{
-      out += `<circle cx="${X(x).toFixed(1)}" cy="${Y(y).toFixed(1)}" r="2.8" fill="#fff" stroke="#7d6a50" stroke-width=".9"/>`;
-    });
-    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'4 shelf pins':'4 полкодержателя'}</text>`;
-  } else {
-    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'no drilling':'без присадки'}</text>`;
   }
-  return `<div style="width:100%;margin:0 0 26px">
-    <div style="font:700 15px/1.2 inherit;color:var(--tx);margin-bottom:3px">${p.id}. ${tstr(p.name)}</div>
-    <div style="font:400 12.5px/1.3 inherit;color:var(--tx3);margin-bottom:6px">${p.qty} ${pcs} · ${p.edge ? (LANG==='en'?'with edge':'с кромкой') : (LANG==='en'?'finished size':'чистовой размер')} ${f0(p.w)} × ${f0(p.h)}${p.edge ? ' · ' + tstr('Кромка') + ' ' + f1(p.edge) + (edgeSides(p.edgeMode)>1?' × '+edgeSides(p.edgeMode):'') : ''}</div>
-    <svg viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg">${out}</svg>
-  </div>`;
+  const c1 = add(p1, mul(d1, s)), c2 = add(p2, mul(d2, t));
+  return len(sub(c1, c2));
 }
 
+const CLEAR = 3;   /* минимальный мостик материала между стенками отверстий */
+
+/* =========================== УЗЛЫ =========================== */
+
+function buildBox(M, box) {
+  const T = M.T, Lc = box.w, C = M.C, z0 = M.zBot, z1 = M.zBotTop, z2 = M.zIn0, z3 = M.zU;
+  const joints = [];
+  let id = 0;
+  const bx0 = box.x0 || 0;
+
+  /* доски в координатах корпуса: модуль считается от своего левого края */
+  const boards = [];
+  if (M.modular) {
+    boards.push({ kind: 'side', x0: 0, x1: T });
+    boards.push({ kind: 'side', x0: Lc - T, x1: Lc });
+  } else {
+    (M.uprights || []).forEach(u => {
+      const n = Math.max(1, Math.round((u.x1 - u.x0) / T));
+      for (let i = 0; i < n; i++) boards.push({ kind: u.kind, x0: u.x0 + i * T, x1: u.x0 + (i + 1) * T });
+    });
+  }
+  const sides = boards.filter(b => b.kind === 'side');
+
+  /* наружная пласть боковины: у модуля их две, и обе могут стоять на стыке */
+  function sideFace(s) {
+    const left = Math.abs(s.x0) < 0.5;
+    return left
+      ? { xFace: s.x0, dir: 1, inner: s.x0 + T }
+      : { xFace: s.x1, dir: -1, inner: s.x1 - T };
+  }
+
+  const parts = boards.filter(b => b.kind !== 'side');
+
+  /* дверцы этого корпуса, в его координатах */
+  const doors = (M.doors || []).filter(d => {
+    const c = (d.x0 + d.x1) / 2;
+    return c >= bx0 - 0.5 && c < bx0 + Lc + 0.5;
+  }).map(d => ({ x0: d.x0 - bx0, x1: d.x1 - bx0, hinge: d.hinge }));
+
+  const SPEC = {
+    confirmat: { dia: 5, cb: 8, dB: 32, op: 'confirmat', label: 'конфирмат' },
+    dowel:     { dia: 8, cb: 0, dB: 12, op: 'dowel',     label: 'шкант' },
+    pin:       { dia: 5, cb: 0, dB: 12, op: 'pin',       label: 'полкодержатель' },
+    plate:     { dia: 5, cb: 0, dB: 13, op: 'plate',     label: 'планка петли' }
+  };
+
+  /* точки вдоль ребра: пара «конфирмат + шкант» у каждого торца,
+     промежуточные пары через 352 мм; позиции ближе 40 мм не дублируются */
+  function ts(L, dowel) {
+    const out = [{ t: 32, op: 'confirmat' }];
+    if (dowel !== false) out.push({ t: 64, op: 'dowel' });
+    out.push({ t: L - 32, op: 'confirmat' });
+    if (dowel !== false) out.push({ t: L - 64, op: 'dowel' });
+    return out.sort((a, b) => a.t - b.t);
+  }
+
+  /**
+   * Узел «насквозь через A в торец B».
+   * run  — ребро, вдоль которого можно сдвигать узел
+   * entry — точка входа на наружной пласти A при t=0
+   * dir  — направление от A к B
+   * th   — толщина A
+   */
+  function joint(o) {
+    const sp = SPEC[o.spec];
+    const P = add(o.run.o, mul(o.run.axis, o.t));
+    const E = add(o.entry, sub(P, o.run.o));           /* точка входа */
+    const hA = {
+      part: o.A, p0: E, dir: o.dir, depth: o.th, dia: sp.dia, cb: sp.cb,
+      op: sp.op, side: o.sideA || 'out', jid: ++id, role: 'A'
+    };
+    const hB = o.B ? {
+      part: o.B, p0: add(E, mul(o.dir, o.th)), dir: o.dir, depth: sp.dB, dia: sp.dia,
+      cb: 0, op: sp.op, side: o.sideB || 'in', jid: id, role: 'B'
+    } : null;
+    joints.push({ id: id, kind: o.kind, t: o.t, run: o.run, a: hA, b: hB, note: o.note });
+    return joints[joints.length - 1];
+  }
+
+  /* 1. боковина стоит на дне: снизу через дно в торец боковины */
+  sides.forEach(s => {
+    const cx = (s.x0 + s.x1) / 2;
+    ts(C).forEach(e => joint({
+      kind: 'боковина—дно', spec: e.op, t: e.t, A: 'bottom', B: 'side', th: T,
+      dir: AX.z, sideA: 'out', sideB: 'end',
+      entry: v3(cx, T, z0),
+      run: { o: v3(cx, T, 0), axis: AX.y, min: 24, max: C - 24 }
+    }));
+  });
+
+  /* 2. задняя стенка стоит на дне */
+  ts(Lc).forEach(e => joint({
+    kind: 'дно—задняя', spec: e.op, t: e.t, A: 'bottom', B: 'back', th: T,
+    dir: AX.z, sideA: 'out', sideB: 'end',
+    entry: v3(0, C + T / 2, z0),
+    run: { o: v3(0, C + T / 2, 0), axis: AX.x, min: 24, max: Lc - 24 }
+  }));
+
+  /* 3. боковина ↔ задняя: снаружи через боковину в торец задней */
+  sides.forEach(s => {
+    const cx = (s.x0 + s.x1) / 2;
+    const F = sideFace(s);
+    const outward = F.dir;
+    const xFace = F.xFace;
+    ts(M.Hu).forEach(e => joint({
+      kind: 'боковина—задняя', spec: e.op, t: e.t, A: 'side', B: 'back', th: T,
+      dir: v3(outward, 0, 0), sideA: 'out', sideB: 'end',
+      entry: v3(xFace, C + T / 2, z1),
+      run: { o: v3(cx, C + T / 2, z1), axis: AX.z, min: 24, max: M.Hu - 24 }
+    }));
+  });
+
+  /* 4. боковина ↔ вкладная крышка */
+  sides.forEach(s => {
+    const cx = (s.x0 + s.x1) / 2;
+    const F = sideFace(s);
+    const outward = F.dir;
+    const xFace = F.xFace;
+    ts(C - T).forEach(e => joint({
+      kind: 'боковина—крышка', spec: e.op, t: e.t, A: 'side', B: 'intop', th: T,
+      dir: v3(outward, 0, 0), sideA: 'out', sideB: 'end',
+      entry: v3(xFace, T, z3 - T / 2),
+      run: { o: v3(cx, T, z3 - T / 2), axis: AX.y, min: 24, max: C - T - 24 }
+    }));
+  });
+
+  /* 5. стойки: снизу в торец, сверху в торец */
+  parts.forEach(p => {
+    const cx = (p.x0 + p.x1) / 2;
+    ts(C - T, false).forEach(e => {
+      joint({
+        kind: 'стойка—дно', spec: e.op, t: e.t, A: 'bottom', B: 'part', th: T,
+        dir: AX.z, sideA: 'out', sideB: 'end',
+        entry: v3(cx, T, z0),
+        run: { o: v3(cx, T, 0), axis: AX.y, min: 24, max: C - T - 24 }
+      });
+      joint({
+        kind: 'стойка—крышка', spec: e.op, t: e.t, A: 'intop', B: 'part', th: T,
+        dir: v3(0, 0, -1), sideA: 'out', sideB: 'end',
+        entry: v3(cx, T, z3),
+        run: { o: v3(cx, T, 0), axis: AX.y, min: 24, max: C - T - 24 }
+      });
+    });
+  });
+
+  /* 6. стойка ↔ задняя: сзади через заднюю в торец стойки */
+  parts.forEach(p => {
+    const cx = (p.x0 + p.x1) / 2;
+    ts(M.Hpart, false).forEach(e => joint({
+      kind: 'стойка—задняя', spec: e.op, t: e.t, A: 'back', B: 'part', th: T,
+      dir: v3(0, -1, 0), sideA: 'out', sideB: 'end',
+      entry: v3(cx, M.D, z1),
+      run: { o: v3(cx, 0, z1), axis: AX.z, min: 24, max: M.Hpart - 24 }
+    }));
+  });
+
+  /* 7. полкодержатели — только в боковине, сверлятся с внутренней пласти */
+  const shelf = (M.parts || []).find(p => p.role === 'shelf');
+  if (shelf) {
+    const u = M.pinZ - z1;               /* высота от низа боковины */
+    const y1 = 48 + 50;                  /* полка: 48…482, по 50 мм от кромок */
+    const y2 = C - 50;
+    sides.forEach(s => {
+      const F = sideFace(s);
+      const outward = F.dir;
+      const inner = F.inner;
+      [y1, y2].forEach(y => {
+        const j = joint({
+          kind: 'полкодержатель', spec: 'pin', t: u, A: 'side', B: null, th: 12,
+          dir: v3(-outward, 0, 0), sideA: 'in',
+          entry: v3(inner, y, z1),
+          run: { o: v3(inner, y, z1), axis: AX.z, min: u, max: u },
+          note: '50 мм от кромки полки'
+        });
+        j.a.op = 'pin';
+      });
+    });
+  }
+
+  /* 8. петли: чашка в дверце + планка на ближайшей стойке/боковине */
+  if ((M.parts || []).some(p => p.role === 'door')) {
+    const hz = hingeZs(M);
+
+    /* все пласти, на которых может стоять планка */
+    const faces = [];
+    boards.forEach(b => {
+      faces.push({ x: b.x0, n: -1 });
+      faces.push({ x: b.x1, n: +1 });
+    });
+    function plateFace(edge, left) {
+      const want = left ? +1 : -1;               /* нормаль пласти — к дверце */
+      const ok = faces.filter(f => f.n === want);
+      const near = left
+        ? ok.filter(f => f.x <= edge + 1).sort((a, b) => b.x - a.x)[0]
+        : ok.filter(f => f.x >= edge - 1).sort((a, b) => a.x - b.x)[0];
+      if (near) return near;
+      return left ? ok.slice().sort((a, b) => a.x - b.x)[0]
+                  : ok.slice().sort((a, b) => b.x - a.x)[0];
+    }
+
+    const usedPlate = {};
+    doors.forEach((d, di) => {
+      const left = d.hinge === 'L';
+      const dx = left ? d.x0 + 22.5 : d.x1 - 22.5;
+      const edge = left ? d.x0 : d.x1;
+      const want = left ? 1 : -1;
+      const cands = faces.filter(f => f.n === want)
+        .sort((a, b) => Math.abs(a.x - edge) - Math.abs(b.x - edge));
+
+      hz.forEach(z => {
+        let pick = null, host = null;
+        for (const c of cands) {
+          const bd = boards.find(b => (c.n > 0 ? Math.abs(b.x1 - c.x) < 0.5 : Math.abs(b.x0 - c.x) < 0.5));
+          if (!bd) continue;
+          const key = bd.x0 + '|' + Math.round(z);
+          if (usedPlate[key]) continue;          /* на этой доске уже есть планка на этой высоте */
+          pick = c; host = bd; usedPlate[key] = 1; break;
+        }
+        if (!pick) return;
+        if (Math.abs(pick.x - edge) > 50) {
+          M.__prisWarn = M.__prisWarn || [];
+          const msg = 'Дверь ' + (di + 1) + ': планка петли на ' + Math.round(Math.abs(pick.x - edge)) +
+            ' мм от кромки — плечо петли не достанет. Нужна стойка у кромки или другая разбивка дверей.';
+          if (M.__prisWarn.indexOf(msg) < 0) M.__prisWarn.push(msg);
+        }
+        const role = host.kind === 'side' ? 'side' : 'part';
+        const j = { id: ++id, kind: 'петля', t: 0, nopair: true, run: { o: v3(dx, 0, z), axis: AX.x, min: 0, max: 0 } };
+        j.a = { part: 'door', p0: v3(dx, T, z), dir: v3(0, -1, 0), depth: 13, dia: 35, cb: 0, op: 'cup', side: 'in', jid: j.id, role: 'A', ox: d.x0, hinge: d.hinge };
+        j.b = { part: role, p0: v3(pick.x, 37, z), dir: v3(-pick.n, 0, 0), depth: 13, dia: 5, cb: 0, op: 'plate', side: 'in', jid: j.id, role: 'B' };
+        joints.push(j);
+      });
+    });
+  }
+
+  /* привязка отверстий к конкретной доске (стойки бывают сдвоенными) */
+  joints.forEach(j => {
+    [j.a, j.b].forEach(h => {
+      if (!h) return;
+      if (h.part === 'side' || h.part === 'part') {
+        const q = add(h.p0, mul(h.dir, 2));
+        const b = boards.find(b => q.x >= b.x0 - 0.01 && q.x <= b.x1 + 0.01);
+        h.bid = b ? b.x0 : -1;
+      }
+    });
+  });
+
+  return joints;
+}
+
+/* снаружи: список корпусов. В модульной тумбе каждый модуль считается отдельно,
+   поэтому его присадка не зависит от соседей и от общей длины */
+function build(M) {
+  if (!M.modular) return [{ w: M.Lc, joints: buildBox(M, { x0: 0, x1: M.Lc, w: M.Lc }) }];
+  const groups = [], seen = {};
+  (M.modules || []).forEach(m => {
+    const inner = (M.doors || []).filter(d => {
+      const c = (d.x0 + d.x1) / 2;
+      return c >= m.x0 - 0.5 && c < m.x1 + 0.5;
+    }).map(d => d.hinge).join('');
+    const key = Math.round(m.w) + '|' + inner;
+    if (seen[key]) return;
+    seen[key] = 1;
+    groups.push({ w: m.w, joints: buildBox(M, { x0: m.x0, x1: m.x1, w: m.w }) });
+  });
+  return groups;
+}
+
+/* высоты петель: 100 от торцов, промежуточные не реже 600 */
+function hingeZs(M) {
+  const H = M.doorH, a = 100, b = H - 100, span = b - a;
+  const k = Math.max(1, Math.ceil(span / 600));
+  const out = [];
+  for (let i = 0; i <= k; i++) out.push(a + span * i / k);
+  return out;
+}
+
+/* ---------- коллизии ---------- */
+function collide(j1, j2) {
+  if (j1 === j2) return null;
+  const s1 = [j1.a, j1.b].filter(Boolean);
+  const s2 = [j2.a, j2.b].filter(Boolean);
+  let worst = null;
+  for (const h1 of s1) for (const h2 of s2) {
+    if (h1.part !== h2.part) continue;
+    if (h1.bid !== undefined && h2.bid !== undefined && h1.bid !== h2.bid) continue;
+    const q1 = add(h1.p0, mul(h1.dir, h1.depth));
+    const q2 = add(h2.p0, mul(h2.dir, h2.depth));
+    const d = segDist(h1.p0, q1, h2.p0, q2);
+    const need = (h1.dia + h2.dia) / 2 + CLEAR;
+    if (d < need - 1e-6) {
+      if (!worst || d / need < worst.ratio) worst = { d: d, need: need, ratio: d / need, a: h1.part };
+    }
+  }
+  return worst;
+}
+
+function countJoints(joints) {
+  let n = 0, list = [];
+  for (let i = 0; i < joints.length; i++)
+    for (let j = i + 1; j < joints.length; j++) {
+      const c = collide(joints[i], joints[j]);
+      if (c) { n++; list.push([joints[i], joints[j], c]); }
+    }
+  return { n: n, list: list };
+}
+
+function asGroups(data) {
+  return Array.isArray(data) ? data : [{ w: 0, joints: data }];
+}
+
+function solve(data, log) {
+  let moved = 0;
+  asGroups(data).forEach(g => { moved += solveJoints(g.joints, log); });
+  return moved;
+}
+
+function countCollisions(data) {
+  let n = 0, list = [];
+  asGroups(data).forEach(g => {
+    const r = countJoints(g.joints);
+    n += r.n;
+    list = list.concat(r.list);
+  });
+  return { n: n, list: list };
+}
+
+function solveJoints(joints, log) {
+  let moved = 0;
+  for (let pass = 0; pass < 60; pass++) {
+    let any = false;
+    for (let i = 0; i < joints.length; i++) {
+      for (let j = i + 1; j < joints.length; j++) {
+        const c = collide(joints[i], joints[j]);
+        if (!c) continue;
+        const cand = [joints[i], joints[j]].filter(x => x.run.max - x.run.min > 1);
+        if (!cand.length) continue;
+        const J = cand[cand.length - 1];
+        const step = (J.t + 16 <= J.run.max) ? 16 : -16;
+        const nt = Math.min(J.run.max, Math.max(J.run.min, J.t + step));
+        if (nt === J.t) continue;
+        if (log) log.push(J.kind + ' #' + J.id + ': ' + J.t + ' -> ' + nt + '  (зазор ' + c.d.toFixed(1) + ' < ' + c.need.toFixed(1) + ')');
+        J.t = nt;
+        if (J.a) J.a.p0 = add(J.a.p0, mul(J.run.axis, step));
+        if (J.b) J.b.p0 = add(J.b.p0, mul(J.run.axis, step));
+        any = true; moved++;
+      }
+    }
+    if (!any) break;
+  }
+  return moved;
+}
+
+/* ---------- локальные системы деталей ---------- */
+function frame(part, M, boxW) {
+  const T = M.T, C = M.C, Lc = (boxW == null ? M.Lc : boxW);
+  if (part === 'bottom') return { o: v3(0, T, M.zBot), u: AX.x, v: AX.y, n: AX.z, w: Lc, h: C, flip: false, uName: 'длина', vName: 'глубина' };
+  if (part === 'side')   return { o: v3(0, T, M.zBotTop), u: AX.z, v: AX.y, n: AX.x, w: M.Hu, h: C, flip: false, uName: 'высота', vName: 'глубина' };
+  if (part === 'back')   return { o: v3(T, C, M.zBotTop), u: AX.x, v: AX.z, n: AX.y, w: Lc - 2 * T, h: M.Hu, flip: true, uName: 'длина', vName: 'высота' };
+  if (part === 'intop')  return { o: v3(T, T, M.zU - T), u: AX.x, v: AX.y, n: AX.z, w: Lc - 2 * T, h: C - T, flip: false, uName: 'длина', vName: 'глубина' };
+  if (part === 'part')   return { o: v3(0, T, M.zBotTop), u: AX.z, v: AX.y, n: AX.x, w: M.Hpart, h: C - T, flip: false, uName: 'высота', vName: 'глубина' };
+  if (part === 'door')   return { o: v3(0, 0, M.doorZ0), u: AX.x, v: AX.z, n: AX.y, w: M.doorW, h: M.doorH, flip: true, uName: 'ширина', vName: 'высота' };
+  return null;
+}
+
+/* имя ребра зависит от того, что отложено по оси:
+   высота — низ/верх, глубина — перед/зад, длина/ширина — левый/правый */
+function edgeName(axisName, low) {
+  if (axisName === 'высота') return low ? 'низ' : 'верх';
+  if (axisName === 'глубина') return low ? 'перед' : 'зад';
+  return low ? 'левый' : 'правый';
+}
+
+function localize(h, F) {
+  const rel = sub(h.p0, F.o);
+  const u = dot(rel, F.u) - (h.ox || 0), v = dot(rel, F.v), w = dot(rel, F.n);
+  const faceHole = Math.abs(dot(h.dir, F.n)) > 0.5;
+  let edge = null, pos = 0, axisName = '', edgeAxis = null, edgeLow = false;
+  if (!faceHole) {
+    if (u < 1) { edgeAxis = 'u'; edgeLow = true; }
+    else if (u > F.w - 1) { edgeAxis = 'u'; edgeLow = false; }
+    else if (v < 1) { edgeAxis = 'v'; edgeLow = true; }
+    else if (v > F.h - 1) { edgeAxis = 'v'; edgeLow = false; }
+    else { edgeAxis = 'u'; edgeLow = true; }
+    axisName = edgeAxis === 'u' ? F.vName : F.uName;
+    pos = edgeAxis === 'u' ? v : u;
+    edge = edgeName(edgeAxis === 'u' ? F.uName : F.vName, edgeLow);
+  }
+  return { u: u, v: v, w: w, faceHole: faceHole, edge: edge, pos: pos,
+           axisName: axisName, edgeAxis: edgeAxis, edgeLow: edgeLow };
+}
+
+/* ---------- карта ---------- */
+const OP_LABEL = {
+  confirmat: 'конфирмат', dowel: 'шкант', pin: 'полкодержатель',
+  plate: 'планка петли', cup: 'чашка петли'
+};
+
+function render(p, M, data, opts) {
+  opts = opts || {};
+  const LANG = opts.lang || 'ru';
+  const T = M.T;
+  const pcs = LANG === 'en' ? 'pcs' : 'шт';
+  const variant = opts.variant || null;      /* 'L' | 'R' — сторона навески дверцы */
+  const qty = opts.qty != null ? opts.qty : p.qty;
+
+  /* корпусов может быть несколько (модульная тумба): берём тот, что совпадает
+     с шириной детали. У боковин, стоек и дверец присадка от ширины не зависит. */
+  const groups = asGroups(data);
+  const wide = p.role === 'bottom' || p.role === 'back' || p.role === 'intop';
+  const wantW = p.role === 'bottom' ? p.w : (wide ? p.w + 2 * T : null);
+  let gs = groups;
+  if (wide && wantW != null) {
+    const f = groups.filter(g => Math.abs(g.w - wantW) < 1.5);
+    if (f.length) gs = f;
+  }
+  const F = frame(p.role, M, gs[0] ? gs[0].w : M.Lc);
+
+  /* отверстия этой детали, без дублей (левая и правая боковины дают одно и то же) */
+  const seen = {};
+  const list = [];
+  gs.forEach(g => g.joints.forEach(j => {
+    [j.a, j.b].forEach(h => {
+      if (!h || h.part !== p.role) return;
+      if (p.role === 'door' && variant && h.hinge && h.hinge !== variant) return;
+      const l = F ? localize(h, F) : null;
+      const key = l
+        ? [Math.round(l.u * 10), Math.round(l.v * 10), h.dia, h.op, h.side, l.faceHole ? 1 : 0].join('|')
+        : [h.op, h.dia].join('|');
+      if (seen[key]) return;
+      seen[key] = 1;
+      list.push({ h: h, l: l });
+    });
+  }));
+
+  const titleAdd = variant ? (LANG === 'en' ? (variant === 'L' ? ' — left hung' : ' — right hung')
+                                            : (variant === 'L' ? ' — навеска слева' : ' — навеска справа')) : '';
+  const EDGE_SIDES = {
+    all: 'по периметру', front_lr: 'перед, лево, право', front_l: 'перед, лево',
+    front_r: 'перед, право', front: 'перед'
+  };
+  const edgeTxt = p.edge
+    ? 'кромка ' + f1(p.edge) + (EDGE_SIDES[p.edgeMode] ? ' · ' + EDGE_SIDES[p.edgeMode] : '')
+    : 'без кромки';
+  const head = '<h2 class="ct" style="margin:26px 0 8px">' + p.id + '. ' + tstr(p.name) + titleAdd +
+    ' <span class="hint">' + qty + ' ' + pcs + ' · ' + f0(p.w) + ' × ' + f0(p.h) + ' × ' + T + ' мм · ' +
+    edgeTxt + '</span></h2>';
+
+  if (!F || !list.length) {
+    return '<div style="width:100%;margin:0 0 26px">' + head +
+      '<svg viewBox="0 0 900 110" width="100%" xmlns="http://www.w3.org/2000/svg">' +
+      '<rect x="330" y="14" width="240" height="70" fill="#f8f4ec" stroke="#7d6a50" stroke-width="1.2" rx="2"/>' +
+      '<text x="450" y="54" text-anchor="middle" font-size="13" font-family="Segoe UI" fill="#8a7b66">' +
+      (LANG === 'en' ? 'no drilling' : 'без присадки') + '</text></svg></div>';
+  }
+
+  /* ---- раскладка чертежа ---- */
+  const maxW = 800, maxH = 220, dOx = 56, dOy = 46;
+  const sc = Math.min(maxW / Math.max(F.w, 1), maxH / Math.max(F.h, 1));
+  const rw = F.w * sc, rh = F.h * sc;
+  const ox = dOx + (maxW - rw) / 2, oy = dOy + (maxH - rh) / 2;
+  const X = u => ox + u * sc;
+  const Yv = v => F.flip ? (oy + rh - v * sc) : (oy + v * sc);
+
+  let s = '';
+  s += '<rect x="' + ox.toFixed(1) + '" y="' + oy.toFixed(1) + '" width="' + rw.toFixed(1) + '" height="' + rh.toFixed(1) + '" fill="#f8f4ec" stroke="#7d6a50" stroke-width="1.2" rx="2"/>';
+
+  /* база: левый нижний угол */
+  const bx = ox, by = oy + rh;
+  s += '<path d="M' + (bx - 16) + ',' + (by + 16) + ' L' + bx + ',' + by + ' L' + (bx - 16) + ',' + by + ' Z" fill="#4d6bfe"/>';
+  s += '<text x="' + (bx - 18) + '" y="' + (by + 13) + '" font-size="10.5" font-family="Consolas" fill="#3a55df" text-anchor="end">0,0</text>';
+
+  /* оси */
+  s += '<text x="' + (ox + rw / 2).toFixed(1) + '" y="' + (oy - 14).toFixed(1) + '" text-anchor="middle" font-size="11" font-family="Segoe UI" fill="#8b919b">' + F.uName + ' ' + f0(F.w) + ' мм →</text>';
+  s += '<text transform="rotate(-90 ' + (ox + rw + 22).toFixed(1) + ' ' + (oy + rh / 2).toFixed(1) + ')" x="' + (ox + rw + 22).toFixed(1) + '" y="' + (oy + rh / 2).toFixed(1) + '" text-anchor="middle" font-size="11" font-family="Segoe UI" fill="#8b919b">' + F.vName + ' ' + f0(F.h) + ' мм →</text>';
+
+  /* нумерация и отрисовка */
+  list.forEach((it, i) => { it.no = i + 1; });
+
+  list.forEach(it => {
+    const h = it.h, l = it.l;
+    if (!l.faceHole) return;
+    const cx = X(l.u), cy = Yv(l.v);
+    const r = Math.max(2.6, Math.min(10, h.dia * sc / 2));
+    const col = h.side === 'in' ? '#0f9d63' : '#7d6a50';
+    s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="#fff" stroke="' + col + '" stroke-width="1.1"/>';
+    if (h.cb) s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (r * 1.5).toFixed(1) + '" fill="none" stroke="' + col + '" stroke-width=".7" stroke-dasharray="2 2"/>';
+    s += '<text x="' + (cx + r + 2).toFixed(1) + '" y="' + (cy - r - 2).toFixed(1) + '" font-size="9" font-family="Consolas" fill="' + col + '">' + it.no + '</text>';
+  });
+
+  list.forEach(it => {
+    const h = it.h, l = it.l;
+    if (l.faceHole) return;
+    const L = h.dia <= 5 ? 9 : 12;
+    let x1, y1, x2, y2, tx, ty;
+    /* ребро вдоль u (левый/правый торец) — горизонтальная чёрточка на вертикальном ребре,
+       ребро вдоль v (перед/зад) — вертикальная чёрточка на горизонтальном ребре */
+    let anchor = 'start';
+    if (l.edgeAxis === 'u') {
+      const xx = X(l.edgeLow ? 0 : F.w);
+      const right = xx > ox + rw / 2;
+      x1 = xx - L / 2; y1 = Yv(l.pos); x2 = xx + L / 2; y2 = Yv(l.pos);
+      tx = xx + (right ? -9 : 9); ty = Yv(l.pos) - 6;
+      anchor = right ? 'end' : 'start';
+    } else {
+      const yy = Yv(l.edgeLow ? 0 : F.h);
+      const below = yy > oy + rh / 2;
+      x1 = X(l.pos); y1 = yy - L / 2; x2 = X(l.pos); y2 = yy + L / 2;
+      tx = X(l.pos) + 6; ty = yy + (below ? 13 : -6);
+      anchor = 'start';
+    }
+    s += '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="#7d6a50" stroke-width="2.8" stroke-linecap="round"/>';
+    s += '<text x="' + tx.toFixed(1) + '" y="' + ty.toFixed(1) + '" font-size="9" font-family="Consolas" fill="#7d6a50" text-anchor="' + anchor + '">' + it.no + '</text>';
+  });
+
+  /* ---- таблица ---- */
+  const rows = list.map(it => {
+    const h = it.h, l = it.l;
+    return {
+      no: it.no,
+      x: l.faceHole ? l.u : l.pos,
+      y: l.faceHole ? l.v : null,
+      dia: h.dia, cb: h.cb, depth: h.depth, op: h.op,
+      place: l.faceHole ? (h.side === 'in' ? 'внутр.' : 'наруж.') : 'торец ' + l.edge,
+      faceHole: l.faceHole
+    };
+  });
+
+  const rowH = 18.5, tblTop = 316;
+  const cols = [0, 50, 112, 158, 204, 252, 356];
+  const header = ['№', 'X', 'Y', 'Ø', 'глуб.', 'пласть', 'операция'];
+  let table = '<g font-family="Consolas,monospace" font-size="11.5" fill="#3d3a35">';
+  header.forEach((t, i) => {
+    table += '<text x="' + (10 + cols[i]) + '" y="' + (tblTop - 9) + '" font-family="Segoe UI" font-size="9.5" fill="#8b919b">' + t.toUpperCase() + '</text>';
+  });
+  table += '<line x1="10" y1="' + (tblTop - 4) + '" x2="890" y2="' + (tblTop - 4) + '" stroke="#d8dae1" stroke-width="1"/>';
+  rows.forEach((r, i) => {
+    const y = tblTop + 12 + i * rowH;
+    table += '<text x="' + (10 + cols[0]) + '" y="' + y + '">' + r.no + '</text>';
+    table += '<text x="' + (10 + cols[1]) + '" y="' + y + '">' + (Math.round(r.x * 10) / 10) + '</text>';
+    table += '<text x="' + (10 + cols[2]) + '" y="' + y + '">' + (r.y === null ? '—' : Math.round(r.y * 10) / 10) + '</text>';
+    table += '<text x="' + (10 + cols[3]) + '" y="' + y + '">' + r.dia + (r.cb ? '/' + r.cb : '') + '</text>';
+    table += '<text x="' + (10 + cols[4]) + '" y="' + y + '">' + r.depth + '</text>';
+    table += '<text x="' + (10 + cols[5]) + '" y="' + y + '" font-family="Segoe UI" font-size="10" fill="#7a828d">' + r.place + '</text>';
+    table += '<text x="' + (10 + cols[6]) + '" y="' + y + '" font-family="Segoe UI" font-size="10.5">' + (OP_LABEL[r.op] || r.op) + '</text>';
+  });
+  table += '</g>';
+
+  const H = tblTop + 20 + rows.length * rowH;
+  let extra = '';
+  if (p.role === 'door') {
+    extra = '<text x="10" y="' + (H + 31) + '" font-size="10.5" font-family="Segoe UI" fill="#8b919b">' +
+      'Чашки Ø35 — 22,5 мм от петлевой кромки. Планки петель — на боковине или стойке, 37 мм от переда корпуса.' +
+      (variant ? '' : ' Правая навеска — зеркально.') + '</text>';
+  } else if (p.role === 'side' || p.role === 'part') {
+    extra = '<text x="10" y="' + (H + 31) + '" font-size="10.5" font-family="Segoe UI" fill="#8b919b">' +
+      'Деталь симметрична: обе боковины (стойки) сверлятся по этой карте с внутренней стороны.</text>';
+  }
+  const note = '<text x="10" y="' + (H + 14) + '" font-size="10.5" font-family="Segoe UI" fill="#8b919b">' +
+    'X — по ' + F.uName + ' от базы, Y — по ' + F.vName + '. Зелёные — с внутренней пласти, коричневые — с наружной. ' +
+    'Торец: X — расстояние вдоль ребра.</text>';
+
+  const boxH = H + (extra ? 42 : 24);
+  return '<div style="width:100%;margin:0 0 30px">' + head +
+    '<svg viewBox="0 0 900 ' + boxH + '" width="100%" xmlns="http://www.w3.org/2000/svg">' + s + table + note + extra + '</svg></div>';
+}
+
+const API = { build, solve, countCollisions, collide, hingeZs, frame, localize, render, segDist, v3, add, mul };
+if (typeof globalThis !== 'undefined') globalThis.PRIS = API;
+if (typeof module !== 'undefined' && module.exports) module.exports = API;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+
+
+
+
+
+
+
+
+
 function drillPartsHtml(M){
-  return `<div style="display:flex;flex-direction:column;gap:0;padding:10px 2px 0">${M.parts.map(p=>drillCard(p,M)).join('')}</div>`;
+  if(!M.__pris){
+    M.__pris = PRIS.build(M);
+    PRIS.solve(M.__pris);
+  }
+  const warn = (M.__prisWarn && M.__prisWarn.length)
+    ? '<div class="warnbox">' + M.__prisWarn.map(w=>'<div>· '+w+'</div>').join('') + '</div>'
+    : '';
+  const doorsL = (M.doors || []).filter(d => d.hinge === 'L').length;
+  const doorsR = (M.doors || []).length - doorsL;
+  const cards = [];
+  M.parts.forEach(p => {
+    if(p.role === 'door'){
+      if(doorsL) cards.push(PRIS.render(p, M, M.__pris, {lang:LANG, variant:'L', qty:doorsL}));
+      if(doorsR) cards.push(PRIS.render(p, M, M.__pris, {lang:LANG, variant:'R', qty:doorsR}));
+    } else {
+      cards.push(PRIS.render(p, M, M.__pris, {lang:LANG}));
+    }
+  });
+  return warn + '<div style="display:flex;flex-direction:column;gap:0;padding:10px 2px 0">'
+    + cards.join('') + '</div>';
 }
 
 function renderCut(M){
@@ -2176,7 +2630,7 @@ function renderCut(M){
     <div class="legend">${M.parts.map(p=>`<span><i style="background:${PAL[(p.id-1)%PAL.length]}"></i>${p.id} — ${tstr(p.name)}</span>`).join('')}</div>
     <h2 class="ct" style="margin-top:26px">${tstr('Схемы присадок')} <span class="hint">${LANG==='en' ? '32 mm system · visible edges in wavy line' : 'система 32 · видимые кромки — волнистой линией'}</span></h2>
     ${drillPartsHtml(M)}
-    <p class="note">${LANG==='en' ? 'long dash — confirmat in the end, short dash — dowel in the end, ○ — hole in the face. 32 mm from the edge, +32 mm dowel, +352 mm next confirmat; from both ends to mid-length. Shorter than 600 mm — one pair per side. Doors: Ø35 cup, 22 mm from the edge. Edge banding as a wavy line.' : 'длинная чёрточка — конфирмат в торце, короткая — шкант в торце, ○ — отверстие в пласти. 32 мм от края, +32 мм шкант, +352 мм следующий конфирмат; с двух сторон до середины. Короче 600 мм — одна пара с каждой стороны. Двери: Ø35, 22 мм от кромки. Кромка — волнистой.'}</p>
+    <p class="note">${LANG==='en' ? 'Every card is dimensioned from its base (0,0 in the lower-left corner): X along the length/height, Y along the depth. Brown holes — drill from the outer face, green — from the inner face. End holes: X is the distance along the edge. Both holes of a joint are computed from one point, so they always meet; crossing axes are pushed apart.' : 'Каждая карта размерена от базы (0,0 в левом нижнем углу): X — по длине/высоте, Y — по глубине. Коричневые отверстия — сверлить с наружной пласти, зелёные — с внутренней. Торец: X — расстояние вдоль ребра. Оба отверстия узла считаются из одной точки, поэтому всегда сходятся; пересекающиеся оси разведены.'}</p>
     <p class="note">${LANG==='en' ? `Kerf ${K.KERF} mm is included. Cut sizes are core sizes; edge banding is added on visible edges. Grain runs along the long side.` : `Пропил ${K.KERF} мм учтён. Размер заготовки — без кромки; кромка добавляется на видимые кромки. Текстура — вдоль длинной стороны.`}</p>`;
   $('#btnCsv').onclick = downloadCSV;
   $('#btnPrint').onclick = ()=>window.print();
@@ -2202,7 +2656,7 @@ function downloadCSV(){
 
 function renderAsm(M){
   const pinFromBottom = M.pinZ - M.zBotTop;
-  const hinges = 2*M.doorN;
+  const hinges = PRIS.hingeZs(M).length * M.doorN;
   const screw70 = 4*(M.n+1);
   const screw30 = 6*M.n;
   const screw16 = 4*hinges + 4*M.feetN + 8;
@@ -2233,8 +2687,8 @@ function renderAsm(M){
       ? `${M.feetN} NO-10 feet into the bottom, 2 per upright. Level the stand.`
       : `${M.feetN} опор НО-10 в дно, 2 на стойку. Выставить по уровню.`],
     ['Дверцы', LANG==='en'
-      ? `${hinges} hinges, 2 per door. Ø35 cups, 22 mm from the edge. ${K.DGAP} mm gap. No handles.`
-      : `${hinges} петель, по 2 на дверцу. Чашки Ø35, 22 мм от кромки. Зазор ${K.DGAP} мм. Без ручек.`],
+      ? `${hinges} hinges, ${PRIS.hingeZs(M).length} per door. Ø35 cups, 22,5 mm from the hinge edge. ${K.DGAP} mm gap. No handles.`
+      : `${hinges} петель, по ${PRIS.hingeZs(M).length} на дверцу. Чашки Ø35, 22,5 мм от петлевой кромки. Зазор ${K.DGAP} мм. Без ручек.`],
     ['Отделка', LANG==='en'
       ? `Sanding 120/180, r2 edges, two coats of oil.`
       : `Шлифовка 120/180, кромки r2, масло в 2 слоя.`],
@@ -2285,7 +2739,7 @@ function renderAsm(M){
         <tr><td>${purpose(`Furniture foot NO-10 (${K.LEG} mm, Ø50)`,`Опора мебельная НО-10 (${K.LEG} мм, Ø50)`)}</td><td class="num">${M.feetN}</td><td class="mut">${purpose('2 under each upright, hidden','2 под каждой стойкой, скрытые')}</td></tr>
         <tr><td>${purpose(`Spacer ${K.TGAP} mm for the overlay top`,`Проставка ${K.TGAP} мм под накладную крышку`)}</td><td class="num">${2*(M.n+1)}</td><td class="mut">${purpose('keeps the shadow gap','держит теневой зазор')}</td></tr>
         <tr><td>${purpose('Shelf pin Ø5×16','Полкодержатель Ø5×16')}</td><td class="num">${4*M.n}</td><td class="mut">${purpose('4 per bay','4 на секцию')}</td></tr>
-        <tr><td>${purpose('Overlay hinge 110°','Петля накладная 110°')}</td><td class="num">${hinges}</td><td class="mut">${purpose('2 per door','2 на дверцу')}</td></tr>
+        <tr><td>${purpose('Overlay hinge 110°','Петля накладная 110°')}</td><td class="num">${hinges}</td><td class="mut">${purpose(PRIS.hingeZs(M).length + ' per door', PRIS.hingeZs(M).length + ' на дверцу')}</td></tr>
         <tr><td>${purpose('PVA glue D3','Клей ПВА Д3')}</td><td class="num">1</td><td class="mut">${purpose('all joints','все соединения')}</td></tr>
         ${M.modular ? `<tr><td>${purpose('Module connector bolt / cam','Стяжка межмодульная')}</td><td class="num">${Math.max(0, M.modules.length-1)*4}</td><td class="mut">${purpose('module joints, 4 per joint','стыки модулей, 4 на стык')}</td></tr>` : ''}
         ${M.edgeOn ? `<tr><td>${purpose(`Edge banding ${f1(M.edge)} / ${f1(M.edgeDoor)} mm`,`Кромка ${f1(M.edge)} / ${f1(M.edgeDoor)} мм`)}</td><td class="num">—</td><td class="mut">${purpose('visible edges only','только видимые кромки')}</td></tr>` : ''}
@@ -3200,7 +3654,7 @@ function setSection(sec){
   if(MODEL){ renderKpis(MODEL); renderNow(MODEL); }
 }
 
-const SAVE_IDS = ['inL','inD','inH','inSoil','inHS','inBoard','inThick','inEdgeBody','inEdgeDoor','inBuild','inModDoors','inComp','inSheet','inMedia','inMV','inTemp','inProt','inRate','inFish',
+const SAVE_IDS = ['inL','inD','inH','inSoil','inHS','inBoard','inThick','inEdgeBody','inEdgeDoor','inBuild','inModDoors','inSheet','inMedia','inMV','inTemp','inProt','inRate','inFish',
   'inNO3','inPO4','inK','inCa','inMg','inFe','inPH','inKH','inGH','inNH3','inNO2','inCu','inTDS','inEC',
   'inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe','inDoors'];
 function saveState(){
@@ -3238,7 +3692,7 @@ function renderAll(){
   const buildType = $('#inBuild').value === 'modular' ? 'modular' : 'solid';
   const modDoors = clamp(+$('#inModDoors').value || 1, 1, 3);
   const backWorks = true;
-  const compTop = $('#inComp').value === '1';
+  const compTop = true;                      /* крышка всегда считается склеенной */
   const [SW, SH] = $('#inSheet').value.split(',').map(Number);
   const bio = {
     media: $('#inMedia').value,
@@ -3303,7 +3757,12 @@ function renderAll(){
       if(ok) modChoiceCount++;
     });
   }
-  $('#doorField').classList.toggle('hide', L < 800);
+  /* селектор числа дверей нужен только если вариантов больше одного */
+  const doorChoices = MODEL.dMax - MODEL.dMin;
+  const hideDoors = L < 800 || doorChoices <= 0;
+  if(hideDoors) selD.value = '0';
+  $('#doorField').classList.toggle('hide', hideDoors);
+  $('#doorField').style.display = hideDoors ? 'none' : '';
   $('#edgeField').classList.toggle('hide', boardKey !== 'ldsp');
   $('#edgeField').style.display = boardKey === 'ldsp' ? '' : 'none';
   $('#edgeDoorField').classList.toggle('hide', boardKey !== 'ldsp');
@@ -3363,7 +3822,6 @@ $('#inEdgeBody').addEventListener('change', renderAll);
 $('#inEdgeDoor').addEventListener('change', renderAll);
 $('#inBuild').addEventListener('change', renderAll);
 $('#inModDoors').addEventListener('change', renderAll);
-$('#inComp').addEventListener('change', renderAll);
 $('#inDoors').addEventListener('change', renderAll);
 ['inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe'].forEach(id=>{
   document.getElementById(id).addEventListener('input', ()=>{ clearTimeout(tmr); tmr = setTimeout(renderAll, 130); });
@@ -3415,7 +3873,6 @@ try{
   if(qp.get('edgedoor')) $('#inEdgeDoor').value = qp.get('edgedoor');
   if(qp.get('build')) $('#inBuild').value = qp.get('build');
   if(qp.get('moddoors')) $('#inModDoors').value = qp.get('moddoors');
-  if(qp.get('comp')) $('#inComp').value = qp.get('comp');
   if(qp.get('sheet')) $('#inSheet').value = qp.get('sheet');
   if(qp.get('color')==='black'){ state.color='black'; $('#colors').querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.c==='black'))); }
 }catch(e){}
