@@ -49,13 +49,13 @@ body{
   .grid{display:flex;flex-direction:column;gap:16px;align-items:stretch;width:100%;min-width:0}
   .main{display:contents}
   .segs,.seghint,.kpis,#kpiNote,
-  #secTank,#secStand,#secGear,#secBio,#secFert,#udoInputs,#secUdo{width:100%;min-width:0}
+  #secTank,#secStand,#secGear,#secBio,#secFert,#udoInputs{width:100%;min-width:0}
   .segs{order:1}
   .seghint{order:2}
   .side{order:3;width:100%;min-width:0;position:static!important;max-height:none!important;overflow:visible!important;padding-right:0;height:auto}
   .kpis{order:4}
   #kpiNote{order:5}
-  #secTank,#secStand,#secGear,#secBio,#secFert,#udoInputs,#secUdo{order:6}
+  #secTank,#secStand,#secGear,#secBio,#secFert,#udoInputs{order:6}
 }
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px;min-width:0}
@@ -92,7 +92,6 @@ body{
 #udoInputs.udo{grid-template-columns:1fr 1fr;align-items:start}
 #udoInputs.udo .udo-col{display:flex;flex-direction:column;gap:16px;min-width:0}
 #udoInputs.udo .udo-col .card{margin:0}
-#secUdo{margin-top:16px}
 .ct{margin:0 0 14px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);font-weight:650;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .ct .hint{text-transform:none;letter-spacing:0;font-weight:400;color:var(--tx3);font-size:12px}
 
@@ -293,6 +292,53 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
   .kpi .s{font-size:9.5px}
 }
 @media print{body{background:#fff}.side,.vtabs,.btnrow{display:none}.card,.hdr{box-shadow:none;border-color:#ddd}}
+
+/* ---------- сетка показателей ---------- */
+#udoInputs{display:block}
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:0 0 12px}
+.seg{display:inline-flex;background:var(--soft2);border:1px solid var(--line);border-radius:11px;padding:3px;gap:2px}
+.seg button{background:none;border:0;color:var(--tx2);font:550 12px/1.2 inherit;padding:7px 11px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:#fff;color:var(--acc-dk);font-weight:650;box-shadow:0 1px 2px rgba(17,24,39,.08)}
+.st{display:inline-flex;align-items:center;gap:6px;font:600 11px/1 inherit;padding:4px 8px;border-radius:999px;white-space:nowrap}
+.st::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.st.ok{color:var(--ok);background:#e9f6ef}
+.st.warn{color:var(--warn);background:#fbf1e1}
+.st.bad{color:var(--bad);background:#fbe9e9}
+.st.none{color:var(--tx3);background:var(--soft2)}
+.acts{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:8px}
+.act{position:relative;padding:8px 10px 8px 12px;border-left:3px solid var(--line2);background:var(--soft);border-radius:8px;font-size:12.5px;line-height:1.45;color:var(--tx2)}
+.act b{color:var(--tx)}
+.act.warn{border-left-color:var(--warn)}
+.act.bad{border-left-color:var(--bad)}
+.act.ok{border-left-color:var(--ok)}
+.rels{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.rel{font:600 11px/1 var(--mono);padding:5px 8px;border-radius:7px;background:var(--soft2);color:var(--tx2)}
+.rel.ok{color:var(--ok)} .rel.warn{color:var(--warn)}
+.ugrid{display:grid;grid-template-columns:minmax(140px,1.15fr) minmax(0,1fr) minmax(0,1fr);gap:6px 14px;align-items:center}
+.uhead{grid-column:1/-1;display:grid;grid-template-columns:minmax(140px,1.15fr) minmax(0,1fr) minmax(0,1fr);gap:14px;
+  font:650 10px/1.2 inherit;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);padding:2px 0 6px;border-bottom:1px solid var(--line2)}
+.uhead span:nth-child(2),.uhead span:nth-child(3){padding-left:12px}
+.ugrp{grid-column:1/-1;font:650 10px/1.2 inherit;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);padding:14px 0 4px;border-bottom:1px solid var(--line2)}
+.urow{display:contents}
+.ulabel{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--tx2);min-width:0}
+.ulabel .rng{font:600 12px/1 var(--mono);color:var(--tx2);white-space:nowrap}
+.uval{min-width:0}
+.uval .inp{margin:0}
+.uempty{color:var(--tx3);font-size:12px;text-align:center}
+.fs{width:7px;height:7px;border-radius:50%;background:var(--line2);display:inline-block;flex:0 0 auto}
+.fs.ok{background:var(--ok)} .fs.warn{background:var(--warn)} .fs.bad{background:var(--bad)}
+.warns{margin:12px 0 0;padding-left:18px;color:var(--warn);font-size:12.5px;line-height:1.5}
+.emptybox{padding:8px 2px}
+.emptybox b{font-size:14px}
+.emptybox p{margin:6px 0 0;color:var(--tx2);font-size:13px}
+@media (max-width:720px){
+  .ugrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 10px}
+  .uhead{display:none}
+  .ulabel{grid-column:1/-1;padding-top:10px;gap:8px}
+  .ugrp{padding-top:16px}
+  .tbl.recipe th:nth-child(5), .tbl.recipe td:nth-child(5){display:none}
+  .tbl.recipe th,.tbl.recipe td{padding:8px 6px}
+}
 </style>
 </head>
 <body>
@@ -407,6 +453,13 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
           </select>
         </div>
         <div class="field">
+          <label for="inComp"><span data-i18n="f_comp">Столешница</span></label>
+          <select id="inComp">
+            <option value="0" selected data-i18n="opt_comp_no">не склеена</option>
+            <option value="1" data-i18n="opt_comp_yes">склеена, композит</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="inSheet"><span data-i18n="f_sheet">Лист</span> <b data-i18n="u_mm">мм</b></label>
           <select id="inSheet">
             <option value="2440,1220" selected>2440 × 1220 · 4×8 ft</option>
@@ -476,66 +529,6 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
         </div>
       </section>
 
-      <section class="card" id="cardWater">
-        <h2 class="ct"><span data-i18n="card_water">Вода</span> <span class="hint" data-i18n="hint_empty">пусто = нет теста</span></h2>
-        <div class="f3">
-          <div class="field"><label for="inPH"><span data-i18n="f_ph">pH</span></label><div class="inp"><input id="inPH" type="number" value="7" min="4" max="10" step="0.1"><em>pH</em></div></div>
-          <div class="field"><label for="inKH"><span data-i18n="f_kh">KH</span></label><div class="inp"><input id="inKH" type="number" value="4" min="0" max="30" step="0.5"><em>°dKH</em></div></div>
-          <div class="field"><label for="inGH"><span data-i18n="f_gh">GH</span></label><div class="inp"><input id="inGH" type="number" value="" min="0" max="40" step="0.5"><em>°dGH</em></div></div>
-          <div class="field"><label for="inTDS"><span data-i18n="f_tds">TDS</span></label><div class="inp"><input id="inTDS" type="number" value="" min="0" max="2000" step="10"><em>ppm</em></div></div>
-          <div class="field"><label for="inEC"><span data-i18n="f_ec">EC</span></label><div class="inp"><input id="inEC" type="number" value="" min="0" max="3000" step="10"><em>µS</em></div></div>
-        </div>
-      </section>
-
-      <section class="card" id="cardNP">
-        <h2 class="ct" data-i18n="card_np">Азот и фосфор</h2>
-        <div class="f3">
-          <div class="field f-extra"><label for="inNH3"><span data-i18n="f_nh3">NH₃ / NH₄</span></label><div class="inp"><input id="inNH3" type="number" value="" min="0" max="10" step="0.01"><em data-i18n="u_mgl">мг/л</em></div></div>
-          <div class="field f-extra"><label for="inNO2"><span data-i18n="f_no2">Нитрит NO₂</span></label><div class="inp"><input id="inNO2" type="number" value="" min="0" max="10" step="0.01"><em data-i18n="u_mgl">мг/л</em></div></div>
-          <div class="field"><label for="inNO3"><span data-i18n="f_no3">Нитрат NO₃</span></label><div class="inp"><input id="inNO3" type="number" value="5" min="0" max="200" step="0.5"><em data-i18n="u_mgl">мг/л</em></div></div>
-          <div class="field"><label for="inPO4"><span data-i18n="f_po4">Фосфат PO₄</span></label><div class="inp"><input id="inPO4" type="number" value="5" min="0" max="50" step="0.1"><em data-i18n="u_mgl">мг/л</em></div></div>
-        </div>
-      </section>
-
-      <section class="card" id="cardMin">
-        <h2 class="ct" data-i18n="card_min">Минералы</h2>
-        <div class="f3">
-          <div class="field"><label for="inK"><span data-i18n="f_k">Калий K</span></label><div class="inp"><input id="inK" type="number" value="25" min="0" max="200" step="1"><em data-i18n="u_mgl">мг/л</em></div></div>
-          <div class="field"><label for="inCa"><span data-i18n="f_ca">Кальций Ca</span></label><div class="inp"><input id="inCa" type="number" value="30" min="0" max="200" step="1"><em data-i18n="u_mgl">мг/л</em></div></div>
-          <div class="field"><label for="inMg"><span data-i18n="f_mg">Магний Mg</span></label><div class="inp"><input id="inMg" type="number" value="8" min="0" max="100" step="0.5"><em data-i18n="u_mgl">мг/л</em></div></div>
-          <div class="field"><label for="inFe"><span data-i18n="f_fe">Железо Fe</span></label><div class="inp"><input id="inFe" type="number" value="0.05" min="0" max="2" step="0.01"><em data-i18n="u_mgl">мг/л</em></div></div>
-          <div class="field f-extra"><label for="inCu"><span data-i18n="f_cu">Медь Cu</span></label><div class="inp"><input id="inCu" type="number" value="" min="0" max="2" step="0.01"><em data-i18n="u_mgl">мг/л</em></div></div>
-        </div>
-      </section>
-
-      <section class="card" id="cardGoal">
-        <h2 class="ct" data-i18n="card_goal">Цели</h2>
-        <div class="field">
-          <label for="inGNO3"><span data-i18n="f_no3">Нитрат NO₃</span> <b data-i18n="u_mgl">мг/л</b></label>
-          <div class="inp"><input id="inGNO3" type="number" value="20" min="0" max="200" step="1"><em data-i18n="u_mgl">мг/л</em></div>
-        </div>
-        <div class="field">
-          <label for="inGPO4"><span data-i18n="f_po4">Фосфат PO₄</span> <b data-i18n="u_mgl">мг/л</b></label>
-          <div class="inp"><input id="inGPO4" type="number" value="1.5" min="0" max="50" step="0.1"><em data-i18n="u_mgl">мг/л</em></div>
-        </div>
-        <div class="field">
-          <label for="inGK"><span data-i18n="f_k">Калий K</span> <b data-i18n="u_mgl">мг/л</b></label>
-          <div class="inp"><input id="inGK" type="number" value="20" min="0" max="200" step="1"><em data-i18n="u_mgl">мг/л</em></div>
-        </div>
-        <div class="field">
-          <label for="inGCa"><span data-i18n="f_ca">Кальций Ca</span> <b data-i18n="u_mgl">мг/л</b></label>
-          <div class="inp"><input id="inGCa" type="number" value="30" min="0" max="200" step="1"><em data-i18n="u_mgl">мг/л</em></div>
-        </div>
-        <div class="field">
-          <label for="inGMg"><span data-i18n="f_mg">Магний Mg</span> <b data-i18n="u_mgl">мг/л</b></label>
-          <div class="inp"><input id="inGMg" type="number" value="10" min="0" max="100" step="0.5"><em data-i18n="u_mgl">мг/л</em></div>
-        </div>
-        <div class="field" style="margin-bottom:2px">
-          <label for="inGFe"><span data-i18n="f_fe">Железо Fe</span> <b data-i18n="u_mgl">мг/л</b></label>
-          <div class="inp"><input id="inGFe" type="number" value="0.1" min="0" max="2" step="0.01"><em data-i18n="u_mgl">мг/л</em></div>
-        </div>
-      </section>
-
       <section class="card" id="sideSpec"></section>
     </aside>
 
@@ -546,7 +539,6 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
         <button data-s="gear" data-i18n="tab_gear">Оборудование</button>
         <button data-s="bio" data-i18n="tab_bio">Биология</button>
         <button data-s="fert" data-i18n="tab_test">Тесты</button>
-        <button data-s="udo" data-i18n="tab_udo">Удо</button>
       </div>
       <p class="seghint" id="seghint"></p>
       <div class="kpis" id="kpis"></div>
@@ -564,16 +556,412 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
       </div>
       <div id="secGear"></div>
       <div id="secBio"></div>
-      <div id="secFert"></div>
-      <div id="udoInputs" class="two hide">
-        <div class="udo-col" id="udoCol1"></div>
-        <div class="udo-col" id="udoCol2"></div>
+      <div id="udoInputs" class="hide">
+        <div id="fertBar"></div>
+        <section class="card" id="cardUdo">
+          <h2 class="ct"><span data-i18n="card_udo">Показатели и цели</span> <span class="hint" data-i18n="hint_empty">пусто = нет теста</span></h2>
+          <div class="ugrid" id="ugrid"></div>
+        </section>
       </div>
-      <div id="secUdo"></div>
+      <div id="secFert"></div>
+    </main>
     </main>
   </div>
 </div>
 
+<script id="aqua-core">
+/* ============================================================
+   AQUA CORE — чистая химия воды и удобрений, без DOM.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  const MW = {
+    H: 1.008, C: 12.011, N: 14.007, O: 15.999, Na: 22.990, Mg: 24.305,
+    P: 30.974, S: 32.06, Cl: 35.45, K: 39.098, Ca: 40.078,
+    Fe: 55.845, Mn: 54.938, Zn: 65.38, Cu: 63.546, B: 10.811, Mo: 95.95
+  };
+  const sum = p => p.reduce((s, x) => s + MW[x[0]] * x[1], 0);
+
+  const M = {
+    NO3: sum([['N', 1], ['O', 3]]),
+    PO4: sum([['P', 1], ['O', 4]]),
+    NH3: sum([['N', 1], ['H', 3]]),
+    SO4: sum([['S', 1], ['O', 4]]),
+    KNO3: sum([['K', 1], ['N', 1], ['O', 3]]),
+    KH2PO4: sum([['K', 1], ['H', 2], ['P', 1], ['O', 4]]),
+    K2SO4: sum([['K', 2], ['S', 1], ['O', 4]]),
+    MGSO4: sum([['Mg', 1], ['S', 1], ['O', 4]]) + 7 * sum([['H', 2], ['O', 1]]),
+    CANO3: sum([['Ca', 1], ['N', 2], ['O', 6]]) + 4 * sum([['H', 2], ['O', 1]]),
+    CACL2: sum([['Ca', 1], ['Cl', 2]]) + 2 * sum([['H', 2], ['O', 1]]),
+    UREA: sum([['C', 1], ['O', 1], ['N', 2], ['H', 4]])
+  };
+
+  const FR = {
+    kno3_no3: M.NO3 / M.KNO3,
+    kno3_k: MW.K / M.KNO3,
+    cano3_no3: 2 * M.NO3 / M.CANO3,
+    cano3_ca: MW.Ca / M.CANO3,
+    urea_n: 2 * MW.N / M.UREA,
+    kh2po4_po4: M.PO4 / M.KH2PO4,
+    kh2po4_k: MW.K / M.KH2PO4,
+    k2so4_k: 2 * MW.K / M.K2SO4,
+    k2so4_so4: M.SO4 / M.K2SO4,
+    mgso4_mg: MW.Mg / M.MGSO4,
+    mgso4_so4: M.SO4 / M.MGSO4,
+    cacl2_ca: MW.Ca / M.CACL2,
+    cacl2_cl: 2 * MW.Cl / M.CACL2
+  };
+
+  const PER = {
+    k_per_no3: FR.kno3_k / FR.kno3_no3,
+    ca_per_no3: FR.cano3_ca / FR.cano3_no3,
+    k_per_po4: FR.kh2po4_k / FR.kh2po4_po4
+  };
+
+  const SALTS = [
+    { key: 'kno3', name: { ru: 'Калиевая селитра', en: 'Potassium nitrate' }, formula: 'KNO₃', stockG: 50, stockL: 0.5 },
+    { key: 'cano3', name: { ru: 'Кальциевая селитра', en: 'Calcium nitrate' }, formula: 'Ca(NO₃)₂ · 4H₂O', stockG: 50, stockL: 0.5 },
+    { key: 'urea', name: { ru: 'Мочевина, карбамид', en: 'Urea' }, formula: 'CO(NH₂)₂', stockG: 50, stockL: 0.5 },
+    { key: 'kh2po4', name: { ru: 'Монофосфат калия', en: 'Monopotassium phosphate' }, formula: 'KH₂PO₄', stockG: 50, stockL: 0.5 },
+    { key: 'k2so4', name: { ru: 'Сульфат калия', en: 'Potassium sulphate' }, formula: 'K₂SO₄', stockG: 40, stockL: 0.5 },
+    { key: 'nahco3', name: { ru: 'Пищевая сода', en: 'Baking soda' }, formula: 'NaHCO₃', stockG: 30, stockL: 0.5 },
+    { key: 'mgso4', name: { ru: 'Магнезия, сульфат магния', en: 'Magnesium sulphate' }, formula: 'MgSO₄ · 7H₂O', stockG: 50, stockL: 0.5 },
+    { key: 'cacl2', name: { ru: 'Хлорид кальция', en: 'Calcium chloride' }, formula: 'CaCl₂ · 2H₂O', stockG: 50, stockL: 0.5 },
+    { key: 'csm', name: { ru: 'Микро + железо, хелат', en: 'Micro + iron chelate' }, formula: 'CSM+B / Fe-DTPA', stockG: 5, stockL: 0.5, fe: 0.07 }
+  ];
+  const SALT_BY = {};
+  SALTS.forEach(s => { SALT_BY[s.key] = s; });
+
+  const U = { c: '°C', none: '', dkh: '°dKH', dgh: '°dGH', ppm: 'ppm', us: 'µS/см', mgl: 'мг/л' };
+  const T = (ru, en) => ({ ru: ru, en: en });
+
+  const META = {
+    temp: { label: T('Температура', 'Temperature'), unit: U.c, dec: 0, wc: false, hint: { low: T('Проверьте нагреватель и теплопотери.', 'Check the heater and heat loss.'), high: T('Усильте аэрацию, охладите воду, приглушите свет.', 'Increase aeration, cool the water, dim the light.') } },
+    ph: { label: T('pH', 'pH'), unit: U.none, dec: 2, wc: false, goal: true, hint: { low: T('Проверьте KH и подачу CO₂ — возможна передозировка.', 'Check KH and CO₂ supply — possible overdose.'), high: T('Уменьшите CO₂, проверьте дегазацию и KH.', 'Reduce CO₂, check degassing and KH.') } },
+    kh: { label: T('KH', 'KH'), unit: U.dkh, dec: 1, wc: false, goal: true, hint: { low: T('Добавьте NaHCO₃: без буфера pH будет скакать.', 'Add NaHCO₃: without a buffer pH will swing.'), high: T('Разбавляйте осмосом или подкисляйте подменную воду.', 'Dilute with RO or acidify the replacement water.') } },
+    gh: { label: T('GH', 'GH'), unit: U.dgh, dec: 1, wc: false, goal: true, hint: { low: T('Добавьте CaCl₂ и MgSO₄.', 'Add CaCl₂ and MgSO₄.'), high: T('Разбавляйте осмосом: Ca и Mg уже с избытком.', 'Dilute with RO: Ca and Mg are in surplus.') } },
+    tds: { label: T('TDS', 'TDS'), unit: U.ppm, dec: 0, hint: { low: null, high: T('Накопились соли — подмена 30–50 %.', 'Salts have built up — change 30–50 %.') } },
+    ec: { label: T('EC', 'EC'), unit: U.us, dec: 0, hint: { low: null, high: T('Проверьте TDS и подмены: EC растёт вместе с солями.', 'Check TDS and water changes: EC rises with salts.') } },
+    co2: { label: T('CO₂', 'CO₂'), unit: U.mgl, dec: 1, derived: true, wc: false, hint: { low: T('Для травника мало: увеличьте подачу или проверьте диффузор.', 'Low for a planted tank: increase supply or check the diffuser.'), high: T('Опасно для рыбы: уменьшите подачу и усильте течение.', 'Dangerous for fish: reduce supply and increase flow.') } },
+    tan: { label: T('Аммоний TAN', 'Ammonia TAN'), unit: U.mgl, dec: 2, hint: { low: null, high: T('Аммиак: подмена 50 %, не кормить, проверить фильтр.', 'Ammonia: 50 % water change, do not feed, check the filter.') } },
+    nh3: { label: T('NH₃ свободный', 'Free NH₃'), unit: U.mgl, dec: 3, derived: true, wc: false, hint: { low: null, high: T('Токсичен: срочная подмена и аэрация.', 'Toxic: urgent water change and aeration.') } },
+    no2: { label: T('Нитрит NO₂', 'Nitrite NO₂'), unit: U.mgl, dec: 2, hint: { low: null, high: T('Нитрит: подмена, аэрация, не кормить.', 'Nitrite: water change, aeration, do not feed.') } },
+    no3: { label: T('Нитрат NO₃', 'Nitrate NO₃'), unit: U.mgl, dec: 1, goal: true, hint: { low: T('Добавьте KNO₃ или уменьшите подмены.', 'Add KNO₃ or reduce water changes.'), high: T('Не вносить азот; подмена или больше растений.', 'Do not add nitrogen; water change or more plants.') } },
+    po4: { label: T('Фосфат PO₄', 'Phosphate PO₄'), unit: U.mgl, dec: 2, goal: true, hint: { low: T('Добавьте KH₂PO₄.', 'Add KH₂PO₄.'), high: T('Не вносить фосфат; подмена или сорбент.', 'Do not add phosphate; water change or adsorbent.') } },
+    k: { label: T('Калий K', 'Potassium K'), unit: U.mgl, dec: 1, goal: true, hint: { low: T('Добавьте K₂SO₄ или KNO₃.', 'Add K₂SO₄ or KNO₃.'), high: T('Не вносить калий; снизить можно подменой.', 'Do not add potassium; only a water change lowers it.') } },
+    ca: { label: T('Кальций Ca', 'Calcium Ca'), unit: U.mgl, dec: 0, goal: true, hint: { low: T('Добавьте CaCl₂ или Ca(NO₃)₂.', 'Add CaCl₂ or Ca(NO₃)₂.'), high: T('Не вносить кальций; разбавить осмосом.', 'Do not add calcium; dilute with RO.') } },
+    mg: { label: T('Магний Mg', 'Magnesium Mg'), unit: U.mgl, dec: 1, goal: true, hint: { low: T('Добавьте MgSO₄·7H₂O.', 'Add MgSO₄·7H₂O.'), high: T('Не вносить магний; подмена.', 'Do not add magnesium; water change.') } },
+    fe: { label: T('Железо Fe', 'Iron Fe'), unit: U.mgl, dec: 2, goal: true, hint: { low: T('Добавьте хелат железа (DTPA/EDDHA).', 'Add chelated iron (DTPA/EDDHA).'), high: T('Уменьшите микро: избыток железа блокирует марганец.', 'Reduce micro: excess iron blocks manganese.') } },
+    cu: { label: T('Медь Cu', 'Copper Cu'), unit: U.mgl, dec: 3, hint: { low: null, high: T('Медь: убрать источник, подмена, сорбент.', 'Copper: remove the source, water change, adsorbent.') } }
+  };
+
+  const TOL = { ph: 0.2, kh: 0.5, gh: 1, no3: 2, po4: 0.2, k: 2, ca: 5, mg: 2, fe: 0.02 };
+  Object.keys(TOL).forEach(k => { if (META[k]) META[k].tol = TOL[k]; });
+
+  const GROUPS = [
+    { id: 'water', name: T('Вода', 'Water'), keys: ['temp', 'ph', 'kh', 'gh', 'tds', 'ec', 'co2'] },
+    { id: 'food', name: T('Питание', 'Nutrition'), keys: ['no3', 'po4', 'k', 'ca', 'mg', 'fe'] },
+    { id: 'ctrl', name: T('Контроль', 'Control'), keys: ['tan', 'nh3', 'no2', 'cu'] }
+  ];
+
+  const PROFILES = {
+    hi: {
+      id: 'hi', name: T('Травник с CO₂', 'Planted + CO₂'),
+      goals: { ph: 6.8, kh: 4, gh: 7, no3: 20, po4: 1.5, k: 20, ca: 30, mg: 10, fe: 0.1 },
+      params: {
+        temp: [22, 26], ph: [6.4, 7.4], kh: [2, 6], gh: [4, 14], tds: [100, 400], ec: [200, 600],
+        co2: [15, 30], tan: [0, 0.1], nh3: [0, 0.01], no2: [0, 0.2], no3: [10, 30], po4: [0.5, 2],
+        k: [10, 30], ca: [20, 60], mg: [5, 20], fe: [0.05, 0.2], cu: [0, 0.05]
+      },
+      crit: { temp: [18, 30], ph: [6.0, 8.0], kh: [1, 10], tan: [0, 0.5], nh3: [0, 0.05], no2: [0, 0.5], co2: [5, 40], no3: [0, 50], po4: [0, 5], cu: [0, 0.1] }
+    },
+    low: {
+      id: 'low', name: T('Травник без CO₂', 'Planted, no CO₂'),
+      goals: { ph: 7.0, kh: 5, gh: 8, no3: 10, po4: 1, k: 15, ca: 30, mg: 10, fe: 0.1 },
+      params: {
+        temp: [22, 26], ph: [6.5, 7.8], kh: [2, 8], gh: [4, 14], tds: [100, 450], ec: [200, 650],
+        co2: [3, 15], tan: [0, 0.1], nh3: [0, 0.01], no2: [0, 0.2], no3: [5, 20], po4: [0.2, 1.5],
+        k: [5, 20], ca: [20, 60], mg: [5, 20], fe: [0.05, 0.2], cu: [0, 0.05]
+      },
+      crit: { temp: [18, 30], ph: [6.0, 8.2], kh: [1, 12], tan: [0, 0.5], nh3: [0, 0.05], no2: [0, 0.5], co2: [1, 30], no3: [0, 50], po4: [0, 5], cu: [0, 0.1] }
+    },
+    fish: {
+      id: 'fish', name: T('Общий аквариум', 'Community tank'),
+      goals: { ph: 7.2, kh: 6, gh: 9, no3: 10, po4: 0.5, k: 10, ca: 30, mg: 10, fe: 0.05 },
+      params: {
+        temp: [22, 27], ph: [6.5, 8.0], kh: [3, 10], gh: [5, 16], tds: [150, 500], ec: [250, 700],
+        co2: [2, 15], tan: [0, 0.1], nh3: [0, 0.01], no2: [0, 0.2], no3: [5, 40], po4: [0.1, 1.5],
+        k: [5, 30], ca: [20, 80], mg: [5, 25], fe: [0, 0.2], cu: [0, 0.05]
+      },
+      crit: { temp: [18, 31], ph: [6.0, 8.5], kh: [1, 14], tan: [0, 0.5], nh3: [0, 0.05], no2: [0, 0.5], co2: [1, 30], no3: [0, 60], po4: [0, 5], cu: [0, 0.1] }
+    }
+  };
+
+  const num = (v, d) => (v == null || v === '' || !isFinite(+v)) ? d : +v;
+
+  function nh3Fraction(ph, tC) {
+    const pKa = 0.09018 + 2729.92 / (tC + 273.15);
+    return 1 / (1 + Math.pow(10, pKa - ph));
+  }
+  function co2FromKhPh(kh, ph) { return 3 * kh * Math.pow(10, 7 - ph); }
+  function ghFromCaMg(ca, mg) { return (num(ca, 0) / 7.14) + (num(mg, 0) / 4.34); }
+
+  function evaluate(input) {
+    input = input || {};
+    const prof = PROFILES[input.profile] || PROFILES.hi;
+    const f = input.fert || {}, g = input.goal || {};
+    const tC = num(input.tempC, 25);
+    const co2 = (f.kh != null && f.ph != null) ? co2FromKhPh(f.kh, f.ph) : null;
+    const gh = f.gh != null ? f.gh : ((f.ca != null || f.mg != null) ? ghFromCaMg(f.ca, f.mg) : null);
+    const nh3 = (f.tan != null && f.ph != null) ? f.tan * nh3Fraction(f.ph, tC) : null;
+    const vals = {
+      temp: tC, ph: f.ph, kh: f.kh, gh: gh, tds: f.tds, ec: f.ec, co2: co2,
+      tan: f.tan, nh3: nh3, no2: f.no2, no3: f.no3, po4: f.po4,
+      k: f.k, ca: f.ca, mg: f.mg, fe: f.fe, cu: f.cu
+    };
+    const rows = [];
+    GROUPS.forEach(gr => gr.keys.forEach(key => {
+      const m = META[key], v = vals[key], norm = prof.params[key] || null;
+      const goal = (m.goal && g[key] != null) ? g[key] : null;
+      let status = 'none', sev = 'none';
+      if (v != null && norm) {
+        status = v < norm[0] ? 'low' : (v > norm[1] ? 'high' : 'ok');
+        sev = status === 'ok' ? 'ok' : 'warn';
+        const c = prof.crit && prof.crit[key];
+        if (c && (v < c[0] || v > c[1])) sev = 'bad';
+      }
+      rows.push({
+        key: key, label: m.label, unit: m.unit, dec: m.dec, group: gr.id,
+        value: v, norm: norm, goal: goal, status: status, severity: sev,
+        derived: !!m.derived || (key === 'gh' && f.gh == null && v != null),
+        wc: m.wc !== false, hint: m.hint || null
+      });
+    }));
+    const known = rows.filter(r => r.value != null);
+    const counts = {
+      known: known.length, total: rows.length,
+      ok: known.filter(r => r.status === 'ok').length,
+      warn: known.filter(r => r.severity === 'warn').length,
+      bad: known.filter(r => r.severity === 'bad').length
+    };
+    const rel = [];
+    if (f.ca != null && f.mg != null && f.mg > 0.01) {
+      const r = f.ca / f.mg; rel.push({ code: 'ca_mg', value: r, ok: r >= 3 && r <= 5 });
+    }
+    if (f.k != null && f.ca != null && f.ca > 0.01) {
+      const r = f.k / f.ca; rel.push({ code: 'k_ca', value: r, ok: r <= 2.5 });
+    }
+    if (f.no3 != null && f.po4 != null && f.po4 > 0.05) {
+      const r = f.no3 / f.po4; rel.push({ code: 'n_p', value: r, ok: r >= 5 && r <= 20 });
+    }
+    return { profile: prof.id, rows: rows, groups: GROUPS, counts: counts, relations: rel };
+  }
+
+  function recipe(input) {
+    input = input || {};
+    const prof = PROFILES[input.profile] || PROFILES.hi;
+    const f = input.fert || {}, g = input.goal || {};
+    const V = Math.max(1, num(input.volume, 100));
+    const tC = num(input.tempC, 25);
+    const pH = f.ph != null ? f.ph : 7;
+    const warnings = [], missing = [], salts = [];
+    const add = { no3: 0, po4: 0, k: 0, ca: 0, mg: 0, fe: 0, kh: 0, gh: 0, so4: 0, cl: 0, tan: 0 };
+    const has = v => v != null && isFinite(v);
+
+    const gN = g.no3, gP = g.po4, gK = g.k, gCa = g.ca, gMg = g.mg, gFe = g.fe;
+    const gPH = g.ph, gKH = g.kh, gGH = g.gh;
+
+    let dN = 0;
+    if (gN != null) {
+      if (!has(f.no3)) missing.push('no3');
+      else { dN = Math.max(0, gN - f.no3); if (dN < TOL.no3) dN = 0; }
+    }
+
+    let kFree, caFree;
+    if (gK != null) {
+      if (!has(f.k)) { missing.push('k'); kFree = 0; }
+      else { kFree = Math.max(0, gK - f.k); if (kFree < TOL.k) kFree = 0; }
+    } else kFree = Infinity;
+    if (gCa != null) {
+      if (!has(f.ca)) { missing.push('ca'); caFree = 0; }
+      else { caFree = Math.max(0, gCa - f.ca); if (caFree < TOL.ca) caFree = 0; }
+    } else caFree = Infinity;
+
+    let no3K = 0, no3Ca = 0;
+    if (dN > 0) {
+      no3K = kFree === Infinity ? dN : Math.min(dN, kFree / PER.k_per_no3);
+      const rem = dN - no3K;
+      no3Ca = caFree === Infinity ? rem : Math.min(rem, caFree / PER.ca_per_no3);
+    }
+    const no3Urea = Math.max(0, dN - no3K - no3Ca);
+
+    let dP = 0;
+    if (gP != null) {
+      if (!has(f.po4)) missing.push('po4');
+      else { dP = Math.max(0, gP - f.po4); if (dP < TOL.po4) dP = 0; }
+    }
+
+    const kFromN = no3K * PER.k_per_no3;
+    const kFromP = dP * PER.k_per_po4;
+    let kNeed = (gK != null && has(f.k)) ? Math.max(0, gK - (f.k + kFromN + kFromP)) : 0;
+    if (kNeed < TOL.k) kNeed = 0;
+
+    const caFromN = no3Ca * PER.ca_per_no3;
+    let caNeed = (gCa != null && has(f.ca)) ? Math.max(0, gCa - (f.ca + caFromN)) : 0;
+    if (caNeed < TOL.ca) caNeed = 0;
+
+    let mgNeed = (gMg != null && has(f.mg)) ? Math.max(0, gMg - f.mg) : 0;
+    let feNeed = (gFe != null && has(f.fe)) ? Math.max(0, gFe - f.fe) : 0;
+    if (mgNeed < TOL.mg) mgNeed = 0;
+    if (feNeed < TOL.fe) feNeed = 0;
+    if (gMg != null && !has(f.mg)) missing.push('mg');
+    if (gFe != null && !has(f.fe)) missing.push('fe');
+
+    let dKH = 0;
+    if (gKH != null) {
+      if (!has(f.kh)) missing.push('kh');
+      else {
+        dKH = gKH - f.kh;
+        if (Math.abs(dKH) <= TOL.kh) dKH = 0;
+        if (dKH < 0) { warnings.push({ code: 'kh_down', value: dKH }); dKH = 0; }
+      }
+    }
+
+    const curGH = (has(f.ca) && has(f.mg)) ? ghFromCaMg(f.ca, f.mg) : (has(f.gh) ? f.gh : ((has(f.ca) || has(f.mg)) ? ghFromCaMg(f.ca, f.mg) : null));
+    let ghNeed = 0;
+    if (gGH != null && curGH != null) {
+      ghNeed = gGH - curGH;
+      if (Math.abs(ghNeed) <= TOL.gh) ghNeed = 0;
+      if (ghNeed < 0) { warnings.push({ code: 'gh_down', value: ghNeed }); ghNeed = 0; }
+    }
+    if (gGH != null && curGH == null) missing.push('gh');
+    let caGH = 0, mgGH = 0;
+    const caSet = gCa != null, mgSet = gMg != null;
+    if (ghNeed > 0 && !caSet && !mgSet) { caGH = ghNeed * 2 / 3; mgGH = ghNeed / 3; }
+
+    const grams = {
+      kno3: no3K * V / FR.kno3_no3 / 1000,
+      cano3: no3Ca * V / FR.cano3_no3 / 1000,
+      urea: (no3Urea / (M.NO3 / MW.N)) * V / FR.urea_n / 1000,
+      kh2po4: dP * V / FR.kh2po4_po4 / 1000,
+      k2so4: kNeed * V / FR.k2so4_k / 1000,
+      nahco3: dKH * 3.0 * V / 100,
+      mgso4: mgNeed * V / FR.mgso4_mg / 1000 + mgGH * 44.02 * V / 1000,
+      cacl2: caNeed * V / FR.cacl2_ca / 1000 + caGH * 26.19 * V / 1000,
+      csm: feNeed * V / (SALT_BY.csm.fe || 0.07) / 1000
+    };
+
+    const perL = g => g * 1000 / V;
+    const addsFor = (key, g) => {
+      const a = {};
+      if (key === 'kno3') { a.no3 = perL(g) * FR.kno3_no3; a.k = perL(g) * FR.kno3_k; }
+      if (key === 'cano3') { a.no3 = perL(g) * FR.cano3_no3; a.ca = perL(g) * FR.cano3_ca; }
+      if (key === 'urea') { a.tan = perL(g) * FR.urea_n; }
+      if (key === 'kh2po4') { a.po4 = perL(g) * FR.kh2po4_po4; a.k = perL(g) * FR.kh2po4_k; }
+      if (key === 'k2so4') { a.k = perL(g) * FR.k2so4_k; a.so4 = perL(g) * FR.k2so4_so4; }
+      if (key === 'nahco3') { a.kh = perL(g) / 0.03; }
+      if (key === 'mgso4') { a.mg = perL(g) * FR.mgso4_mg; a.so4 = perL(g) * FR.mgso4_so4; }
+      if (key === 'cacl2') { a.ca = perL(g) * FR.cacl2_ca; a.cl = perL(g) * FR.cacl2_cl; }
+      if (key === 'csm') { a.fe = perL(g) * (SALT_BY.csm.fe || 0.07); }
+      return a;
+    };
+    Object.keys(grams).forEach(key => {
+      if (grams[key] > 0.001) {
+        const s = SALT_BY[key];
+        const ml = grams[key] / (s.stockG / s.stockL) * 1000;
+        salts.push({
+          key: key, formula: s.formula, name: s.name,
+          grams: grams[key], ml: ml, stockG: s.stockG, stockL: s.stockL,
+          adds: addsFor(key, grams[key]),
+          bottles: grams[key] > s.stockG ? Math.ceil(grams[key] / s.stockG) : 1
+        });
+        if (grams[key] > s.stockG) warnings.push({ code: 'bottles', key: key, grams: grams[key], bottles: Math.ceil(grams[key] / s.stockG) });
+      }
+    });
+
+    add.no3 = dN; add.po4 = dP;
+    add.k = kFromN + kFromP + grams.k2so4 * FR.k2so4_k * 1000 / V;
+    add.ca = caFromN + grams.cacl2 * FR.cacl2_ca * 1000 / V;
+    add.mg = grams.mgso4 * FR.mgso4_mg * 1000 / V;
+    add.fe = grams.csm * (SALT_BY.csm.fe || 0.07) * 1000 / V;
+    add.kh = dKH; add.gh = caGH + mgGH;
+    add.so4 = (grams.k2so4 * FR.k2so4_so4 + grams.mgso4 * FR.mgso4_so4) * 1000 / V;
+    add.cl = grams.cacl2 * FR.cacl2_cl * 1000 / V;
+
+    const ureaN = no3Urea / (M.NO3 / MW.N);
+    add.tan = ureaN;
+    const nh3 = ureaN * nh3Fraction(pH, tC);
+    if (ureaN > 0.01) warnings.push({ code: 'urea_tan', value: ureaN, nh3: nh3 });
+    if (nh3 > 0.02) warnings.push({ code: 'urea_nh3', value: nh3 });
+
+    const miss = missing.filter((v, i, a) => a.indexOf(v) === i);
+    miss.forEach(k => warnings.push({ code: 'no_test', key: k }));
+
+    ['ph', 'kh', 'gh', 'no3', 'po4', 'k', 'ca', 'mg', 'fe'].forEach(k => {
+      if (g[k] != null && prof.params[k] && (g[k] < prof.params[k][0] || g[k] > prof.params[k][1])) {
+        warnings.push({ code: 'goal_out', key: k, value: g[k], norm: prof.params[k] });
+      }
+    });
+    if (gK != null && has(f.k) && f.k > gK + 0.01) warnings.push({ code: 'above_goal', key: 'k', value: f.k, goal: gK });
+    if (gCa != null && has(f.ca) && f.ca > gCa + 0.01) warnings.push({ code: 'above_goal', key: 'ca', value: f.ca, goal: gCa });
+
+    const final = {
+      no3: has(f.no3) ? f.no3 + add.no3 : null,
+      po4: has(f.po4) ? f.po4 + add.po4 : null,
+      k: has(f.k) ? f.k + add.k : null,
+      ca: has(f.ca) ? f.ca + add.ca : null,
+      mg: has(f.mg) ? f.mg + add.mg : null,
+      fe: has(f.fe) ? f.fe + add.fe : null,
+      kh: has(f.kh) ? f.kh + dKH : null,
+      gh: (has(f.ca) && has(f.mg)) ? ghFromCaMg(f.ca + add.ca, f.mg + add.mg) : (curGH == null ? null : curGH + add.ca / 7.14 + add.mg / 4.34)
+    };
+
+    let phInfo = null;
+    if (gPH != null) {
+      if (final.kh == null) missing.push('kh');
+      else {
+        phInfo = { goal: gPH, kh: final.kh, co2Target: co2FromKhPh(final.kh, gPH), co2Now: (f.ph != null && f.kh != null) ? co2FromKhPh(f.kh, f.ph) : null };
+        if (gPH < 6 || gPH > 8.5) warnings.push({ code: 'ph_goal_out', value: gPH });
+        if (phInfo.co2Target > 35) warnings.push({ code: 'ph_co2_high', value: phInfo.co2Target });
+        if (phInfo.co2Target < 5) warnings.push({ code: 'ph_co2_low', value: phInfo.co2Target });
+      }
+    }
+    if (gGH != null && final.gh != null && Math.abs(final.gh - gGH) > TOL.gh) {
+      warnings.push({ code: 'gh_conflict', value: final.gh, goal: gGH });
+    }
+
+    return {
+      profile: prof.id, volume: V, salts: salts, add: add, final: final,
+      ph: phInfo, kh: { dose: dKH }, gh: { need: ghNeed },
+      warnings: warnings, missing: miss,
+      urea: { tan: ureaN, nh3: nh3 },
+      empty: salts.length === 0
+    };
+  }
+
+  function waterChange(rows, goal) {
+    const out = [];
+    rows.forEach(r => {
+      if (!r.wc || r.value == null || !r.norm) return;
+      let target = r.norm[1];
+      if (goal && goal[r.key] != null) target = Math.min(target, goal[r.key]);
+      if (target > 0 && r.value > target) out.push({ key: r.key, pct: Math.min(95, Math.ceil((r.value - target) / r.value * 100)), target: target });
+    });
+    return out;
+  }
+
+  const AquaCore = {
+    version: '1.0', M: M, FR: FR, PER: PER, SALTS: SALTS, SALT_BY: SALT_BY,
+    META: META, GROUPS: GROUPS, PROFILES: PROFILES, TOL: TOL,
+    nh3Fraction: nh3Fraction, co2FromKhPh: co2FromKhPh, ghFromCaMg: ghFromCaMg,
+    evaluate: evaluate, recipe: recipe, waterChange: waterChange
+  };
+  if (typeof window !== 'undefined') window.AquaCore = AquaCore;
+  if (typeof module !== 'undefined' && module.exports) module.exports = AquaCore;
+})();
+
+</script>
 <script>
 'use strict';
 /* =========================================================
@@ -615,6 +1003,14 @@ const _nfc = {
 const f0 = v => _nfc[LANG].n0.format(Math.round(v));
 const f1 = v => _nfc[LANG].n1.format(v);
 const f2 = v => _nfc[LANG].n2.format(v);
+const f3 = v => (LANG === 'en' ? v.toFixed(3) : v.toFixed(3).replace('.', ','));
+const trimZ = s => s.replace(/([.,]\d*?)0+$/, '$1').replace(/[.,]$/, '');
+const fmtD = (v, d) => v == null ? '—' : trimZ(d === 0 ? f0(v) : d === 1 ? f1(v) : d === 2 ? f2(v) : f3(v));
+const L = (ru, en) => (LANG === 'en' ? en : ru);
+const TX = o => (o ? (LANG === 'en' ? o.en : o.ru) : '');
+const plural = (n, one, few, many, enOne, enMany) => LANG === 'en' ? (n === 1 ? enOne : enMany) : pl(n, one, few, many);
+const stLabel = s => s === 'ok' ? tstr('норма') : (s === 'low' ? tstr('низко') : (s === 'high' ? tstr('высоко') : tstr('нет данных')));
+
 const clamp = (v,a,b) => Math.min(b, Math.max(a,v));
 const pl = (n, one, few, many) => {
   const a = Math.abs(n) % 100, b = a % 10;
@@ -668,16 +1064,17 @@ const I18N = {
     h_stand:'Корпус, раскрой фанеры и порядок сборки.',
     h_gear:'Фильтр, свет, аэрация и обогрев под объём воды.',
     h_bio:'Сколько азота перерабатывает фильтр и сколько рыбы это кормит.',
-    h_test:'Ваши показатели против эталона травника.',
+    h_test:'Показатели, цели и рецепт удобрений.',
     h_udo:'Сколько и каких солей добавить до цели.',
-    card_aqua:'Аквариум', card_stand:'Тумба', card_filter:'Фильтр', card_water:'Вода',
+    card_aqua:'Аквариум', card_stand:'Тумба', card_filter:'Фильтр', card_water:'Вода', card_udo:'Показатели и цели',
+    grp_water:'Вода', grp_food:'Питание', grp_ctrl:'Контроль',
     hint_empty:'пусто = нет теста', card_np:'Азот и фосфор', card_min:'Минералы', card_goal:'Цели',
     f_len:'Длина', f_depth:'Глубина', f_height:'Высота', f_soil:'Слой грунта', f_standH:'Высота тумбы', f_doors:'Дверцы', f_sheet:'Лист',
     f_color:'Цвет', f_beige:'Бежевый', f_black:'Чёрный', f_media:'Материал', f_vol:'Объём',
     f_board:'Материал корпуса', f_thick:'Толщина', f_edge_body:'Кромка корпуса', f_edge_door:'Кромка двери', f_build:'Конструкция', f_moddoors:'Дверей в модуле',
     f_comp:'Столешница', opt_comp_no:'не склеена', opt_comp_yes:'склеена, композит',
     f_temp:'Температура', f_protein:'Белок корма', f_rate:'Кормление', f_fish:'Рыба',
-    f_ph:'pH', f_kh:'KH', f_gh:'GH', f_tds:'TDS', f_ec:'EC', f_nh3:'NH₃ / NH₄',
+    f_ph:'pH', f_kh:'KH', f_gh:'GH', f_tds:'TDS', f_ec:'EC', f_nh3:'Аммоний TAN',
     f_no2:'Нитрит NO₂', f_no3:'Нитрат NO₃', f_po4:'Фосфат PO₄',
     f_k:'Калий K', f_ca:'Кальций Ca', f_mg:'Магний Mg', f_fe:'Железо Fe', f_cu:'Медь Cu',
     door_def:'по умолчанию',
@@ -686,7 +1083,7 @@ const I18N = {
     page_short:'Калькулятор аквариумиста',
     page_desc:'Расчёт аквариума: толщина стекла и грунт, вес, тумба с раскроем фанеры, фильтр и свет, бионагрузка, тесты воды и рецепт удобрений.',
     page_desc_short:'Стекло, грунт и вес аквариума, тумба с раскроем фанеры, фильтр и свет, бионагрузка, тесты воды, рецепт удобрений.',
-    u_mm:'мм', u_cm:'см', u_l:'л', u_g:'г', u_mgl:'мг/л', u_pctmass:'% массы',
+    u_mm:'мм', u_cm:'см', u_l:'л', u_g:'г', u_mgl:'мг/л', u_pctmass:'% массы', u_param:'Параметр', u_fact:'Факт', u_goal:'Цель',
     opt_auto:'авто', opt_plywood:'Фанера', opt_ldsp:'ЛДСП', opt_mdf:'МДФ', opt_solid:'Цельная', opt_modular:'Модульная',
     opt_edge04:'0,4 мм', opt_edge1:'1 мм', opt_edge2:'2 мм', opt_sponge:'Губка 30 ppi', opt_k1:'K1 статичный', opt_k1f:'K1 кипящий слой',
     opt_rings:'Керамические кольца', opt_matrix:'Матрикс / Biohome', opt_wool:'Синтепон, мочалки'
@@ -698,16 +1095,17 @@ const I18N = {
     h_stand:'Carcass, plywood cutting plan and assembly order.',
     h_gear:'Filter, light, aeration and heating for the water volume.',
     h_bio:'How much nitrogen the filter processes and how much fish it feeds.',
-    h_test:'Your parameters against a reference planted tank.',
+    h_test:'Parameters, targets and the fertilizer recipe.',
     h_udo:'How much of which salt to add to reach the target.',
-    card_aqua:'Aquarium', card_stand:'Stand', card_filter:'Filter', card_water:'Water',
+    card_aqua:'Aquarium', card_stand:'Stand', card_filter:'Filter', card_water:'Water', card_udo:'Parameters & targets',
+    grp_water:'Water', grp_food:'Nutrition', grp_ctrl:'Control',
     hint_empty:'empty = no test', card_np:'Nitrogen & phosphate', card_min:'Minerals', card_goal:'Targets',
     f_len:'Length', f_depth:'Depth', f_height:'Height', f_soil:'Substrate layer', f_standH:'Stand height', f_doors:'Doors', f_sheet:'Sheet',
     f_color:'Colour', f_beige:'Beige', f_black:'Black', f_media:'Media', f_vol:'Volume',
     f_board:'Carcass material', f_thick:'Thickness', f_edge_body:'Carcass edge banding', f_edge_door:'Door edge banding', f_build:'Construction', f_moddoors:'Doors per module',
     f_comp:'Top panel', opt_comp_no:'not glued', opt_comp_yes:'glued, composite',
     f_temp:'Temperature', f_protein:'Feed protein', f_rate:'Feeding', f_fish:'Fish',
-    f_ph:'pH', f_kh:'KH', f_gh:'GH', f_tds:'TDS', f_ec:'EC', f_nh3:'NH₃ / NH₄',
+    f_ph:'pH', f_kh:'KH', f_gh:'GH', f_tds:'TDS', f_ec:'EC', f_nh3:'Ammonia TAN',
     f_no2:'Nitrite NO₂', f_no3:'Nitrate NO₃', f_po4:'Phosphate PO₄',
     f_k:'Potassium K', f_ca:'Calcium Ca', f_mg:'Magnesium Mg', f_fe:'Iron Fe', f_cu:'Copper Cu',
     door_def:'default',
@@ -716,7 +1114,7 @@ const I18N = {
     page_short:'Aquarium Calculator',
     page_desc:'Aquarium calculation: glass thickness and substrate, weight, a plywood-cut stand, filter and light, biological load, water tests and a fertilizer recipe.',
     page_desc_short:'Glass, substrate and weight, a plywood-cut stand, filter and light, biological load, water tests, a fertilizer recipe.',
-    u_mm:'mm', u_cm:'cm', u_l:'l', u_g:'g', u_mgl:'mg/l', u_pctmass:'% of body weight',
+    u_mm:'mm', u_cm:'cm', u_l:'l', u_g:'g', u_mgl:'mg/l', u_pctmass:'% of body weight', u_param:'Parameter', u_fact:'Actual', u_goal:'Target',
     opt_auto:'auto', opt_plywood:'Plywood', opt_ldsp:'Laminated chipboard', opt_mdf:'MDF', opt_solid:'Solid', opt_modular:'Modular',
     opt_edge04:'0.4 mm', opt_edge1:'1 mm', opt_edge2:'2 mm', opt_sponge:'Sponge 30 ppi', opt_k1:'K1 static', opt_k1f:'K1 fluidised',
     opt_rings:'Ceramic rings', opt_matrix:'Matrix / Biohome', opt_wool:'Filter wool, sponges'
@@ -1123,132 +1521,13 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant, soilD, boardKey, 
   const sig  = q*clear*clear / (8*(D*T*T/6));
 
   /* ---------- тесты и удобрения ---------- */
-  const f = Object.assign({no3:5, po4:5, k:25, ca:30, mg:8, fe:0.05,
-                           ph:7, kh:4, gh:null, nh3:null, no2:null, tds:null, ec:null, cu:null}, fert||{});
-  const n0 = v => (v == null ? 0 : v);
-  const TGT  = Object.assign({ no3:20, po4:1.5, k:20, ca:30, mg:10, fe:0.1 }, goal||{});
-  const kCap = Math.max(0, TGT.k), caCap = Math.max(0, TGT.ca);
-  const ghRaw = f.gh != null ? f.gh : ((f.ca != null || f.mg != null) ? n0(f.ca)/7.1 + n0(f.mg)/4.3 : null);
-  const ghMeas = ghRaw == null ? null : Math.round(ghRaw*10)/10;
-  const co2raw = (f.ph != null && f.kh != null) ? 3 * f.kh * Math.pow(10, 7 - f.ph) : null;
-  const co2 = co2raw == null ? null : Math.round(co2raw*10)/10;
-  const ratioNP = (f.po4 != null && f.po4 > 0.05 && f.no3 != null) ? f.no3/f.po4 : 0;
-
-  const TPAR = [
-    ['pH',           f.ph,   6.5,  7.5, '',      1],
-    ['KH',           f.kh,   2,    6,   '°dKH',  1],
-    ['GH',           ghMeas, 4,    14,  '°dGH',  1],
-    ['TDS',          f.tds,  100,  400, 'ppm',   0],
-    ['EC',           f.ec,   200,  600, 'µS/см', 0],
-    ['CO₂ (расчёт)', co2,    8,    25,  'мг/л',  1],
-    ['NH₃ / NH₄',    f.nh3,  0,    0.1, 'мг/л',  2],
-    ['NO₂',          f.no2,  0,    0.2, 'мг/л',  2],
-    ['NO₃',          f.no3,  10,   30,  'мг/л',  1],
-    ['PO₄',          f.po4,  0.5,  2,   'мг/л',  2],
-    ['K',            f.k,    10,   30,  'мг/л',  1],
-    ['Ca',           f.ca,   20,   60,  'мг/л',  0],
-    ['Mg',           f.mg,   5,    20,  'мг/л',  1],
-    ['Fe',           f.fe,   0.05, 0.2, 'мг/л',  2],
-    ['Cu',           f.cu,   0,    0.05,'мг/л',  3]
-  ];
-  const inRng = v => v[1] != null && v[1] >= v[2] && v[1] <= v[3];
-  const known = TPAR.filter(v => v[1] != null);
-  const okN   = known.filter(inRng).length;
-  const baseCut = TPAR.filter(v => v[1] != null && v[1] > v[3] && v[3] > 0)
-    .map(v => [v[0], Math.min(95, Math.round((v[1] - v[3])/v[1]*100))]);
-  const cutNames = new Set(baseCut.map(v => v[0]));
-  if(f.k != null && f.k > TGT.k + 0.01 && !cutNames.has('K'))
-    baseCut.push(['K', Math.min(95, Math.round((f.k - TGT.k)/Math.max(f.k, 0.01)*100))]);
-  if(f.ca != null && f.ca > TGT.ca + 0.01 && !cutNames.has('Ca'))
-    baseCut.push(['Ca', Math.min(95, Math.round((f.ca - TGT.ca)/Math.max(f.ca, 0.01)*100))]);
-  const WCUT = baseCut;
-
-  const dN = Math.max(0, TGT.no3 - n0(f.no3));
-  const kFree  = Math.max(0, kCap - n0(f.k));
-  const caFree = Math.max(0, caCap - n0(f.ca));
-  const no3FromK  = Math.min(dN, kFree / 0.387 * 0.613);
-  const kUsed     = no3FromK / 0.613 * 0.387;
-  const no3FromCa = Math.min(dN - no3FromK, caFree / 0.17 * 0.525);
-  const caUsed    = no3FromCa / 0.525 * 0.17;
-  const no3FromUrea = Math.max(0, dN - no3FromK - no3FromCa);
-  const mKNO3  = no3FromK  * waterV / 0.613 / 1000;
-  const mCaNO3 = no3FromCa * waterV / 0.525 / 1000;
-  const mUrea  = no3FromUrea / 4.43 * waterV / 0.46 / 1000;
-
-  const dP = Math.max(0, TGT.po4 - n0(f.po4));
-  const mKH2PO4 = dP * waterV / 0.698 / 1000;
-  const kFromP  = mKH2PO4 * 1000 * 0.287 / waterV;
-  const kTotal  = n0(f.k) + kUsed + kFromP;
-  const mK2SO4  = Math.max(0, TGT.k - kTotal) * waterV / 0.448 / 1000;
-  const mMgSO4  = Math.max(0, TGT.mg - n0(f.mg)) * waterV / 0.099 / 1000;
-  const mCaCl2  = 0;
-  const mCSM    = Math.max(0, TGT.fe - n0(f.fe)) * waterV / 0.07 / 1000;
-
-  /* что уйдёт побочно и что получится в итоге */
-  const kFromK2SO4 = mK2SO4 * 1000 * 0.448 / waterV;
-  const kSide = kUsed + kFromP;
-  const caSide = caUsed;
-  const so4 = (mK2SO4 * 0.552 + mMgSO4 * 0.39) * 1000 / waterV;
-  const finalK = n0(f.k) + kSide + kFromK2SO4;
-  const finalCa = n0(f.ca) + caSide;
-  const finalNo3 = n0(f.no3) + no3FromK + no3FromCa + no3FromUrea;
-  const finalPo4 = n0(f.po4) + dP;
-  const finalMg = n0(f.mg) + mMgSO4 * 1000 * 0.099 / waterV;
-  const finalFe = n0(f.fe) + mCSM * 1000 * 0.07 / waterV;
-  const highK = n0(f.k) > kCap + 0.01;
-  const highCa = n0(f.ca) > caCap + 0.01;
-
-  /* мочевина при гидролизе даёт NH₃/NH₄⁺; доля свободного NH₃ зависит от pH */
+  const AC = window.AquaCore;
   const tempC = (bio && bio.t) ? +bio.t : 25;
-  const phU = f.ph != null ? +f.ph : 7;
-  const pKa = 0.09018 + 2729.92 / (tempC + 273.15);
-  const fNH3 = 1 / (1 + Math.pow(10, pKa - phU));
-  const tanUrea = no3FromUrea / 4.43;
-  const nh3Mass = tanUrea * fNH3 * 17/14;
-  const nh4Mass = tanUrea * (1 - fNH3) * 18/14;
-
-  const fertRec = [];
-  const miss = TPAR.filter(v => v[1] == null).map(v => tstr(v[0]));
-  const tr = (en, ru) => LANG==='en' ? en : ru;
-  if(f.nh3 != null && f.nh3 > 0.1)  fertRec.push([tr('Ammonia above 0.1 mg/l — change 50 % at once and do not feed.', 'Аммиак выше 0,1 мг/л — срочно подмена 50 % и не кормить.'), 'bad']);
-  if(f.no2 != null && f.no2 > 0.2)  fertRec.push([tr('Nitrite above 0.2 mg/l — the cycle is not working. Change water and wait for zeros.', 'Нитрит выше 0,2 мг/л — цикл не работает. Подмена и ждать нулей.'), 'bad']);
-  if(f.cu != null && f.cu > 0.05)   fertRec.push([tr('Copper above 0.05 mg/l — kills shrimp and snails. Change water and remove the source.', 'Медь выше 0,05 мг/л — гибель креветок и улиток. Подмена, убрать источник.'), 'bad']);
-  if(f.no3 != null && f.no3 < 5)    fertRec.push([tr('Nitrate below 5 mg/l — plants stall.', 'Нитрат ниже 5 мг/л — растения останавливаются.'), 'bad']);
-  if(f.no3 != null && f.no3 > 30)   fertRec.push([tr('Nitrate above 30 mg/l — do not dose, change water.', 'Нитрат выше 30 мг/л — не вносить, подмена.'), 'warn']);
-  if(f.po4 != null && f.po4 > 2)    fertRec.push([tr('Phosphate above 2 mg/l — do not dose; remove it with clean-water changes or GFO.', 'Фосфат выше 2 мг/л — не вносить, выводить подменой чистой воды или GFO.'), 'bad']);
-  if(ratioNP > 0 && f.po4 > 1.5 && f.no3 < 15) fertRec.push([tr(`Phosphate is high for nitrate ${f1(f.no3)} — ratio ${f1(ratioNP)} : 1. Raise nitrate.`, `Фосфата многовато при нитрате ${f1(f.no3)} — соотношение ${f1(ratioNP)} : 1. Поднять нитрат.`), 'warn']);
-  if(ratioNP > 0 && f.no3 > 25 && f.po4 < 1)   fertRec.push([tr(`Nitrate is high for phosphate ${f1(f.po4)} — ratio ${f1(ratioNP)} : 1.`, `Нитрата много при фосфате ${f1(f.po4)} — соотношение ${f1(ratioNP)} : 1.`), 'warn']);
-  if(f.k != null && f.ca != null && f.k > 2.5*f.ca) fertRec.push([tr('Potassium above 2.5× calcium — blocks calcium and magnesium. Remove K₂SO₄, check GH.', 'Калий выше 2,5 кальция — блокирует кальций и магний. Убрать K₂SO₄, проверить GH.'), 'bad']);
-  if(f.mg != null && f.mg > 0.01 && f.ca != null && (f.ca/f.mg < 3 || f.ca/f.mg > 5)) fertRec.push([tr(`Ca : Mg = ${f1(f.ca/f.mg)} — outside the 3–5 range.`, `Ca : Mg = ${f1(f.ca/f.mg)} — вне нормы 3–5.`), 'warn']);
-  if(f.ph != null && (f.ph < 6 || f.ph > 8.5)) fertRec.push([tr(`pH ${f1(f.ph)} — outside the working range 6.0–8.5.`, `pH ${f1(f.ph)} — вне рабочего диапазона 6,0–8,5.`), 'warn']);
-  if(f.kh != null && f.kh < 2) fertRec.push([tr('KH below 2 — no buffer, pH will swing.', 'KH ниже 2 — нет буфера, pH будет скакать.'), 'warn']);
-  if(co2 != null && co2 > 30) fertRec.push([tr(`CO₂ ${f0(co2)} mg/l — above 30, the fish lack oxygen. Reduce the supply.`, `CO₂ ${f0(co2)} мг/л — выше 30, рыбе не хватает кислорода. Уменьшить подачу.`), 'bad']);
-  if(co2 != null && co2 < 5)  fertRec.push([tr(`CO₂ ${f0(co2)} mg/l — low for a planted tank, the range is 15–30.`, `CO₂ ${f0(co2)} мг/л — мало для травника, норма 15–30.`), 'warn']);
-  if(f.tds != null && f.tds > 400) fertRec.push([tr(`TDS ${f0(f.tds)} ppm — salts have built up, a water change is needed.`, `TDS ${f0(f.tds)} ppm — накопились соли, нужна подмена.`), 'warn']);
-  if(ghMeas != null && ghMeas < 4)  fertRec.push([tr('GH below 4 — soft water, calcium and magnesium at the minimum.', 'GH ниже 4 — мягкая вода, кальция и магния на минимуме.'), 'warn']);
-  if(ghMeas != null && ghMeas > 14) fertRec.push([tr('GH above 14 — hard water, Ca and Mg are already in surplus, do not add.', 'GH выше 14 — жёсткая вода, Ca и Mg уже с запасом, не добавлять.'), 'warn']);
-  if(f.fe != null && f.fe < 0.05) fertRec.push([tr('Iron below 0.05 mg/l — interveinal chlorosis on young leaves.', 'Железо ниже 0,05 мг/л — межжилковый хлороз на молодых листьях.'), 'warn']);
-  if(dN > 0.01 && highK && highCa){
-    fertRec.push([tr('K and Ca are already above target — use urea for nitrogen; only a water change lowers K/Ca.', 'K и Ca уже выше цели — азот даём мочевиной; снизить K/Ca можно только подменой.'), 'warn']);
-  } else if(dN > 0.01 && highK){
-    fertRec.push([tr('K is above target — no potassium nitrate; nitrogen comes from calcium nitrate/urea.', 'K выше цели — калиевую селитру не используем; азот — кальциевой селитрой/мочевиной.'), 'warn']);
-  } else if(dN > 0.01 && highCa){
-    fertRec.push([tr('Ca is above target — no calcium nitrate; nitrogen comes from potassium nitrate/urea.', 'Ca выше цели — кальциевую селитру не используем; азот — калиевой селитрой/мочевиной.'), 'warn']);
-  } else if(dN > 0.01 && no3FromUrea > 0.01){
-    fertRec.push([tr(`Part of the nitrogen (${f0(no3FromUrea)} mg/l) goes in as urea: K and Ca are already at target.`, `Часть азота (${f0(no3FromUrea)} мг/л) уйдёт мочевиной: K и Ca уже на цели.`), 'warn']);
-  }
-  if((highK || highCa) && dN <= 0.01){
-    fertRec.push([tr('K/Ca are above target — fertilizers cannot lower them; a water change is the way.', 'K/Ca выше цели — удобрениями не снизить, нужна подмена.'), 'warn']);
-  }
-  if(miss.length) fertRec.push([tr(`No tests: ${miss.join(', ')}. These parameters are unverified.`, `Нет тестов: ${miss.join(', ')}. Эти параметры не проверены.`), 'warn']);
-  if(!fertRec.length) fertRec.push([tr('All parameters are on target — keep them with dosing, not water changes.', 'Все показатели в эталоне — держите дозами, а не подменами.'), 'ok']);
-
-  const fertRes = {
-    f, TGT, gh: ghMeas, co2, ratioNP, dN, dP, mKNO3, mCaNO3, mUrea, mKH2PO4, kTotal, mK2SO4, mMgSO4, mCaCl2, mCSM,
-    no3FromK, no3FromCa, no3FromUrea, caUsed, kUsed, kSide, caSide, so4, finalK, finalCa, finalNo3, finalPo4, finalMg, finalFe, highK, highCa,
-    nh3Mass, nh4Mass, tanUrea, fNH3, phU, tempC,
-    fertRec, TPAR, okN, knownN: known.length, WCUT, miss
-  };
+  const profId = state.profile || 'hi';
+  const ev = AC.evaluate({ fert: fert || {}, goal: goal || {}, tempC: tempC, profile: profId });
+  const rec = AC.recipe({ fert: fert || {}, goal: goal || {}, volume: waterV, tempC: tempC, profile: profId });
+  const wc = AC.waterChange(ev.rows, goal || {});
+  const fertRes = { ev: ev, rec: rec, wc: wc, goal: goal || {}, fert: fert || {}, tempC: tempC, profile: profId };
 
   /* ---------- биология ---------- */
   const SFA = { sponge:3.5, k1:2.97, k1f:3.5, rings:0.8, matrix:0.6, wool:2.5 };
@@ -1772,7 +2051,7 @@ function drawDetail(M){
 /* =========================================================
    ИНТЕРФЕЙС
    ========================================================= */
-const state = { section:'tank', tab:'tumba', color:'beige' };
+const state = { section:'tank', tab:'tumba', color:'beige', profile:'hi' };
 const fishCart = {};
 let MODEL = null;
 
@@ -1802,16 +2081,22 @@ function renderKpis(M){
       ['Обогрев', `${f0(Math.max(25, Math.round(g.heatMax/25)*25))}<small>${tstr('Вт')}</small>`, tstr('0,8–1 Вт/л'), false],
       ['Подмена', `${f0(g.changeMin)}–${f0(g.changeMax)}<small>${tstr('л')}</small>`, tstr('в неделю'), false]
     ];
-  } else if(sec === 'fert' || sec === 'udo'){
-    const r = M.fertRes, f = r.f;
-    const [rt, rc] = r.ratioNP === 0 ? ['—',''] : (r.ratioNP < 10 ? [f1(r.ratioNP),'badge-bad'] : (r.ratioNP > 20 ? [f1(r.ratioNP),'badge-warn'] : [f1(r.ratioNP),'badge-ok']));
+  } else if(sec === 'fert'){
+    const ev = M.fertRes.ev;
+    const get = k => ev.rows.find(x => x.key === k) || { value: null, goal: null, dec: 1 };
+    const n = get('no3'), p = get('po4'), k = get('k'), g = get('gh'), fe = get('fe');
+    const rel = ev.relations.find(x => x.code === 'n_p');
+    const rc = rel ? (rel.ok ? 'badge-ok' : 'badge-warn') : '';
+    const rt = rel ? f1(rel.value) : '—';
+    const v = r => r.value == null ? '—' : fmtD(r.value, r.dec);
+    const goalTxt = r => r.goal != null ? `${L('цель', 'target')} ${fmtD(r.goal, r.dec)}` : '';
     cards = [
-      ['NO₃ : PO₄', `<span class="${rc}">${rt}</span><small>: 1</small>`, LANG==='en' ? 'range 10–20' : 'норма 10–20', true],
-      ['Азот', `${f1(f.no3)}<small>${tstr('мг/л')}</small>`, LANG==='en' ? `up to ${r.TGT.no3}` : `до ${r.TGT.no3}`, false],
-      ['Фосфор', `${f1(f.po4)}<small>${tstr('мг/л')}</small>`, LANG==='en' ? `up to ${r.TGT.po4}` : `до ${r.TGT.po4}`, false],
-      ['Калий', `${f1(f.k)}<small>${tstr('мг/л')}</small>`, tstr('норма 10–30'), false],
-      ['Жёсткость', `${f1(r.gh)}<small>°dGH</small>`, tstr('норма 4–14'), false],
-      ['Железо', `${f2(f.fe)}<small>${tstr('мг/л')}</small>`, tstr('норма 0,05–0,2'), false]
+      ['NO₃ : PO₄', `<span class="${rc}">${rt}</span><small>: 1</small>`, L('норма 5–20', 'range 5–20'), true],
+      ['Азот', `${v(n)}<small>${tstr('мг/л')}</small>`, goalTxt(n), false],
+      ['Фосфор', `${v(p)}<small>${tstr('мг/л')}</small>`, goalTxt(p), false],
+      ['Калий', `${v(k)}<small>${tstr('мг/л')}</small>`, goalTxt(k), false],
+      ['Жёсткость', `${v(g)}<small>°dGH</small>`, L('норма 4–14', 'range 4–14'), false],
+      ['Железо', `${v(fe)}<small>${tstr('мг/л')}</small>`, goalTxt(fe), false]
     ];
   } else if(sec === 'bio'){
     const b = M.bioRes;
@@ -1944,652 +2229,192 @@ function wavyLine(x1,y1,x2,y2,amp,step){
 const edgeSides = mode => ({all:4, front_lr:3, front_l:2, front_r:2, front:1}[mode] || 0);
 const fmtDim = v => Math.abs(v - Math.round(v)) < 0.05 ? f0(v) : f1(v);
 
-/* ===================== присадка: модель отверстий и карты ===================== */
-﻿/* =========================================================================
-   ПРИСАДКА v2 — модель отверстий, проверка коллизий, карта детали
-   -------------------------------------------------------------------------
-   Узел описывается ОДИН раз: точка на оси каркаса + направление + толщины.
-   Оба отверстия пары строятся из одной точки и лежат на одной оси, поэтому
-   пара сходится по построению. Позиция вдоль ребра (t) — параметр узла;
-   решатель двигает узел целиком, пока его ось не перестанет пересекаться
-   с чужими осями.
-   ========================================================================= */
-(function (global) {
-'use strict';
-
-/* ---------- векторы ---------- */
-const v3 = (x, y, z) => ({ x: x, y: y, z: z });
-const add = (a, b) => v3(a.x + b.x, a.y + b.y, a.z + b.z);
-const mul = (a, k) => v3(a.x * k, a.y * k, a.z * k);
-const sub = (a, b) => v3(a.x - b.x, a.y - b.y, a.z - b.z);
-const dot = (a, b) => a.x * b.x + a.y * b.y + a.z * b.z;
-const len = a => Math.sqrt(dot(a, a));
-const AX = { x: v3(1, 0, 0), y: v3(0, 1, 0), z: v3(0, 0, 1) };
-
-/* расстояние между отрезками p1q1 и p2q2 */
-function segDist(p1, q1, p2, q2) {
-  const d1 = sub(q1, p1), d2 = sub(q2, p2), r = sub(p1, p2);
-  const a = dot(d1, d1), e = dot(d2, d2), f = dot(d2, r);
-  const EPS = 1e-9;
-  let s, t;
-  if (a <= EPS && e <= EPS) return len(r);
-  if (a <= EPS) { s = 0; t = Math.max(0, Math.min(1, f / e)); }
-  else {
-    const c = dot(d1, r);
-    if (e <= EPS) { t = 0; s = Math.max(0, Math.min(1, -c / a)); }
-    else {
-      const b = dot(d1, d2), den = a * e - b * b;
-      s = den !== 0 ? Math.max(0, Math.min(1, (b * f - c * e) / den)) : 0;
-      t = (b * s + f) / e;
-      if (t < 0) { t = 0; s = Math.max(0, Math.min(1, -c / a)); }
-      else if (t > 1) { t = 1; s = Math.max(0, Math.min(1, (b - c) / a)); }
-    }
+function drillCard(p,M){
+  const W=900, H=360, maxW=780, maxH=230;
+  const sc=Math.min(maxW/Math.max(p.w,1), maxH/Math.max(p.h,1));
+  const rw=Math.max(24, p.w*sc), rh=Math.max(24, p.h*sc);
+  const ox=(W-rw)/2, oy=40+(maxH-rh)/2;
+  const X=mm=>ox+mm*sc, Y=mm=>oy+mm*sc;
+  const pcs = LANG==='en' ? 'pcs' : 'шт';
+  let out='';
+  out += `<rect x="${ox.toFixed(1)}" y="${oy.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}" fill="#f8f4ec" stroke="#7d6a50" stroke-width="1.2" rx="2"/>`;
+  /* dimensions */
+  out += `<text x="${(ox+rw/2).toFixed(1)}" y="${(oy-8).toFixed(1)}" text-anchor="middle" font-size="14" font-family="Consolas,monospace" fill="#5e5141">${f0(p.w)}</text>`;
+  out += `<text transform="rotate(-90 ${(ox+rw+14).toFixed(1)} ${(oy+rh/2).toFixed(1)})" x="${(ox+rw+14).toFixed(1)}" y="${(oy+rh/2).toFixed(1)}" text-anchor="middle" font-size="14" font-family="Consolas,monospace" fill="#5e5141">${f0(p.h)}</text>`;
+  /* edge banding: visible orange band + wavy line */
+  const band=(x1,y1,x2,y2)=>`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#d97706" stroke-width="7" opacity=".22" stroke-linecap="round"/>` + wavyLine(x1,y1,x2,y2);
+  if(p.edgeMode==='all'){
+    out += band(ox,oy,ox+rw,oy)+band(ox+rw,oy,ox+rw,oy+rh)+band(ox+rw,oy+rh,ox,oy+rh)+band(ox,oy+rh,ox,oy);
+  } else if(p.edgeMode){
+    const front = ()=>band(ox,oy+rh,ox+rw,oy+rh);
+    if(p.edgeMode==='front_lr'){ out += front()+band(ox,oy,ox,oy+rh)+band(ox+rw,oy,ox+rw,oy+rh); }
+    else if(p.edgeMode==='front_l'){ out += front()+band(ox,oy,ox,oy+rh); }
+    else if(p.edgeMode==='front_r'){ out += front()+band(ox+rw,oy,ox+rw,oy+rh); }
+    else if(p.edgeMode==='front'){ out += front(); }
   }
-  const c1 = add(p1, mul(d1, s)), c2 = add(p2, mul(d2, t));
-  return len(sub(c1, c2));
-}
-
-const CLEAR = 3;   /* минимальный мостик материала между стенками отверстий */
-
-/* =========================== УЗЛЫ =========================== */
-
-function buildBox(M, box) {
-  const T = M.T, Lc = box.w, C = M.C, z0 = M.zBot, z1 = M.zBotTop, z2 = M.zIn0, z3 = M.zU;
-  const joints = [];
-  let id = 0;
-  const bx0 = box.x0 || 0;
-
-  /* доски в координатах корпуса: модуль считается от своего левого края */
-  const boards = [];
-  if (M.modular) {
-    boards.push({ kind: 'side', x0: 0, x1: T });
-    boards.push({ kind: 'side', x0: Lc - T, x1: Lc });
-  } else {
-    (M.uprights || []).forEach(u => {
-      const n = Math.max(1, Math.round((u.x1 - u.x0) / T));
-      for (let i = 0; i < n; i++) boards.push({ kind: u.kind, x0: u.x0 + i * T, x1: u.x0 + (i + 1) * T });
-    });
-  }
-  const sides = boards.filter(b => b.kind === 'side');
-
-  /* наружная пласть боковины: у модуля их две, и обе могут стоять на стыке */
-  function sideFace(s) {
-    const left = Math.abs(s.x0) < 0.5;
-    return left
-      ? { xFace: s.x0, dir: 1, inner: s.x0 + T }
-      : { xFace: s.x1, dir: -1, inner: s.x1 - T };
-  }
-
-  const parts = boards.filter(b => b.kind !== 'side');
-
-  /* дверцы этого корпуса, в его координатах */
-  const doors = (M.doors || []).filter(d => {
-    const c = (d.x0 + d.x1) / 2;
-    return c >= bx0 - 0.5 && c < bx0 + Lc + 0.5;
-  }).map(d => ({ x0: d.x0 - bx0, x1: d.x1 - bx0, hinge: d.hinge }));
-
-  const SPEC = {
-    confirmat: { dia: 5, cb: 8, dB: 32, op: 'confirmat', label: 'конфирмат' },
-    dowel:     { dia: 8, cb: 0, dB: 12, op: 'dowel',     label: 'шкант' },
-    pin:       { dia: 5, cb: 0, dB: 12, op: 'pin',       label: 'полкодержатель' },
-    plate:     { dia: 5, cb: 0, dB: 13, op: 'plate',     label: 'планка петли' }
-  };
-
-  /* точки вдоль ребра: пара «конфирмат + шкант» у каждого торца,
-     промежуточные пары через 352 мм; позиции ближе 40 мм не дублируются */
-  function ts(L, dowel) {
-    const out = [{ t: 32, op: 'confirmat' }];
-    if (dowel !== false) out.push({ t: 64, op: 'dowel' });
-    out.push({ t: L - 32, op: 'confirmat' });
-    if (dowel !== false) out.push({ t: L - 64, op: 'dowel' });
-    return out.sort((a, b) => a.t - b.t);
-  }
-
-  /**
-   * Узел «насквозь через A в торец B».
-   * run  — ребро, вдоль которого можно сдвигать узел
-   * entry — точка входа на наружной пласти A при t=0
-   * dir  — направление от A к B
-   * th   — толщина A
-   */
-  function joint(o) {
-    const sp = SPEC[o.spec];
-    const P = add(o.run.o, mul(o.run.axis, o.t));
-    const E = add(o.entry, sub(P, o.run.o));           /* точка входа */
-    const hA = {
-      part: o.A, p0: E, dir: o.dir, depth: o.th, dia: sp.dia, cb: sp.cb,
-      op: sp.op, side: o.sideA || 'out', jid: ++id, role: 'A'
+  /* bottom: no holes in the end; all holes are in the face, 3 sides,
+     plus rows at internal partitions in a solid carcass */
+  if(p.role==='bottom'){
+    const cps=[], dps=[];
+    const seq=L=>{
+      for(let d=32; d<=L/2; d+=352){ cps.push(d, L-d); dps.push(d+32, L-(d+32)); }
     };
-    const hB = o.B ? {
-      part: o.B, p0: add(E, mul(o.dir, o.th)), dir: o.dir, depth: sp.dB, dia: sp.dia,
-      cb: 0, op: sp.op, side: o.sideB || 'in', jid: id, role: 'B'
-    } : null;
-    joints.push({ id: id, kind: o.kind, t: o.t, run: o.run, a: hA, b: hB, note: o.note });
-    return joints[joints.length - 1];
-  }
-
-  /* 1. боковина стоит на дне: снизу через дно в торец боковины */
-  sides.forEach(s => {
-    const cx = (s.x0 + s.x1) / 2;
-    ts(C).forEach(e => joint({
-      kind: 'боковина—дно', spec: e.op, t: e.t, A: 'bottom', B: 'side', th: T,
-      dir: AX.z, sideA: 'out', sideB: 'end',
-      entry: v3(cx, T, z0),
-      run: { o: v3(cx, T, 0), axis: AX.y, min: 24, max: C - 24 }
-    }));
-  });
-
-  /* 2. задняя стенка стоит на дне */
-  ts(Lc).forEach(e => joint({
-    kind: 'дно—задняя', spec: e.op, t: e.t, A: 'bottom', B: 'back', th: T,
-    dir: AX.z, sideA: 'out', sideB: 'end',
-    entry: v3(0, C + T / 2, z0),
-    run: { o: v3(0, C + T / 2, 0), axis: AX.x, min: 24, max: Lc - 24 }
-  }));
-
-  /* 3. боковина ↔ задняя: снаружи через боковину в торец задней */
-  sides.forEach(s => {
-    const cx = (s.x0 + s.x1) / 2;
-    const F = sideFace(s);
-    const outward = F.dir;
-    const xFace = F.xFace;
-    ts(M.Hu).forEach(e => joint({
-      kind: 'боковина—задняя', spec: e.op, t: e.t, A: 'side', B: 'back', th: T,
-      dir: v3(outward, 0, 0), sideA: 'out', sideB: 'end',
-      entry: v3(xFace, C + T / 2, z1),
-      run: { o: v3(cx, C + T / 2, z1), axis: AX.z, min: 24, max: M.Hu - 24 }
-    }));
-  });
-
-  /* 4. боковина ↔ вкладная крышка */
-  sides.forEach(s => {
-    const cx = (s.x0 + s.x1) / 2;
-    const F = sideFace(s);
-    const outward = F.dir;
-    const xFace = F.xFace;
-    ts(C - T).forEach(e => joint({
-      kind: 'боковина—крышка', spec: e.op, t: e.t, A: 'side', B: 'intop', th: T,
-      dir: v3(outward, 0, 0), sideA: 'out', sideB: 'end',
-      entry: v3(xFace, T, z3 - T / 2),
-      run: { o: v3(cx, T, z3 - T / 2), axis: AX.y, min: 24, max: C - T - 24 }
-    }));
-  });
-
-  /* 5. стойки: снизу в торец, сверху в торец */
-  parts.forEach(p => {
-    const cx = (p.x0 + p.x1) / 2;
-    ts(C - T, false).forEach(e => {
-      joint({
-        kind: 'стойка—дно', spec: e.op, t: e.t, A: 'bottom', B: 'part', th: T,
-        dir: AX.z, sideA: 'out', sideB: 'end',
-        entry: v3(cx, T, z0),
-        run: { o: v3(cx, T, 0), axis: AX.y, min: 24, max: C - T - 24 }
+    const uniq=a=>Array.from(new Set(a.map(v=>Math.round(v)))).filter(v=>v>=0 && v<=Math.max(p.w,p.h));
+    const face=(x,y,kind)=>{
+      if(kind==='c') return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="#fff" stroke="#7d6a50" stroke-width=".9"/><path d="M${(x-1.6).toFixed(1)},${(y-1.6).toFixed(1)}L${(x+1.6).toFixed(1)},${(y+1.6).toFixed(1)}M${(x+1.6).toFixed(1)},${(y-1.6).toFixed(1)}L${(x-1.6).toFixed(1)},${(y+1.6).toFixed(1)}" stroke="#7d6a50" stroke-width=".7"/>`;
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.3" fill="#fff" stroke="#7d6a50" stroke-width=".9"/>`;
+    };
+    const drawRow=(fix,vals,vertical)=>{
+      const cs=uniq(vals.c), ds=uniq(vals.d);
+      cs.forEach(v=>out += vertical ? face(fix,Y(v),'c') : face(X(v),fix,'c'));
+      ds.forEach(v=>out += vertical ? face(fix,Y(v),'d') : face(X(v),fix,'d'));
+    };
+    /* left and right edges, along depth */
+    cps.length=0; dps.length=0; seq(p.h);
+    drawRow(ox+7,{c:cps,d:dps},true);
+    drawRow(ox+rw-7,{c:cps,d:dps},true);
+    /* back edge, along length */
+    cps.length=0; dps.length=0; seq(p.w);
+    drawRow(oy+7,{c:cps,d:dps},false);
+    /* internal partitions in a solid bottom */
+    if(!M.modular){
+      M.uprights.filter(u=>u.kind!=='side').forEach(u=>{
+        const x=X((u.x0+u.x1)/2);
+        cps.length=0; dps.length=0; seq(p.h);
+        uniq(cps).forEach(v=>out+=face(x,Y(v),'c'));
+        uniq(dps).forEach(v=>out+=face(x,Y(v),'d'));
       });
-      joint({
-        kind: 'стойка—крышка', spec: e.op, t: e.t, A: 'intop', B: 'part', th: T,
-        dir: v3(0, 0, -1), sideA: 'out', sideB: 'end',
-        entry: v3(cx, T, z3),
-        run: { o: v3(cx, T, 0), axis: AX.y, min: 24, max: C - T - 24 }
-      });
+    }
+  /* cup holes in doors */
+  } else if(p.role==='door'){
+    const ys = [100, p.h-100];
+    const cx = X(22), rr = Math.max(4, 17.5*sc);
+    ys.forEach((yy,i)=>{
+      const cy = Y(yy);
+      out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}" fill="#fff" stroke="#7d6a50" stroke-width="1"/>`;
+      out += `<path d="M${(cx-rr*0.7).toFixed(1)},${cy.toFixed(1)}L${(cx+rr*0.7).toFixed(1)},${cy.toFixed(1)}M${cx.toFixed(1)},${(cy-rr*0.7).toFixed(1)}L${cx.toFixed(1)},${(cy+rr*0.7).toFixed(1)}" stroke="#7d6a50" stroke-width=".8"/>`;
+      if(i===0) out += `<text x="${(cx+rr+4).toFixed(1)}" y="${(cy+3).toFixed(1)}" font-size="8" font-family="Consolas,monospace" fill="#7d6a50">Ø35</text>`;
     });
-  });
-
-  /* 6. стойка ↔ задняя: сзади через заднюю в торец стойки */
-  parts.forEach(p => {
-    const cx = (p.x0 + p.x1) / 2;
-    ts(M.Hpart, false).forEach(e => joint({
-      kind: 'стойка—задняя', spec: e.op, t: e.t, A: 'back', B: 'part', th: T,
-      dir: v3(0, -1, 0), sideA: 'out', sideB: 'end',
-      entry: v3(cx, M.D, z1),
-      run: { o: v3(cx, 0, z1), axis: AX.z, min: 24, max: M.Hpart - 24 }
-    }));
-  });
-
-  /* 7. полкодержатели — только в боковине, сверлятся с внутренней пласти */
-  const shelf = (M.parts || []).find(p => p.role === 'shelf');
-  if (shelf) {
-    const u = M.pinZ - z1;               /* высота от низа боковины */
-    const y1 = 48 + 50;                  /* полка: 48…482, по 50 мм от кромок */
-    const y2 = C - 50;
-    sides.forEach(s => {
-      const F = sideFace(s);
-      const outward = F.dir;
-      const inner = F.inner;
-      [y1, y2].forEach(y => {
-        const j = joint({
-          kind: 'полкодержатель', spec: 'pin', t: u, A: 'side', B: null, th: 12,
-          dir: v3(-outward, 0, 0), sideA: 'in',
-          entry: v3(inner, y, z1),
-          run: { o: v3(inner, y, z1), axis: AX.z, min: u, max: u },
-          note: '50 мм от кромки полки'
+    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'Ø35 cup, 22 mm from edge':'чашка Ø35, 22 мм от кромки'}</text>`;
+  } else if(p.role==='intop'){
+    /* front edge is banded; the other three sides are drilled in the end.
+       In a solid carcass there are also face holes under the internal uprights. */
+    const seq=L=>{
+      const c=[], d=[];
+      for(let x=32; x<=L/2; x+=352){ c.push(x, L-x); d.push(x+32, L-(x+32)); }
+      const uniq=a=>Array.from(new Set(a.map(v=>Math.round(v)))).filter(v=>v>=0 && v<=L);
+      return {c:uniq(c), d:uniq(d)};
+    };
+    const dashX=(x,y,len)=>out += `<line x1="${(x-len/2).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+len/2).toFixed(1)}" y2="${y.toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
+    const dashY=(x,y,len)=>out += `<line x1="${x.toFixed(1)}" y1="${(y-len/2).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y+len/2).toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
+    /* left and right ends: long = confirmat, short = dowel */
+    const hh=seq(p.h), ww=seq(p.w);
+    hh.c.forEach(v=>{ dashX(ox, Y(v), 8); dashX(ox+rw, Y(v), 8); });
+    hh.d.forEach(v=>{ dashX(ox, Y(v), 4); dashX(ox+rw, Y(v), 4); });
+    /* back end */
+    ww.c.forEach(v=>{ dashY(X(v), oy, 8); });
+    ww.d.forEach(v=>{ dashY(X(v), oy, 4); });
+    /* solid: face holes under internal uprights */
+    if(!M.modular){
+      M.uprights.filter(u=>u.kind!=='side').forEach(u=>{
+        const x=X((u.x0+u.x1)/2);
+        [32, p.h-32].forEach(y=>{
+          out += `<circle cx="${x.toFixed(1)}" cy="${Y(y).toFixed(1)}" r="2.6" fill="#fff" stroke="#7d6a50" stroke-width=".9"/>`;
         });
-        j.a.op = 'pin';
       });
-    });
-  }
-
-  /* 8. петли: чашка в дверце + планка на ближайшей стойке/боковине */
-  if ((M.parts || []).some(p => p.role === 'door')) {
-    const hz = hingeZs(M);
-
-    /* все пласти, на которых может стоять планка */
-    const faces = [];
-    boards.forEach(b => {
-      faces.push({ x: b.x0, n: -1 });
-      faces.push({ x: b.x1, n: +1 });
-    });
-    function plateFace(edge, left) {
-      const want = left ? +1 : -1;               /* нормаль пласти — к дверце */
-      const ok = faces.filter(f => f.n === want);
-      const near = left
-        ? ok.filter(f => f.x <= edge + 1).sort((a, b) => b.x - a.x)[0]
-        : ok.filter(f => f.x >= edge - 1).sort((a, b) => a.x - b.x)[0];
-      if (near) return near;
-      return left ? ok.slice().sort((a, b) => a.x - b.x)[0]
-                  : ok.slice().sort((a, b) => b.x - a.x)[0];
     }
-
-    const usedPlate = {};
-    doors.forEach((d, di) => {
-      const left = d.hinge === 'L';
-      const dx = left ? d.x0 + 22.5 : d.x1 - 22.5;
-      const edge = left ? d.x0 : d.x1;
-      const want = left ? 1 : -1;
-      const cands = faces.filter(f => f.n === want)
-        .sort((a, b) => Math.abs(a.x - edge) - Math.abs(b.x - edge));
-
-      hz.forEach(z => {
-        let pick = null, host = null;
-        for (const c of cands) {
-          const bd = boards.find(b => (c.n > 0 ? Math.abs(b.x1 - c.x) < 0.5 : Math.abs(b.x0 - c.x) < 0.5));
-          if (!bd) continue;
-          const key = bd.x0 + '|' + Math.round(z);
-          if (usedPlate[key]) continue;          /* на этой доске уже есть планка на этой высоте */
-          pick = c; host = bd; usedPlate[key] = 1; break;
-        }
-        if (!pick) return;
-        if (Math.abs(pick.x - edge) > 50) {
-          M.__prisWarn = M.__prisWarn || [];
-          const msg = 'Дверь ' + (di + 1) + ': планка петли на ' + Math.round(Math.abs(pick.x - edge)) +
-            ' мм от кромки — плечо петли не достанет. Нужна стойка у кромки или другая разбивка дверей.';
-          if (M.__prisWarn.indexOf(msg) < 0) M.__prisWarn.push(msg);
-        }
-        const role = host.kind === 'side' ? 'side' : 'part';
-        const j = { id: ++id, kind: 'петля', t: 0, nopair: true, run: { o: v3(dx, 0, z), axis: AX.x, min: 0, max: 0 } };
-        j.a = { part: 'door', p0: v3(dx, T, z), dir: v3(0, -1, 0), depth: 13, dia: 35, cb: 0, op: 'cup', side: 'in', jid: j.id, role: 'A', ox: d.x0, hinge: d.hinge };
-        j.b = { part: role, p0: v3(pick.x, 37, z), dir: v3(-pick.n, 0, 0), depth: 13, dia: 5, cb: 0, op: 'plate', side: 'in', jid: j.id, role: 'B' };
-        joints.push(j);
-      });
-    });
-  }
-
-  /* привязка отверстий к конкретной доске (стойки бывают сдвоенными) */
-  joints.forEach(j => {
-    [j.a, j.b].forEach(h => {
-      if (!h) return;
-      if (h.part === 'side' || h.part === 'part') {
-        const q = add(h.p0, mul(h.dir, 2));
-        const b = boards.find(b => q.x >= b.x0 - 0.01 && q.x <= b.x1 + 0.01);
-        h.bid = b ? b.x0 : -1;
-      }
-    });
-  });
-
-  return joints;
-}
-
-/* снаружи: список корпусов. В модульной тумбе каждый модуль считается отдельно,
-   поэтому его присадка не зависит от соседей и от общей длины */
-function build(M) {
-  if (!M.modular) return [{ w: M.Lc, joints: buildBox(M, { x0: 0, x1: M.Lc, w: M.Lc }) }];
-  const groups = [], seen = {};
-  (M.modules || []).forEach(m => {
-    const inner = (M.doors || []).filter(d => {
-      const c = (d.x0 + d.x1) / 2;
-      return c >= m.x0 - 0.5 && c < m.x1 + 0.5;
-    }).map(d => d.hinge).join('');
-    const key = Math.round(m.w) + '|' + inner;
-    if (seen[key]) return;
-    seen[key] = 1;
-    groups.push({ w: m.w, joints: buildBox(M, { x0: m.x0, x1: m.x1, w: m.w }) });
-  });
-  return groups;
-}
-
-/* высоты петель: 100 от торцов, промежуточные не реже 600 */
-function hingeZs(M) {
-  const H = M.doorH, a = 100, b = H - 100, span = b - a;
-  const k = Math.max(1, Math.ceil(span / 600));
-  const out = [];
-  for (let i = 0; i <= k; i++) out.push(a + span * i / k);
-  return out;
-}
-
-/* ---------- коллизии ---------- */
-function collide(j1, j2) {
-  if (j1 === j2) return null;
-  const s1 = [j1.a, j1.b].filter(Boolean);
-  const s2 = [j2.a, j2.b].filter(Boolean);
-  let worst = null;
-  for (const h1 of s1) for (const h2 of s2) {
-    if (h1.part !== h2.part) continue;
-    if (h1.bid !== undefined && h2.bid !== undefined && h1.bid !== h2.bid) continue;
-    const q1 = add(h1.p0, mul(h1.dir, h1.depth));
-    const q2 = add(h2.p0, mul(h2.dir, h2.depth));
-    const d = segDist(h1.p0, q1, h2.p0, q2);
-    const need = (h1.dia + h2.dia) / 2 + CLEAR;
-    if (d < need - 1e-6) {
-      if (!worst || d / need < worst.ratio) worst = { d: d, need: need, ratio: d / need, a: h1.part };
-    }
-  }
-  return worst;
-}
-
-function countJoints(joints) {
-  let n = 0, list = [];
-  for (let i = 0; i < joints.length; i++)
-    for (let j = i + 1; j < joints.length; j++) {
-      const c = collide(joints[i], joints[j]);
-      if (c) { n++; list.push([joints[i], joints[j], c]); }
-    }
-  return { n: n, list: list };
-}
-
-function asGroups(data) {
-  return Array.isArray(data) ? data : [{ w: 0, joints: data }];
-}
-
-function solve(data, log) {
-  let moved = 0;
-  asGroups(data).forEach(g => { moved += solveJoints(g.joints, log); });
-  return moved;
-}
-
-function countCollisions(data) {
-  let n = 0, list = [];
-  asGroups(data).forEach(g => {
-    const r = countJoints(g.joints);
-    n += r.n;
-    list = list.concat(r.list);
-  });
-  return { n: n, list: list };
-}
-
-function solveJoints(joints, log) {
-  let moved = 0;
-  for (let pass = 0; pass < 60; pass++) {
-    let any = false;
-    for (let i = 0; i < joints.length; i++) {
-      for (let j = i + 1; j < joints.length; j++) {
-        const c = collide(joints[i], joints[j]);
-        if (!c) continue;
-        const cand = [joints[i], joints[j]].filter(x => x.run.max - x.run.min > 1);
-        if (!cand.length) continue;
-        const J = cand[cand.length - 1];
-        const step = (J.t + 16 <= J.run.max) ? 16 : -16;
-        const nt = Math.min(J.run.max, Math.max(J.run.min, J.t + step));
-        if (nt === J.t) continue;
-        if (log) log.push(J.kind + ' #' + J.id + ': ' + J.t + ' -> ' + nt + '  (зазор ' + c.d.toFixed(1) + ' < ' + c.need.toFixed(1) + ')');
-        J.t = nt;
-        if (J.a) J.a.p0 = add(J.a.p0, mul(J.run.axis, step));
-        if (J.b) J.b.p0 = add(J.b.p0, mul(J.run.axis, step));
-        any = true; moved++;
-      }
-    }
-    if (!any) break;
-  }
-  return moved;
-}
-
-/* ---------- локальные системы деталей ---------- */
-function frame(part, M, boxW) {
-  const T = M.T, C = M.C, Lc = (boxW == null ? M.Lc : boxW);
-  if (part === 'bottom') return { o: v3(0, T, M.zBot), u: AX.x, v: AX.y, n: AX.z, w: Lc, h: C, flip: false, uName: 'длина', vName: 'глубина' };
-  if (part === 'side')   return { o: v3(0, T, M.zBotTop), u: AX.z, v: AX.y, n: AX.x, w: M.Hu, h: C, flip: false, uName: 'высота', vName: 'глубина' };
-  if (part === 'back')   return { o: v3(T, C, M.zBotTop), u: AX.x, v: AX.z, n: AX.y, w: Lc - 2 * T, h: M.Hu, flip: true, uName: 'длина', vName: 'высота' };
-  if (part === 'intop')  return { o: v3(T, T, M.zU - T), u: AX.x, v: AX.y, n: AX.z, w: Lc - 2 * T, h: C - T, flip: false, uName: 'длина', vName: 'глубина' };
-  if (part === 'part')   return { o: v3(0, T, M.zBotTop), u: AX.z, v: AX.y, n: AX.x, w: M.Hpart, h: C - T, flip: false, uName: 'высота', vName: 'глубина' };
-  if (part === 'door')   return { o: v3(0, 0, M.doorZ0), u: AX.x, v: AX.z, n: AX.y, w: M.doorW, h: M.doorH, flip: true, uName: 'ширина', vName: 'высота' };
-  return null;
-}
-
-/* имя ребра зависит от того, что отложено по оси:
-   высота — низ/верх, глубина — перед/зад, длина/ширина — левый/правый */
-function edgeName(axisName, low) {
-  if (axisName === 'высота') return low ? 'низ' : 'верх';
-  if (axisName === 'глубина') return low ? 'перед' : 'зад';
-  return low ? 'левый' : 'правый';
-}
-
-function localize(h, F) {
-  const rel = sub(h.p0, F.o);
-  const u = dot(rel, F.u) - (h.ox || 0), v = dot(rel, F.v), w = dot(rel, F.n);
-  const faceHole = Math.abs(dot(h.dir, F.n)) > 0.5;
-  let edge = null, pos = 0, axisName = '', edgeAxis = null, edgeLow = false;
-  if (!faceHole) {
-    if (u < 1) { edgeAxis = 'u'; edgeLow = true; }
-    else if (u > F.w - 1) { edgeAxis = 'u'; edgeLow = false; }
-    else if (v < 1) { edgeAxis = 'v'; edgeLow = true; }
-    else if (v > F.h - 1) { edgeAxis = 'v'; edgeLow = false; }
-    else { edgeAxis = 'u'; edgeLow = true; }
-    axisName = edgeAxis === 'u' ? F.vName : F.uName;
-    pos = edgeAxis === 'u' ? v : u;
-    edge = edgeName(edgeAxis === 'u' ? F.uName : F.vName, edgeLow);
-  }
-  return { u: u, v: v, w: w, faceHole: faceHole, edge: edge, pos: pos,
-           axisName: axisName, edgeAxis: edgeAxis, edgeLow: edgeLow };
-}
-
-/* ---------- карта ---------- */
-const OP_LABEL = {
-  confirmat: 'конфирмат', dowel: 'шкант', pin: 'полкодержатель',
-  plate: 'планка петли', cup: 'чашка петли'
-};
-
-function render(p, M, data, opts) {
-  opts = opts || {};
-  const LANG = opts.lang || 'ru';
-  const T = M.T;
-  const pcs = LANG === 'en' ? 'pcs' : 'шт';
-  const variant = opts.variant || null;      /* 'L' | 'R' — сторона навески дверцы */
-  const qty = opts.qty != null ? opts.qty : p.qty;
-
-  /* корпусов может быть несколько (модульная тумба): берём тот, что совпадает
-     с шириной детали. У боковин, стоек и дверец присадка от ширины не зависит. */
-  const groups = asGroups(data);
-  const wide = p.role === 'bottom' || p.role === 'back' || p.role === 'intop';
-  const wantW = p.role === 'bottom' ? p.w : (wide ? p.w + 2 * T : null);
-  let gs = groups;
-  if (wide && wantW != null) {
-    const f = groups.filter(g => Math.abs(g.w - wantW) < 1.5);
-    if (f.length) gs = f;
-  }
-  const F = frame(p.role, M, gs[0] ? gs[0].w : M.Lc);
-
-  /* отверстия этой детали, без дублей (левая и правая боковины дают одно и то же) */
-  const seen = {};
-  const list = [];
-  gs.forEach(g => g.joints.forEach(j => {
-    [j.a, j.b].forEach(h => {
-      if (!h || h.part !== p.role) return;
-      if (p.role === 'door' && variant && h.hinge && h.hinge !== variant) return;
-      const l = F ? localize(h, F) : null;
-      const key = l
-        ? [Math.round(l.u * 10), Math.round(l.v * 10), h.dia, h.op, h.side, l.faceHole ? 1 : 0].join('|')
-        : [h.op, h.dia].join('|');
-      if (seen[key]) return;
-      seen[key] = 1;
-      list.push({ h: h, l: l });
-    });
-  }));
-
-  const titleAdd = variant ? (LANG === 'en' ? (variant === 'L' ? ' — left hung' : ' — right hung')
-                                            : (variant === 'L' ? ' — навеска слева' : ' — навеска справа')) : '';
-  const EDGE_SIDES = {
-    all: 'по периметру', front_lr: 'перед, лево, право', front_l: 'перед, лево',
-    front_r: 'перед, право', front: 'перед'
-  };
-  const edgeTxt = p.edge
-    ? 'кромка ' + f1(p.edge) + (EDGE_SIDES[p.edgeMode] ? ' · ' + EDGE_SIDES[p.edgeMode] : '')
-    : 'без кромки';
-  const head = '<h2 class="ct" style="margin:26px 0 8px">' + p.id + '. ' + tstr(p.name) + titleAdd +
-    ' <span class="hint">' + qty + ' ' + pcs + ' · ' + f0(p.w) + ' × ' + f0(p.h) + ' × ' + T + ' мм · ' +
-    edgeTxt + '</span></h2>';
-
-  if (!F || !list.length) {
-    return '<div style="width:100%;margin:0 0 26px">' + head +
-      '<svg viewBox="0 0 900 110" width="100%" xmlns="http://www.w3.org/2000/svg">' +
-      '<rect x="330" y="14" width="240" height="70" fill="#f8f4ec" stroke="#7d6a50" stroke-width="1.2" rx="2"/>' +
-      '<text x="450" y="54" text-anchor="middle" font-size="13" font-family="Segoe UI" fill="#8a7b66">' +
-      (LANG === 'en' ? 'no drilling' : 'без присадки') + '</text></svg></div>';
-  }
-
-  /* ---- раскладка чертежа ---- */
-  const maxW = 800, maxH = 220, dOx = 56, dOy = 46;
-  const sc = Math.min(maxW / Math.max(F.w, 1), maxH / Math.max(F.h, 1));
-  const rw = F.w * sc, rh = F.h * sc;
-  const ox = dOx + (maxW - rw) / 2, oy = dOy + (maxH - rh) / 2;
-  const X = u => ox + u * sc;
-  const Yv = v => F.flip ? (oy + rh - v * sc) : (oy + v * sc);
-
-  let s = '';
-  s += '<rect x="' + ox.toFixed(1) + '" y="' + oy.toFixed(1) + '" width="' + rw.toFixed(1) + '" height="' + rh.toFixed(1) + '" fill="#f8f4ec" stroke="#7d6a50" stroke-width="1.2" rx="2"/>';
-
-  /* база: левый нижний угол */
-  const bx = ox, by = oy + rh;
-  s += '<path d="M' + (bx - 16) + ',' + (by + 16) + ' L' + bx + ',' + by + ' L' + (bx - 16) + ',' + by + ' Z" fill="#4d6bfe"/>';
-  s += '<text x="' + (bx - 18) + '" y="' + (by + 13) + '" font-size="10.5" font-family="Consolas" fill="#3a55df" text-anchor="end">0,0</text>';
-
-  /* оси */
-  s += '<text x="' + (ox + rw / 2).toFixed(1) + '" y="' + (oy - 14).toFixed(1) + '" text-anchor="middle" font-size="11" font-family="Segoe UI" fill="#8b919b">' + F.uName + ' ' + f0(F.w) + ' мм →</text>';
-  s += '<text transform="rotate(-90 ' + (ox + rw + 22).toFixed(1) + ' ' + (oy + rh / 2).toFixed(1) + ')" x="' + (ox + rw + 22).toFixed(1) + '" y="' + (oy + rh / 2).toFixed(1) + '" text-anchor="middle" font-size="11" font-family="Segoe UI" fill="#8b919b">' + F.vName + ' ' + f0(F.h) + ' мм →</text>';
-
-  /* нумерация и отрисовка */
-  list.forEach((it, i) => { it.no = i + 1; });
-
-  list.forEach(it => {
-    const h = it.h, l = it.l;
-    if (!l.faceHole) return;
-    const cx = X(l.u), cy = Yv(l.v);
-    const r = Math.max(2.6, Math.min(10, h.dia * sc / 2));
-    const col = h.side === 'in' ? '#0f9d63' : '#7d6a50';
-    s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="#fff" stroke="' + col + '" stroke-width="1.1"/>';
-    if (h.cb) s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (r * 1.5).toFixed(1) + '" fill="none" stroke="' + col + '" stroke-width=".7" stroke-dasharray="2 2"/>';
-    s += '<text x="' + (cx + r + 2).toFixed(1) + '" y="' + (cy - r - 2).toFixed(1) + '" font-size="9" font-family="Consolas" fill="' + col + '">' + it.no + '</text>';
-  });
-
-  list.forEach(it => {
-    const h = it.h, l = it.l;
-    if (l.faceHole) return;
-    const L = h.dia <= 5 ? 9 : 12;
-    let x1, y1, x2, y2, tx, ty;
-    /* ребро вдоль u (левый/правый торец) — горизонтальная чёрточка на вертикальном ребре,
-       ребро вдоль v (перед/зад) — вертикальная чёрточка на горизонтальном ребре */
-    let anchor = 'start';
-    if (l.edgeAxis === 'u') {
-      const xx = X(l.edgeLow ? 0 : F.w);
-      const right = xx > ox + rw / 2;
-      x1 = xx - L / 2; y1 = Yv(l.pos); x2 = xx + L / 2; y2 = Yv(l.pos);
-      tx = xx + (right ? -9 : 9); ty = Yv(l.pos) - 6;
-      anchor = right ? 'end' : 'start';
-    } else {
-      const yy = Yv(l.edgeLow ? 0 : F.h);
-      const below = yy > oy + rh / 2;
-      x1 = X(l.pos); y1 = yy - L / 2; x2 = X(l.pos); y2 = yy + L / 2;
-      tx = X(l.pos) + 6; ty = yy + (below ? 13 : -6);
-      anchor = 'start';
-    }
-    s += '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="#7d6a50" stroke-width="2.8" stroke-linecap="round"/>';
-    s += '<text x="' + tx.toFixed(1) + '" y="' + ty.toFixed(1) + '" font-size="9" font-family="Consolas" fill="#7d6a50" text-anchor="' + anchor + '">' + it.no + '</text>';
-  });
-
-  /* ---- таблица ---- */
-  const rows = list.map(it => {
-    const h = it.h, l = it.l;
-    return {
-      no: it.no,
-      x: l.faceHole ? l.u : l.pos,
-      y: l.faceHole ? l.v : null,
-      dia: h.dia, cb: h.cb, depth: h.depth, op: h.op,
-      place: l.faceHole ? (h.side === 'in' ? 'внутр.' : 'наруж.') : 'торец ' + l.edge,
-      faceHole: l.faceHole
+    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'3 sides in the end; 32 / 32 / 352 mm':'3 стороны в торец; 32 / 32 / 352 мм'}${M.modular ? '' : (LANG==='en'?' + face under uprights':' + пласти под стойки')}</text>`;
+  } else if(p.role==='side'){
+    /* side: bottom end -> bottom (dashes), top -> inset top (face circles) */
+    const seq=L=>{
+      const c=[], d=[];
+      for(let x=32; x<=L/2; x+=352){ c.push(x, L-x); d.push(x+32, L-(x+32)); }
+      const uniq=a=>Array.from(new Set(a.map(v=>Math.round(v)))).filter(v=>v>=0 && v<=L);
+      return {c:uniq(c), d:uniq(d)};
     };
-  });
-
-  const rowH = 18.5, tblTop = 316;
-  const cols = [0, 50, 112, 158, 204, 252, 356];
-  const header = ['№', 'X', 'Y', 'Ø', 'глуб.', 'пласть', 'операция'];
-  let table = '<g font-family="Consolas,monospace" font-size="11.5" fill="#3d3a35">';
-  header.forEach((t, i) => {
-    table += '<text x="' + (10 + cols[i]) + '" y="' + (tblTop - 9) + '" font-family="Segoe UI" font-size="9.5" fill="#8b919b">' + t.toUpperCase() + '</text>';
-  });
-  table += '<line x1="10" y1="' + (tblTop - 4) + '" x2="890" y2="' + (tblTop - 4) + '" stroke="#d8dae1" stroke-width="1"/>';
-  rows.forEach((r, i) => {
-    const y = tblTop + 12 + i * rowH;
-    table += '<text x="' + (10 + cols[0]) + '" y="' + y + '">' + r.no + '</text>';
-    table += '<text x="' + (10 + cols[1]) + '" y="' + y + '">' + (Math.round(r.x * 10) / 10) + '</text>';
-    table += '<text x="' + (10 + cols[2]) + '" y="' + y + '">' + (r.y === null ? '—' : Math.round(r.y * 10) / 10) + '</text>';
-    table += '<text x="' + (10 + cols[3]) + '" y="' + y + '">' + r.dia + (r.cb ? '/' + r.cb : '') + '</text>';
-    table += '<text x="' + (10 + cols[4]) + '" y="' + y + '">' + r.depth + '</text>';
-    table += '<text x="' + (10 + cols[5]) + '" y="' + y + '" font-family="Segoe UI" font-size="10" fill="#7a828d">' + r.place + '</text>';
-    table += '<text x="' + (10 + cols[6]) + '" y="' + y + '" font-family="Segoe UI" font-size="10.5">' + (OP_LABEL[r.op] || r.op) + '</text>';
-  });
-  table += '</g>';
-
-  const H = tblTop + 20 + rows.length * rowH;
-  let extra = '';
-  if (p.role === 'door') {
-    extra = '<text x="10" y="' + (H + 31) + '" font-size="10.5" font-family="Segoe UI" fill="#8b919b">' +
-      'Чашки Ø35 — 22,5 мм от петлевой кромки. Планки петель — на боковине или стойке, 37 мм от переда корпуса.' +
-      (variant ? '' : ' Правая навеска — зеркально.') + '</text>';
-  } else if (p.role === 'side' || p.role === 'part') {
-    extra = '<text x="10" y="' + (H + 31) + '" font-size="10.5" font-family="Segoe UI" fill="#8b919b">' +
-      'Деталь симметрична: обе боковины (стойки) сверлятся по этой карте с внутренней стороны.</text>';
+    const dash=(x,y,len)=>out += `<line x1="${(x-len/2).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+len/2).toFixed(1)}" y2="${y.toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
+    const hh=seq(p.h);
+    /* bottom end — only one end, holes in the end */
+    hh.c.forEach(v=>dash(ox, Y(v), 8));
+    hh.d.forEach(v=>dash(ox, Y(v), 4));
+    /* top — mating holes in the face for the inset top */
+    const fx=ox+rw-10;
+    const face=(x,y,kind)=>{
+      if(kind==='c') return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.8" fill="#fff" stroke="#7d6a50" stroke-width=".9"/><path d="M${(x-1.7).toFixed(1)},${(y-1.7).toFixed(1)}L${(x+1.7).toFixed(1)},${(y+1.7).toFixed(1)}M${(x+1.7).toFixed(1)},${(y-1.7).toFixed(1)}L${(x-1.7).toFixed(1)},${(y+1.7).toFixed(1)}" stroke="#7d6a50" stroke-width=".7"/>`;
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" fill="#fff" stroke="#7d6a50" stroke-width=".9"/>`;
+    };
+    hh.c.forEach(v=>out += face(fx, Y(v), 'c'));
+    hh.d.forEach(v=>out += face(fx, Y(v), 'd'));
+    /* back — inset back panel, so holes are in the side face */
+    const ww=seq(p.w);
+    ww.c.forEach(v=>out += face(X(v), oy+9, 'c'));
+    ww.d.forEach(v=>out += face(X(v), oy+9, 'd'));
+    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'bottom: end; top/back: face':'низ: торец; верх и зад: пласть'}</text>`;
+  } else if(p.role==='part'){
+    /* internal upright: both ends are drilled in the end */
+    const seq=L=>{
+      const c=[], d=[];
+      for(let x=32; x<=L/2; x+=352){ c.push(x, L-x); d.push(x+32, L-(x+32)); }
+      const uniq=a=>Array.from(new Set(a.map(v=>Math.round(v)))).filter(v=>v>=0 && v<=L);
+      return {c:uniq(c), d:uniq(d)};
+    };
+    const dash=(x,y,len)=>out += `<line x1="${(x-len/2).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+len/2).toFixed(1)}" y2="${y.toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
+    const hh=seq(p.h);
+    hh.c.forEach(v=>{ dash(ox, Y(v), 8); dash(ox+rw, Y(v), 8); });
+    hh.d.forEach(v=>{ dash(ox, Y(v), 4); dash(ox+rw, Y(v), 4); });
+    /* rear end: holes into the end for the inset back panel */
+    const dashY=(x,y,len)=>out += `<line x1="${x.toFixed(1)}" y1="${(y-len/2).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y+len/2).toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
+    const ww=seq(p.w);
+    ww.c.forEach(v=>dashY(X(v), oy, 8));
+    ww.d.forEach(v=>dashY(X(v), oy, 4));
+    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'both ends + rear end: long confirmat / short dowel':'оба торца + задний торец: длинный конфирмат / короткий шкант'}</text>`;
+  } else if(p.role==='back'){
+    /* back: bottom end (dashes) + face holes at the top under the inset top */
+    const seq=L=>{
+      const c=[], d=[];
+      for(let x=32; x<=L/2; x+=352){ c.push(x, L-x); d.push(x+32, L-(x+32)); }
+      const uniq=a=>Array.from(new Set(a.map(v=>Math.round(v)))).filter(v=>v>=0 && v<=L);
+      return {c:uniq(c), d:uniq(d)};
+    };
+    const dash=(x,y,len)=>out += `<line x1="${x.toFixed(1)}" y1="${(y-len/2).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y+len/2).toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
+    const ww=seq(p.w);
+    ww.c.forEach(v=>dash(X(v), oy+rh, 8));
+    ww.d.forEach(v=>dash(X(v), oy+rh, 4));
+    /* left and right ends into the sides */
+    const hh=seq(p.h);
+    const dashX=(x,y,len)=>out += `<line x1="${(x-len/2).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+len/2).toFixed(1)}" y2="${y.toFixed(1)}" stroke="#7d6a50" stroke-width="2.4"/>`;
+    hh.c.forEach(v=>{ dashX(ox, Y(v), 8); dashX(ox+rw, Y(v), 8); });
+    hh.d.forEach(v=>{ dashX(ox, Y(v), 4); dashX(ox+rw, Y(v), 4); });
+    ww.c.forEach(v=>out += `<circle cx="${X(v).toFixed(1)}" cy="${(oy+9).toFixed(1)}" r="2.7" fill="#fff" stroke="#7d6a50" stroke-width=".9"/><path d="M${(X(v)-1.6).toFixed(1)},${(oy+7.4).toFixed(1)}L${(X(v)+1.6).toFixed(1)},${(oy+10.6).toFixed(1)}M${(X(v)+1.6).toFixed(1)},${(oy+7.4).toFixed(1)}L${(X(v)-1.6).toFixed(1)},${(oy+10.6).toFixed(1)}" stroke="#7d6a50" stroke-width=".7"/>`);
+    ww.d.forEach(v=>out += `<circle cx="${X(v).toFixed(1)}" cy="${(oy+9).toFixed(1)}" r="2.3" fill="#fff" stroke="#7d6a50" stroke-width=".9"/>`);
+    /* face holes by number of uprights */
+    const stands = M.modular ? 2 : M.uprights.length;
+    const xs = M.modular
+      ? [32, p.w-32]
+      : M.uprights.map(u=>Math.max(32, Math.min(p.w-32, (u.x0+u.x1)/2 - M.T)));
+    const yMid = oy + rh/2;
+    xs.forEach(x=>{
+      out += `<circle cx="${X(x).toFixed(1)}" cy="${yMid.toFixed(1)}" r="2.8" fill="#fff" stroke="#7d6a50" stroke-width=".9"/><path d="M${(X(x)-1.7).toFixed(1)},${(yMid-1.7).toFixed(1)}L${(X(x)+1.7).toFixed(1)},${(yMid+1.7).toFixed(1)}M${(X(x)+1.7).toFixed(1)},${(yMid-1.7).toFixed(1)}L${(X(x)-1.7).toFixed(1)},${(yMid+1.7).toFixed(1)}" stroke="#7d6a50" stroke-width=".7"/>`;
+    });
+    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?`bottom/sides: end; top: face; uprights: ${stands}`:`низ и бока: торец; верх: пласть; стоек: ${stands}`}</text>`;
+  } else if(p.role==='shelf'){
+    /* shelf pins in the face */
+    [[32,32],[p.w-32,32],[32,p.h-32],[p.w-32,p.h-32]].forEach(([x,y])=>{
+      out += `<circle cx="${X(x).toFixed(1)}" cy="${Y(y).toFixed(1)}" r="2.8" fill="#fff" stroke="#7d6a50" stroke-width=".9"/>`;
+    });
+    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'4 shelf pins':'4 полкодержателя'}</text>`;
+  } else {
+    out += `<text x="${W/2}" y="${H-8}" text-anchor="middle" font-size="12" font-family="Segoe UI" fill="#8a7b66">${LANG==='en'?'no drilling':'без присадки'}</text>`;
   }
-  const note = '<text x="10" y="' + (H + 14) + '" font-size="10.5" font-family="Segoe UI" fill="#8b919b">' +
-    'X — по ' + F.uName + ' от базы, Y — по ' + F.vName + '. Зелёные — с внутренней пласти, коричневые — с наружной. ' +
-    'Торец: X — расстояние вдоль ребра.</text>';
-
-  const boxH = H + (extra ? 42 : 24);
-  return '<div style="width:100%;margin:0 0 30px">' + head +
-    '<svg viewBox="0 0 900 ' + boxH + '" width="100%" xmlns="http://www.w3.org/2000/svg">' + s + table + note + extra + '</svg></div>';
+  return `<div style="width:100%;margin:0 0 26px">
+    <div style="font:700 15px/1.2 inherit;color:var(--tx);margin-bottom:3px">${p.id}. ${tstr(p.name)}</div>
+    <div style="font:400 12.5px/1.3 inherit;color:var(--tx3);margin-bottom:6px">${p.qty} ${pcs} · ${p.edge ? (LANG==='en'?'with edge':'с кромкой') : (LANG==='en'?'finished size':'чистовой размер')} ${f0(p.w)} × ${f0(p.h)}${p.edge ? ' · ' + tstr('Кромка') + ' ' + f1(p.edge) + (edgeSides(p.edgeMode)>1?' × '+edgeSides(p.edgeMode):'') : ''}</div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg">${out}</svg>
+  </div>`;
 }
-
-const API = { build, solve, countCollisions, collide, hingeZs, frame, localize, render, segDist, v3, add, mul };
-if (typeof globalThis !== 'undefined') globalThis.PRIS = API;
-if (typeof module !== 'undefined' && module.exports) module.exports = API;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
-
-
-
-
-
-
-
-
-
 
 function drillPartsHtml(M){
-  if(!M.__pris){
-    M.__pris = PRIS.build(M);
-    PRIS.solve(M.__pris);
-  }
-  const warn = (M.__prisWarn && M.__prisWarn.length)
-    ? '<div class="warnbox">' + M.__prisWarn.map(w=>'<div>· '+w+'</div>').join('') + '</div>'
-    : '';
-  const doorsL = (M.doors || []).filter(d => d.hinge === 'L').length;
-  const doorsR = (M.doors || []).length - doorsL;
-  const cards = [];
-  M.parts.forEach(p => {
-    if(p.role === 'door'){
-      if(doorsL) cards.push(PRIS.render(p, M, M.__pris, {lang:LANG, variant:'L', qty:doorsL}));
-      if(doorsR) cards.push(PRIS.render(p, M, M.__pris, {lang:LANG, variant:'R', qty:doorsR}));
-    } else {
-      cards.push(PRIS.render(p, M, M.__pris, {lang:LANG}));
-    }
-  });
-  return warn + '<div style="display:flex;flex-direction:column;gap:0;padding:10px 2px 0">'
-    + cards.join('') + '</div>';
+  return `<div style="display:flex;flex-direction:column;gap:0;padding:10px 2px 0">${M.parts.map(p=>drillCard(p,M)).join('')}</div>`;
 }
 
 function renderCut(M){
@@ -2628,9 +2453,9 @@ function renderCut(M){
     </table></div>
     <div class="sheets">${M.sheets.map((sh,i)=>`<div class="sheet"><h4>${LANG==='en' ? 'Sheet' : 'Лист'} ${i+1} <span>${Math.round(100*sh.items.reduce((s,it)=>s+it.w*it.h,0)/(M.SW*M.SH))} %</span></h4>${sheetSVG(M,sh,i)}</div>`).join('')}</div>
     <div class="legend">${M.parts.map(p=>`<span><i style="background:${PAL[(p.id-1)%PAL.length]}"></i>${p.id} — ${tstr(p.name)}</span>`).join('')}</div>
-    <h2 class="ct" style="margin-top:26px">${tstr('Схемы присадок')} <span class="hint">${LANG==='en' ? '32 mm system · visible edges in wavy line' : 'система 32 · видимые кромки — волнистой линией'}</span></h2>
+    <h2 class="ct" style="margin-top:26px">${tstr('Схемы присадок')} <span class="hint">${LANG==='en' ? 'orange wavy line = edge banding · 32 mm system' : 'оранжевая волнистая линия — кромка · система 32'}</span></h2>
     ${drillPartsHtml(M)}
-    <p class="note">${LANG==='en' ? 'Every card is dimensioned from its base (0,0 in the lower-left corner): X along the length/height, Y along the depth. Brown holes — drill from the outer face, green — from the inner face. End holes: X is the distance along the edge. Both holes of a joint are computed from one point, so they always meet; crossing axes are pushed apart.' : 'Каждая карта размерена от базы (0,0 в левом нижнем углу): X — по длине/высоте, Y — по глубине. Коричневые отверстия — сверлить с наружной пласти, зелёные — с внутренней. Торец: X — расстояние вдоль ребра. Оба отверстия узла считаются из одной точки, поэтому всегда сходятся; пересекающиеся оси разведены.'}</p>
+    <p class="note">${LANG==='en' ? 'long dash — confirmat in the end, short dash — dowel in the end, ○ — hole in the face. 32 mm from the edge, +32 mm dowel, +352 mm next confirmat; from both ends to mid-length. Shorter than 600 mm — one pair per side. Doors: Ø35 cup, 22 mm from the edge. Edge banding as a wavy line.' : 'длинная чёрточка — конфирмат в торце, короткая — шкант в торце, ○ — отверстие в пласти. 32 мм от края, +32 мм шкант, +352 мм следующий конфирмат; с двух сторон до середины. Короче 600 мм — одна пара с каждой стороны. Двери: Ø35, 22 мм от кромки. Кромка — волнистой.'}</p>
     <p class="note">${LANG==='en' ? `Kerf ${K.KERF} mm is included. Cut sizes are core sizes; edge banding is added on visible edges. Grain runs along the long side.` : `Пропил ${K.KERF} мм учтён. Размер заготовки — без кромки; кромка добавляется на видимые кромки. Текстура — вдоль длинной стороны.`}</p>`;
   $('#btnCsv').onclick = downloadCSV;
   $('#btnPrint').onclick = ()=>window.print();
@@ -2656,7 +2481,7 @@ function downloadCSV(){
 
 function renderAsm(M){
   const pinFromBottom = M.pinZ - M.zBotTop;
-  const hinges = PRIS.hingeZs(M).length * M.doorN;
+  const hinges = 2*M.doorN;
   const screw70 = 4*(M.n+1);
   const screw30 = 6*M.n;
   const screw16 = 4*hinges + 4*M.feetN + 8;
@@ -2687,8 +2512,8 @@ function renderAsm(M){
       ? `${M.feetN} NO-10 feet into the bottom, 2 per upright. Level the stand.`
       : `${M.feetN} опор НО-10 в дно, 2 на стойку. Выставить по уровню.`],
     ['Дверцы', LANG==='en'
-      ? `${hinges} hinges, ${PRIS.hingeZs(M).length} per door. Ø35 cups, 22,5 mm from the hinge edge. ${K.DGAP} mm gap. No handles.`
-      : `${hinges} петель, по ${PRIS.hingeZs(M).length} на дверцу. Чашки Ø35, 22,5 мм от петлевой кромки. Зазор ${K.DGAP} мм. Без ручек.`],
+      ? `${hinges} hinges, 2 per door. Ø35 cups, 22 mm from the edge. ${K.DGAP} mm gap. No handles.`
+      : `${hinges} петель, по 2 на дверцу. Чашки Ø35, 22 мм от кромки. Зазор ${K.DGAP} мм. Без ручек.`],
     ['Отделка', LANG==='en'
       ? `Sanding 120/180, r2 edges, two coats of oil.`
       : `Шлифовка 120/180, кромки r2, масло в 2 слоя.`],
@@ -2739,7 +2564,7 @@ function renderAsm(M){
         <tr><td>${purpose(`Furniture foot NO-10 (${K.LEG} mm, Ø50)`,`Опора мебельная НО-10 (${K.LEG} мм, Ø50)`)}</td><td class="num">${M.feetN}</td><td class="mut">${purpose('2 under each upright, hidden','2 под каждой стойкой, скрытые')}</td></tr>
         <tr><td>${purpose(`Spacer ${K.TGAP} mm for the overlay top`,`Проставка ${K.TGAP} мм под накладную крышку`)}</td><td class="num">${2*(M.n+1)}</td><td class="mut">${purpose('keeps the shadow gap','держит теневой зазор')}</td></tr>
         <tr><td>${purpose('Shelf pin Ø5×16','Полкодержатель Ø5×16')}</td><td class="num">${4*M.n}</td><td class="mut">${purpose('4 per bay','4 на секцию')}</td></tr>
-        <tr><td>${purpose('Overlay hinge 110°','Петля накладная 110°')}</td><td class="num">${hinges}</td><td class="mut">${purpose(PRIS.hingeZs(M).length + ' per door', PRIS.hingeZs(M).length + ' на дверцу')}</td></tr>
+        <tr><td>${purpose('Overlay hinge 110°','Петля накладная 110°')}</td><td class="num">${hinges}</td><td class="mut">${purpose('2 per door','2 на дверцу')}</td></tr>
         <tr><td>${purpose('PVA glue D3','Клей ПВА Д3')}</td><td class="num">1</td><td class="mut">${purpose('all joints','все соединения')}</td></tr>
         ${M.modular ? `<tr><td>${purpose('Module connector bolt / cam','Стяжка межмодульная')}</td><td class="num">${Math.max(0, M.modules.length-1)*4}</td><td class="mut">${purpose('module joints, 4 per joint','стыки модулей, 4 на стык')}</td></tr>` : ''}
         ${M.edgeOn ? `<tr><td>${purpose(`Edge banding ${f1(M.edge)} / ${f1(M.edgeDoor)} mm`,`Кромка ${f1(M.edge)} / ${f1(M.edgeDoor)} мм`)}</td><td class="num">—</td><td class="mut">${purpose('visible edges only','только видимые кромки')}</td></tr>` : ''}
@@ -3385,168 +3210,252 @@ function renderBio(M){
   });
 }
 
-function renderTests(M){
-  const r = M.fertRes;
-  const fmt = v => (Math.round(v * 1000) / 1000).toString().replace('.', ',');
-  const grp = t => `<tr><td colspan="4" style="padding:16px 0 6px;font:600 10.5px/1 inherit;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)">${tstr(t)}</td></tr>`;
-  const rowT = ([name, v, lo, hi, unit, dec]) => {
-    let st, cls, val;
-    if(v == null){ st = 'нет данных'; cls = 'mut'; val = '—'; }
-    else {
-      val = fmt(v) + (unit ? ` <span class="mut">${tstr(unit)}</span>` : '');
-      if(v < lo){ st = 'низко'; cls = 'badge-warn'; }
-      else if(v > hi){ st = 'высоко'; cls = 'badge-bad'; }
-      else { st = 'норма'; cls = 'badge-ok'; }
-    }
-    const norm = lo === 0 ? (LANG==='en' ? `up to ${fmt(hi)}` : `до ${fmt(hi)}`) : `${fmt(lo)}–${fmt(hi)}`;
-    return `<tr><td>${tstr(name)}</td><td class="num">${val}</td><td class="mut">${norm} ${tstr(unit)}</td><td><span class="${cls}">${tstr(st)}</span></td></tr>`;
-  };
-  const T = r.TPAR;
-  const recRows = r.fertRec.map(([txt, lvl]) => {
-    const cls = lvl === 'bad' ? 'badge-bad' : (lvl === 'warn' ? 'badge-warn' : 'badge-ok');
-    return `<li style="margin-bottom:8px"><span class="${cls}">•</span> ${txt}</li>`;
+/* ---------- сетка «факт / цель» ---------- */
+const UDO_ROWS = [
+  { g: 'grp_water' },
+  { k: 'temp', id: 'inTempW', label: 'f_temp', unit: '°C', type: 'temp' },
+  { k: 'ph', label: 'f_ph', unit: '', goal: true, gid: 'inGPH', step: 0.1, min: 4, max: 10 },
+  { k: 'kh', label: 'f_kh', unit: '°dKH', goal: true, gid: 'inGKH', step: 0.5, min: 0, max: 30 },
+  { k: 'gh', label: 'f_gh', unit: '°dGH', goal: true, gid: 'inGGH', step: 0.5, min: 0, max: 40 },
+  { g: 'grp_food' },
+  { k: 'no3', label: 'f_no3', unit: 'u_mgl', goal: true, gid: 'inGNO3', step: 0.5, min: 0, max: 200 },
+  { k: 'po4', label: 'f_po4', unit: 'u_mgl', goal: true, gid: 'inGPO4', step: 0.1, min: 0, max: 50 },
+  { k: 'k', label: 'f_k', unit: 'u_mgl', goal: true, gid: 'inGK', step: 1, min: 0, max: 200 },
+  { k: 'ca', id: 'inCa', label: 'f_ca', unit: 'u_mgl', goal: true, gid: 'inGCa', step: 1, min: 0, max: 200 },
+  { k: 'mg', id: 'inMg', label: 'f_mg', unit: 'u_mgl', goal: true, gid: 'inGMg', step: 0.5, min: 0, max: 100 },
+  { k: 'fe', id: 'inFe', label: 'f_fe', unit: 'u_mgl', goal: true, gid: 'inGFe', step: 0.01, min: 0, max: 2 },
+  { g: 'grp_ctrl' },
+  { k: 'tan', id: 'inNH3', label: 'f_nh3', unit: 'u_mgl', step: 0.01, min: 0, max: 10 },
+  { k: 'no2', id: 'inNO2', label: 'f_no2', unit: 'u_mgl', step: 0.01, min: 0, max: 10 },
+  { k: 'tds', label: 'f_tds', unit: 'ppm', step: 10, min: 0, max: 2000 },
+  { k: 'ec', label: 'f_ec', unit: 'µS', step: 10, min: 0, max: 3000 },
+  { k: 'cu', id: 'inCu', label: 'f_cu', unit: 'u_mgl', step: 0.01, min: 0, max: 2 }
+];
+
+function buildUdoGrid(){
+  const wrap = document.getElementById('ugrid');
+  if(!wrap) return;
+  const gdef = (AquaCore.PROFILES.hi || {}).goals || {};
+  const unit = u => !u ? '' : (u === 'u_mgl' ? '<em data-i18n="u_mgl">мг/л</em>' : `<em>${u}</em>`);
+  const rows = UDO_ROWS.map(r => {
+    if(r.g) return `<div class="ugrp" data-i18n="${r.g}"></div>`;
+    const id = r.id || ('in' + r.k.toUpperCase());
+    const fact = r.type === 'temp'
+      ? `<select id="${id}"><option>22</option><option>24</option><option selected>25</option><option>26</option><option>27</option><option>28</option><option>30</option></select>`
+      : `<input id="${id}" type="number" value="" placeholder="—" min="${r.min}" max="${r.max}" step="${r.step}">`;
+    const goal = r.goal
+      ? `<div class="uval"><div class="inp"><input id="${r.gid}" type="number" value="${gdef[r.k] != null ? gdef[r.k] : ''}" min="${r.min}" max="${r.max}" step="${r.step}">${unit(r.unit)}</div></div>`
+      : `<div class="uval uempty">—</div>`;
+    return `<div class="urow">
+      <div class="ulabel"><span data-i18n="${r.label}"></span><i class="fs" data-k="${r.k}"></i><span class="rng" data-rng="${r.k}"></span></div>
+      <div class="uval"><div class="inp">${fact}${unit(r.unit)}</div></div>
+      ${goal}
+    </div>`;
   }).join('');
-  const wcut = r.WCUT.length
-    ? r.WCUT.map(([n, pct]) => `<tr><td>${tstr(n)}</td><td class="num">${pct} %</td></tr>`).join('')
-    : `<tr><td colspan="2" class="mut">${tstr('Ничего выводить не нужно — всё в норме или неизвестно.')}</td></tr>`;
+  wrap.innerHTML = `<div class="uhead"><span data-i18n="u_param">Параметр</span><span data-i18n="u_fact">Факт</span><span data-i18n="u_goal">Цель</span></div>` + rows;
+}
+
+function updateUdoStatus(ev){
+  document.querySelectorAll('#ugrid .fs').forEach(el => {
+    const r = ev.rows.find(x => x.key === el.dataset.k);
+    if(!r || r.value == null){ el.className = 'fs'; el.title = tstr('нет данных'); return; }
+    const tol = (AquaCore.META[r.key] && AquaCore.META[r.key].tol) || 0;
+    let st = (r.status === 'ok') ? 'ok' : r.severity;
+    if (r.goal != null && st !== 'bad') st = (Math.abs(r.value - r.goal) <= tol + 1e-9) ? 'ok' : 'warn';
+    el.className = 'fs ' + st;
+    const norm = r.norm ? `${L('норма', 'range')} ${fmtD(r.norm[0], r.dec)}–${fmtD(r.norm[1], r.dec)}` : '';
+    const goal = r.goal != null ? ` · ${L('цель', 'target')} ${fmtD(r.goal, r.dec)}` : '';
+    el.title = `${stLabel(r.status)} · ${fmtD(r.value, r.dec)} ${tstr(r.unit)} · ${norm}${goal}`;
+  });
+  document.querySelectorAll('#ugrid .rng').forEach(el => {
+    const r = ev.rows.find(x => x.key === el.dataset.rng);
+    el.textContent = (r && r.norm) ? `${fmtD(r.norm[0], r.dec)}–${fmtD(r.norm[1], r.dec)}` : '';
+  });
+}
+
+function renderTests(M){
+  const ev = M.fertRes.ev, c = ev.counts, wc = M.fertRes.wc || [];
+  const prof = AquaCore.PROFILES[ev.profile] || AquaCore.PROFILES.hi;
+  const tolOf = r => (AquaCore.META[r.key] && AquaCore.META[r.key].tol) || 0;
+  const issues = ev.rows.filter(r => {
+    if (r.value == null) return false;
+    if (r.goal != null) return Math.abs(r.value - r.goal) > tolOf(r) + 1e-9;
+    return r.status === 'low' || r.status === 'high';
+  }).sort((a, b) => (a.severity === 'bad' ? 0 : 1) - (b.severity === 'bad' ? 0 : 1));
+
+  const acts = issues.length ? issues.map(r => {
+    const goalMode = r.goal != null;
+    const dir = goalMode
+      ? (r.value < r.goal ? L('ниже цели', 'below target') : L('выше цели', 'above target'))
+      : (r.status === 'low' ? L('ниже нормы', 'below range') : L('выше нормы', 'above range'));
+    const key = goalMode ? (r.value < r.goal ? 'low' : 'high') : r.status;
+    const h = r.hint && r.hint[key];
+    const note = h ? TX(h) : L('Проверьте тест и подмену воды.', 'Check the test and change some water.');
+    const sev = r.severity === 'bad' ? 'bad' : 'warn';
+    const target = goalMode ? ` (${L('цель', 'target')} ${fmtD(r.goal, r.dec)})` : '';
+    return `<li class="act ${sev}"><b>${TX(r.label)}</b> — ${dir}: ${fmtD(r.value, r.dec)} ${tstr(r.unit)}${target}. ${note}</li>`;
+  }).join('') : (c.known <= 1
+    ? `<li class="act">${L('Заполните тесты или нажмите «Пример».', 'Fill in the tests or press Example.')}</li>`
+    : `<li class="act ok">${L('Отклонений нет.', 'No deviations.')}</li>`);
+
+  const rel = ev.relations.map(r => {
+    const v = f1(r.value);
+    const txt = r.code === 'ca_mg' ? `Ca : Mg = ${v}` : r.code === 'k_ca' ? `K : Ca = ${v}` : `N : P = ${v}`;
+    return `<span class="rel ${r.ok ? 'ok' : 'warn'}">${txt}</span>`;
+  }).join('');
+
+  const wcRows = wc.length ? wc.map(x => {
+    const r = ev.rows.find(y => y.key === x.key);
+    return `<tr><td>${r ? TX(r.label) : x.key}</td><td class="num">${x.pct} %</td><td class="mut">≤ ${fmtD(x.target, r ? r.dec : 1)}</td></tr>`;
+  }).join('') : `<tr><td colspan="3" class="mut">${L('Ничего выводить не нужно — всё в норме или неизвестно.', 'Nothing to remove — everything is in range or unknown.')}</td></tr>`;
+
+  $('#fertBar').innerHTML = `
+    <div class="toolbar">
+      <div class="seg" id="profSeg">
+        ${Object.keys(AquaCore.PROFILES).map(k => `<button data-p="${k}" class="${k === ev.profile ? 'on' : ''}">${TX(AquaCore.PROFILES[k].name)}</button>`).join('')}
+      </div>
+      <div class="btnrow">
+        <button class="btn" id="btnSample">${L('Пример', 'Example')}</button>
+        <button class="btn" id="btnClear">${L('Очистить', 'Clear')}</button>
+      </div>
+    </div>
+    <p class="note" style="margin:0 0 12px">${c.known <= 1
+      ? L('Пусто = нет теста. Заполните поля или нажмите «Пример» — нормы показаны в строке параметра.', 'Empty = no test. Fill in the fields or press Example — the ranges are shown next to each parameter.')
+      : `${L('Заполнено', 'Filled')} ${c.known} ${L('из', 'of')} ${c.total} · ${c.ok} ${L('в норме', 'in range')} · ${c.warn + c.bad} ${plural(c.warn + c.bad, 'отклонение', 'отклонения', 'отклонений', 'issue', 'issues')}. ${L('Норма', 'Range')} — ${L('эталон профиля', 'profile reference')}, ${L('цель', 'target')} — ${L('то, к чему ведёт рецепт', 'what the recipe drives to')}.`}</p>`;
 
   $('#secFert').innerHTML = `
     <div class="two">
       <section class="card">
-        <h2 class="ct">${tstr('Показатели')} <span class="hint">${r.okN} ${LANG==='en' ? 'of' : 'из'} ${r.knownN} ${LANG==='en' ? 'in range' : 'в норме'}</span></h2>
-        <div style="overflow-x:auto">
-        <table class="tbl">
-          <thead><tr><th>${tstr('Параметр')}</th><th>${tstr('Сейчас')}</th><th>${tstr('Норма')}</th><th></th></tr></thead>
-          <tbody>
-            ${grp('Вода')}${T.slice(0,6).map(rowT).join('')}
-            ${grp('Азот и фосфор')}${T.slice(6,10).map(rowT).join('')}
-            ${grp('Минералы')}${T.slice(10).map(rowT).join('')}
-          </tbody>
-        </table></div>
-        <p class="note">${LANG==='en' ? `CO₂ is calculated from pH and KH: CO₂ = 3 × KH × 10<sup>(7 − pH)</sup>. An empty field means no test.` : `CO₂ считается по pH и KH: CO₂ = 3 × KH × 10<sup>(7 − pH)</sup>. Пустое поле — нет теста.`}</p>
+        <h2 class="ct">${L('Что делать', 'What to do')} <span class="hint">${issues.length ? issues.length + ' ' + plural(issues.length, 'замечание', 'замечания', 'замечаний', 'note', 'notes') : L('чисто', 'clear')}</span></h2>
+        <ul class="acts">${acts}</ul>
+        ${rel ? `<div class="rels">${rel}</div>` : ''}
       </section>
-
       <section class="card">
-        <h2 class="ct">${tstr('Рекомендации')}</h2>
-        <ul style="list-style:none;margin:6px 0 0;padding:0;font-size:13px;line-height:1.5;color:var(--tx2)">${recRows}</ul>
+        <h2 class="ct">${L('Подмены', 'Water changes')} <span class="hint">${L('к норме или цели', 'to range or target')}</span></h2>
+        <div style="overflow-x:auto"><table class="tbl">
+          <thead><tr><th>${L('Параметр', 'Parameter')}</th><th>${L('Подменить', 'Change')}</th><th>${L('До', 'To')}</th></tr></thead>
+          <tbody>${wcRows}</tbody>
+        </table></div>
+        <p class="note">${L('Доля от объёма, если в подменной воде этого вещества нет. Для аммиака и нитрита подмену делают сразу, не дожидаясь расчёта.', 'Share of the volume assuming the replacement water contains none. For ammonia and nitrite, change water at once.')}</p>
       </section>
-    </div>
+    </div>`;
 
-    <section class="card">
-      <h2 class="ct">${tstr('Подмены')} <span class="hint">${LANG==='en'?'to norm or target':'к норме или цели'}</span></h2>
-      <div style="overflow-x:auto">
-      <table class="tbl">
-        <thead><tr><th>${tstr('Параметр')}</th><th>${tstr('Подменить')}</th></tr></thead>
-        <tbody>${wcut}</tbody>
-      </table></div>
-      <p class="note">${LANG==='en' ? `The share of the volume, assuming the replacement water does not contain this substance. For ammonia and nitrite, change water at once without waiting for the calculation.` : `Доля от объёма, если в подменной воде этого вещества нет. Для аммиака и нитрита подмену делают сразу, не дожидаясь расчёта.`}</p>
-    </section>`;
+  $('#profSeg').querySelectorAll('button').forEach(b => b.onclick = () => {
+    state.profile = b.dataset.p;
+    saveState();
+    renderAll();
+  });
+  $('#btnSample').onclick = fillSample;
+  $('#btnClear').onclick = clearTests;
+  updateUdoStatus(ev);
 }
 
 function renderUdo(M){
-  const r = M.fertRes, f = r.f, g = r.TGT;
-  const all = [
-    ['Калиевая селитра', 'KNO₃', r.mKNO3, LANG==='en' ? `+${f1(r.no3FromK)} mg/l NO₃, +${f1(r.kUsed)} K` : `+${f1(r.no3FromK)} мг/л NO₃, +${f1(r.kUsed)} K`],
-    ['Кальциевая селитра', 'Ca(NO₃)₂ · 4H₂O', r.mCaNO3, LANG==='en' ? `+${f1(r.no3FromCa)} mg/l NO₃, +${f1(r.caUsed)} Ca` : `+${f1(r.no3FromCa)} мг/л NO₃, +${f1(r.caUsed)} Ca`],
-    ['Мочевина, карбамид', 'CO(NH₂)₂', r.mUrea, LANG==='en' ? `+${f1(r.no3FromUrea)} mg/l NO₃` : `+${f1(r.no3FromUrea)} мг/л NO₃`],
-    ['Монофосфат калия', 'KH₂PO₄', r.mKH2PO4, LANG==='en' ? `+${f1(r.dP)} mg/l PO₄` : `+${f1(r.dP)} мг/л PO₄`],
-    ['Сульфат калия', 'K₂SO₄', r.mK2SO4, tstr('калий до цели')],
-    ['Магнезия, сульфат магния', 'MgSO₄ · 7H₂O', r.mMgSO4, tstr('магний до цели')],
-    ['Микро + железо, хелат', 'CSM+B / Fe-DTPA', r.mCSM, tstr('железо до цели')]
-  ].filter(x => x[2] > 0.001);
+  const ev = M.fertRes.ev, rec = M.fertRes.rec;
+  const prof = AquaCore.PROFILES[ev.profile] || AquaCore.PROFILES.hi;
 
-  const grams = g0 => g0 < 0.01 ? '&lt; 0,01' : (g0 < 1 ? f2(g0) : f1(g0));
-  const ML = LANG==='en' ? 'ml' : 'мл';
-  const mlPart = (g, formula) => {
-    const st = STOCK_BY[formula];
-    if(!st) return '';
-    const v = g / (st.g / 0.5) * 1000;
-    const t = v < 0.1 ? f2(v) : (v < 10 ? f1(v) : f0(v));
-    return ` / ${t} <span class="mut">${ML}</span>`;
+  const addTxt = s => {
+    const a = s.adds || {}, p = [];
+    if (a.no3 != null) p.push('NO₃ +' + f1(a.no3));
+    if (a.po4 != null) p.push('PO₄ +' + f2(a.po4));
+    if (a.k != null) p.push('K +' + f1(a.k));
+    if (a.ca != null) p.push('Ca +' + f0(a.ca));
+    if (a.mg != null) p.push('Mg +' + f1(a.mg));
+    if (a.fe != null) p.push('Fe +' + f2(a.fe));
+    if (a.kh != null) p.push('KH +' + f1(a.kh));
+    if (a.so4 != null) p.push('SO₄ +' + f1(a.so4));
+    if (a.cl != null) p.push('Cl +' + f1(a.cl));
+    if (a.tan != null) p.push('TAN +' + f2(a.tan));
+    return p.join(' · ');
   };
-  const rows = all.length
-    ? all.map(([n, fm, gram, what]) =>
-      `<tr><td>${tstr(n)}</td><td class="mut">${fm}</td><td class="num">${grams(gram)} <span class="mut">${tstr('г')}</span>${mlPart(gram, fm)}</td><td class="num">${grams(gram/3)} <span class="mut">${tstr('г')}</span>${mlPart(gram/3, fm)}</td><td class="mut">${what}</td></tr>`).join('')
-    : `<tr><td colspan="5" class="mut">${tstr('Всё в цели — вносить нечего.')}</td></tr>`;
+  const gfmt = v => v < 0.01 ? ('< ' + (LANG === 'en' ? '0.01' : '0,01')) : (v < 1 ? f2(v) : f1(v));
+  const mfmt = v => v < 0.1 ? f2(v) : (v < 10 ? f1(v) : f0(v));
 
-  const deficit = [
-    ['NO₃', f.no3, g.no3], ['PO₄', f.po4, g.po4], ['K', f.k, g.k],
-    ['Ca', f.ca, g.ca], ['Mg', f.mg, g.mg], ['Fe', f.fe, g.fe]
-  ].map(([n, cur, tgt]) => {
-    const d = tgt - cur;
-    const cls = d > 0.001 ? 'badge-warn' : (d < -0.001 ? 'mut' : 'badge-ok');
-    return `<span style="margin-right:14px;white-space:nowrap">${n}: <b class="${cls}">${d > 0.001 ? '+' : ''}${f1(d)}</b></span>`;
+  const saltRows = rec.salts.map(s => `<tr>
+      <td><b>${TX(s.name)}</b></td>
+      <td class="mut">${s.formula}</td>
+      <td class="num">${gfmt(s.grams)} <span class="mut">${L('г', 'g')}</span> / ${mfmt(s.ml)} <span class="mut">${L('мл', 'ml')}</span>${s.bottles > 1 ? ` <span class="badge-warn">×${s.bottles}</span>` : ''}</td>
+      <td class="num">${gfmt(s.grams / 3)} <span class="mut">${L('г', 'g')}</span> / ${mfmt(s.ml / 3)} <span class="mut">${L('мл', 'ml')}</span></td>
+      <td class="mut">${addTxt(s)}</td>
+    </tr>`).join('');
+
+  const finKeys = ['ph', 'kh', 'gh', 'no3', 'po4', 'k', 'ca', 'mg', 'fe'];
+  const finRows = finKeys.map(k => {
+    const r = ev.rows.find(x => x.key === k);
+    if (!r) return '';
+    if (k === 'ph') {
+      return `<tr><td>${TX(r.label)}</td><td class="num">${fmtD(r.value, r.dec)}</td><td class="mut">${L('не солями', 'not by salts')}</td><td class="mut">${r.goal != null ? fmtD(r.goal, r.dec) : '—'}</td><td><span class="st none">CO₂</span></td></tr>`;
+    }
+    const after = rec.final[k];
+    const tol = (AquaCore.META[k] && AquaCore.META[k].tol) || 0;
+    const ok = (after != null && r.goal != null) ? after >= r.goal - tol : null;
+    return `<tr><td>${TX(r.label)}</td><td class="num">${fmtD(r.value, r.dec)}</td><td class="num"><b>${fmtD(after, r.dec)}</b></td><td class="mut">${r.goal != null ? fmtD(r.goal, r.dec) : '—'}</td><td>${ok == null ? '' : `<span class="st ${ok ? 'ok' : 'warn'}">${ok ? L('цель', 'target') : L('недобор', 'short')}</span>`}</td></tr>`;
   }).join('');
 
-  const kCls = r.finalK > r.TGT.k + 0.01 ? 'badge-warn' : 'badge-ok';
-  const caCls = r.finalCa > r.TGT.ca + 0.01 ? 'badge-warn' : 'badge-ok';
-  const nh3Cls = r.nh3Mass > 0.05 ? 'badge-warn' : 'badge-ok';
-  const ammoniaRows = r.mUrea > 0.001 ? `
-        <tr><td>NH₃ (${LANG==='en'?'free':'свободный'})</td><td class="num"><b class="${nh3Cls}">+${f2(r.nh3Mass)}</b></td><td class="num">—</td><td class="num">—</td></tr>
-        <tr><td>NH₄⁺</td><td class="num">+${f2(r.nh4Mass)}</td><td class="num">—</td><td class="num">—</td></tr>
-        <tr><td>NH₃ + NH₄ (TAN)</td><td class="num">+${f2(r.tanUrea)} <small>N</small></td><td class="num">—</td><td class="num">—</td></tr>` : '';
-  const sideHtml = `<div style="overflow-x:auto;margin-top:12px">
-    <table class="tbl">
-      <thead><tr><th>${LANG==='en'?'Side substance':'Побочное вещество'}</th><th>${LANG==='en'?'Adds, mg/l':'Внесёт, мг/л'}</th><th>${LANG==='en'?'Final':'Итог'}</th><th>${LANG==='en'?'Target':'Цель'}</th></tr></thead>
-      <tbody>
-        <tr><td>K</td><td class="num">+${f1(r.kSide)}</td><td class="num"><b class="${kCls}">${f1(r.finalK)}</b></td><td class="num">${f1(r.TGT.k)}</td></tr>
-        <tr><td>Ca</td><td class="num">+${f1(r.caSide)}</td><td class="num"><b class="${caCls}">${f1(r.finalCa)}</b></td><td class="num">${f1(r.TGT.ca)}</td></tr>
-        <tr><td>SO₄</td><td class="num">+${f1(r.so4)}</td><td class="num">—</td><td class="num">—</td></tr>
-        ${ammoniaRows}
-      </tbody>
-    </table></div>`;
-  const sideNote = (r.kSide < 0.01 && r.caSide < 0.01 && r.so4 < 0.01 && r.mUrea <= 0.001)
-    ? (r.mCSM > 0.001
-        ? `<p class="note">${LANG==='en' ? 'Micro/iron also adds other trace elements (B, Mn, Mo, etc.) — not calculated.' : 'Микро/железо дополнительно даёт другие микроэлементы (B, Mn, Mo и др.) — не рассчитываются.'}</p>`
-        : `<p class="note">${LANG==='en' ? 'No side substances — this recipe adds only the target element.' : 'Побочных веществ нет — рецепт даёт только целевой элемент.'}</p>`)
-    : '';
-  const ammoniaNote = r.mUrea > 0.001
-    ? `<p class="note">${LANG==='en'
-        ? `Urea hydrolyses to NH₃/NH₄⁺. At pH ${f1(r.phU)} and ${f0(r.tempC)} °C free NH₃ is ${f2(r.fNH3*100)} % of TAN, the rest is NH₄⁺. Nitrification then converts them to NO₃.${r.nh3Mass > 0.05 ? ' Free NH₃ is above 0.05 mg/l — dangerous; add urea in small portions.' : ''}`
-        : `Мочевина при гидролизе даёт NH₃/NH₄⁺. При pH ${f1(r.phU)} и ${f0(r.tempC)} °C на свободный NH₃ приходится ${f2(r.fNH3*100)} % TAN, остальное — NH₄⁺. Дальше нитрификация переводит их в NO₃.${r.nh3Mass > 0.05 ? ' Свободный NH₃ выше 0,05 мг/л — опасно; вносите мочевину малыми порциями.' : ''}`}</p>`
-    : '';
-  const overK = r.finalK > r.TGT.k + 0.01, overCa = r.finalCa > r.TGT.ca + 0.01;
-  const overNote = (overK || overCa)
-    ? `<p class="note">${LANG==='en'
-        ? (overK && overCa ? 'K and Ca are above target — fertilizers cannot lower them; a water change is the way.' : overK ? 'K is above target — fertilizers cannot lower it; a water change is the way.' : 'Ca is above target — fertilizers cannot lower it; a water change is the way.')
-        : (overK && overCa ? 'K и Ca выше цели — удобрениями не снизить, нужна подмена.' : overK ? 'K выше цели — удобрениями не снизить, нужна подмена.' : 'Ca выше цели — удобрениями не снизить, нужна подмена.')}</p>`
-    : '';
+  const warnText = w => {
+    const r = ev.rows.find(x => x.key === w.key) || {};
+    const lab = r.label ? TX(r.label) : (w.key || '');
+    const dec = r.dec == null ? 1 : r.dec;
+    if (w.code === 'no_test') return `${L('Нет теста', 'No test')}: ${lab} — ${L('доза не рассчитана', 'dose not calculated')}.`;
+    if (w.code === 'goal_out') return `${L('Цель', 'Target')} ${lab} = ${fmtD(w.value, dec)} ${L('вне нормы', 'outside range')} ${fmtD(w.norm[0], dec)}–${fmtD(w.norm[1], dec)}.`;
+    if (w.code === 'above_goal') return `${lab} ${L('уже выше цели', 'is already above target')} (${fmtD(w.value, dec)} > ${fmtD(w.goal, dec)}) — ${L('снизить можно только подменой', 'only a water change lowers it')}.`;
+    if (w.code === 'kh_down') return `${L('KH выше цели', 'KH is above target')} — ${L('снизить можно только подменой или осмосом', 'only a water change or RO lowers it')}.`;
+    if (w.code === 'gh_down') return `${L('GH выше цели', 'GH is above target')} — ${L('снизить можно только подменой или осмосом', 'only a water change or RO lowers it')}.`;
+    if (w.code === 'gh_conflict') return `${L('GH после дозы', 'GH after dosing')} ${fmtD(w.value, 1)} ${L('не совпадает с целью', 'does not match target')} ${fmtD(w.goal, 1)}: ${L('цели Ca и Mg задают другой GH', 'the Ca and Mg targets define another GH')}.`;
+    if (w.code === 'ph_goal_out') return `${L('Цель pH', 'pH target')} ${fmtD(w.value, 2)} ${L('вне рабочего диапазона 6,0–8,5', 'outside the working range 6.0–8.5')}.`;
+    if (w.code === 'ph_co2_high') return `${L('Для этой цели pH нужен CO₂', 'This pH target needs CO₂')} ${f1(w.value)} ${tstr('мг/л')} — ${L('опасно для рыбы', 'dangerous for fish')}.`;
+    if (w.code === 'ph_co2_low') return `${L('Для этой цели pH нужен CO₂', 'This pH target needs CO₂')} ${f1(w.value)} ${tstr('мг/л')} — ${L('мало для растений', 'too low for plants')}.`;
+    if (w.code === 'urea_tan') return `${L('Мочевина даст', 'Urea will give')} TAN +${f2(w.value)} ${tstr('мг/л')}, ${L('свободного NH₃', 'free NH₃')} ${f3(w.nh3)} ${tstr('мг/л')}.`;
+    if (w.code === 'urea_nh3') return `${L('Мочевина даст', 'Urea will give')} ${f3(w.value)} ${tstr('мг/л')} ${L('свободного NH₃', 'free NH₃')} — ${L('вносите дробно', 'add in portions')}.`;
+    if (w.code === 'bottles') return `${L('Навеска больше флакона', 'Batch exceeds one bottle')}: ${w.bottles} × ${w.key}.`;
+    return '';
+  };
+  const warns = rec.warnings.map(w => `<li>${warnText(w)}</li>`).filter(Boolean).join('');
 
-  /* постоянный справочник концентратов: не зависит от текущего расчёта */
-  const stockRows = STOCK.map(s => `<tr>
-      <td><b>${tstr(s.name)}</b></td>
-      <td class="mut">${s.formula}</td>
-      <td class="num">${f1(0.5)} ${LANG==='en'?'l':'л'} / ${f0(s.g)} ${LANG==='en'?'g':'г'}</td>
-      <td class="num">${f0(s.g/0.5)} ${LANG==='en'?'g/l':'г/л'}</td>
-    </tr>`).join('');
-  const stockHtml = `<section class="card">
-      <h2 class="ct">${LANG==='en'?'Stock recipes':'Рецепты концентратов'} <span class="hint">${LANG==='en'?'0.5 l · fixed':'0,5 л · постоянные'}</span></h2>
-      <p class="note" style="margin-top:0">${LANG==='en'
-        ? 'Amounts are per 0.5 l of ready solution. The ml doses are in the table above. All recipes are fixed and do not depend on the current calculation.'
-        : 'Навеска — на 0,5 л готового раствора. Дозы в мл — в таблице выше. Все рецепты постоянные и не зависят от текущего расчёта.'}</p>
-      <div style="overflow-x:auto"><table class="tbl">
-        <thead><tr><th>${LANG==='en'?'Salt':'Соль'}</th><th>${LANG==='en'?'Formula':'Формула'}</th><th>${LANG==='en'?'Per 0.5 l':'На 0,5 л'}</th><th>${LANG==='en'?'Concentration':'Концентрация'}</th></tr></thead>
-        <tbody>${stockRows}</tbody>
-      </table></div>
-      <p class="note">${LANG==='en'
-        ? 'Keep each salt in its own bottle (0.5–0.75 l): never mix phosphate with calcium, magnesium or micro. Use distilled or RO water; macro solutions keep for several months, iron and micro for about a month, urea for 1–2 weeks. Stir until fully dissolved, shake before dosing. Garden nitrate is 98–99 %, add 1–2 % to the mass.'
-        : 'Каждую соль — в отдельной бутылке (0,5–0,75 л): фосфат нельзя смешивать с кальцием, магнием и микро. Готовить на дистиллированной или осмотической воде; макро-растворы хранятся несколько месяцев, железо и микро — около месяца, мочевина — 1–2 недели. Размешивать до полного растворения, перед дозой взбалтывать. Садовая селитра 98–99 %, добавьте 1–2 % к массе.'}</p>
-    </section>`;
+  const goalsSet = ['ph', 'kh', 'gh', 'no3', 'po4', 'k', 'ca', 'mg', 'fe'].filter(k => M.fertRes.goal[k] != null).length;
+  const missLabels = rec.missing.map(k => { const r = ev.rows.find(x => x.key === k); return r ? TX(r.label) : k; });
+  const emptyReason = rec.missing.length
+    ? `${L('Не хватает тестов', 'Missing tests')}: ${missLabels.join(', ')}.`
+    : (goalsSet === 0 ? L('Цели не заданы — заполните колонку «Цель».', 'No targets set — fill in the Target column.') : L('Всё уже на цели — вносить нечего.', 'Everything is on target — nothing to add.'));
 
-  $('#secUdo').innerHTML = `
+  const phCard = rec.ph ? `<section class="card">
+      <h2 class="ct">${L('pH и CO₂', 'pH and CO₂')}</h2>
+      <p class="note" style="margin-top:0">${L('Солями pH не меняется. Чтобы держать', 'Salts do not change pH. To hold')} pH ${fmtD(rec.ph.goal, 2)} ${L('при KH', 'at KH')} ${fmtD(rec.ph.kh, 1)}, ${L('CO₂ должен быть', 'CO₂ should be')} ≈ ${f1(rec.ph.co2Target)} ${tstr('мг/л')}${rec.ph.co2Now != null ? ` (${L('сейчас', 'now')} ${f1(rec.ph.co2Now)})` : ''}.</p>
+    </section>` : '';
+
+  const body = rec.empty ? `<section class="card"><div class="emptybox"><b>${L('Рецепт не нужен', 'No recipe needed')}</b><p>${emptyReason}</p></div></section>` : `
     <section class="card">
-      <h2 class="ct">${tstr('Рецепт')} <span class="hint">${LANG==='en' ? `for ${f0(M.waterV)} l` : `на ${f0(M.waterV)} л`}</span></h2>
-      <p class="note" style="margin-top:0">${deficit}</p>
-      <p class="note">${LANG==='en' ? `The doses in the table are grams of dry salt / ml of stock solution. Fixed stock recipes are below.` : `В таблице — граммы сухой соли / мл готового раствора. Ниже — постоянные рецепты концентратов.`}</p>
-      <div style="overflow-x:auto">
-      <table class="tbl">
-        <thead><tr><th>${tstr('В магазине')}</th><th>${tstr('Формула')}</th><th>${tstr('Разовая правка')}, ${LANG==='en'?'g / ml':'г / мл'}</th><th>${tstr('На приём (3 раза в неделю)')}, ${LANG==='en'?'g / ml':'г / мл'}</th><th>${tstr('Что даёт')}</th></tr></thead>
-        <tbody>${rows}</tbody>
+      <h2 class="ct">${L('Рецепт', 'Recipe')} <span class="hint">${L('на', 'for')} ${f0(rec.volume)} ${L('л', 'l')} · ${TX(prof.name)}</span></h2>
+      <p class="note" style="margin-top:0">${L('Граммы — сухая соль. Миллилитры — готовый концентрат 0,5 л. Вторая колонка — та же доза, растянутая на неделю в три приёма.', 'Grams are dry salt. Millilitres are the 0.5 l stock solution. The second column is the same dose spread over a week in three parts.')}</p>
+      <div style="overflow-x:auto"><table class="tbl recipe">
+        <thead><tr><th>${L('Соль', 'Salt')}</th><th>${L('Формула', 'Formula')}</th><th>${L('Разово', 'One-off')}</th><th>${L('За неделю, 3 приёма', 'Per week, 3 doses')}</th><th>${L('Что даёт', 'Provides')}</th></tr></thead>
+        <tbody>${saltRows || `<tr><td colspan="5" class="mut">${L('Всё в цели — вносить нечего.', 'Everything is on target — nothing to add.')}</td></tr>`}</tbody>
       </table></div>
-      ${sideHtml}${sideNote}${overNote}${ammoniaNote}
-      <p class="note">${LANG==='en' ? `The nitrates take only up to the potassium and calcium targets (${f0(g.k)} and ${f0(g.ca)} mg/l); any remaining nitrogen goes in as urea. If you do not want to raise calcium, supply all nitrogen as urea.` : `Селитры берут только до целей по калию и кальцию (${f0(g.k)} и ${f0(g.ca)} мг/л); остаток азота уходит мочевиной. Не хотите поднимать кальций — весь азот дайте мочевиной.`}</p>
     </section>
-    ${stockHtml}`;
+    <section class="card">
+      <h2 class="ct">${L('После дозы', 'After dosing')}</h2>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>${L('Параметр', 'Parameter')}</th><th>${L('Сейчас', 'Now')}</th><th>${L('Станет', 'Becomes')}</th><th>${L('Цель', 'Target')}</th><th></th></tr></thead>
+        <tbody>${finRows}</tbody>
+      </table></div>
+      ${warns ? `<ul class="warns">${warns}</ul>` : ''}
+    </section>
+    ${phCard}`;
+
+  const stock = AquaCore.SALTS.map(s => `<tr><td><b>${TX(s.name)}</b></td><td class="mut">${s.formula}</td><td class="num">${f0(s.stockG)} ${L('г', 'g')} / ${f1(s.stockL)} ${L('л', 'l')}</td><td class="num">${f0(s.stockG / s.stockL)} ${L('г/л', 'g/l')}</td></tr>`).join('');
+
+  $('#secFert').insertAdjacentHTML('beforeend', `
+    ${body}
+    <section class="card">
+      <h2 class="ct">${L('Концентраты', 'Stock solutions')} <span class="hint">${L('0,5 л · постоянные', '0.5 l · fixed')}</span></h2>
+      <p class="note" style="margin-top:0">${L('Каждую соль — в отдельной бутылке: фосфат нельзя смешивать с кальцием, магнием и микро. Готовить на дистиллированной или осмотической воде. Макро — несколько месяцев, железо и микро — около месяца, мочевина — 1–2 недели, сода — растворять перед внесением.', 'Keep each salt in its own bottle: never mix phosphate with calcium, magnesium or micro. Use distilled or RO water. Macro keeps for months, iron and micro about a month, urea 1–2 weeks; dissolve baking soda just before use.')}</p>
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>${L('Соль', 'Salt')}</th><th>${L('Формула', 'Formula')}</th><th>${L('Навеска', 'Batch')}</th><th>${L('Концентрация', 'Concentration')}</th></tr></thead>
+        <tbody>${stock}</tbody>
+      </table></div>
+    </section>`);
+
+  updateUdoStatus(ev);
 }
 
 function renderNow(M){
@@ -3572,27 +3481,26 @@ function renderNow(M){
     sub = LANG==='en'
       ? `Load ${Math.round(M.bioRes.load*100)} % · fish up to ${f1(M.bioRes.fishCap/1000)} kg`
       : `Загрузка ${Math.round(M.bioRes.load*100)} % · рыба до ${f1(M.bioRes.fishCap/1000)} кг`;
-  } else if(sec === 'fert' || sec === 'udo'){
-    const r = M.fertRes;
-    if(sec === 'fert'){
-      big = LANG==='en' ? `${r.okN} of ${r.knownN} in range` : `${r.okN} из ${r.knownN} в норме`;
-      sub = LANG==='en'
-        ? (r.okN === r.knownN ? 'All known parameters are on target' : `${r.knownN - r.okN} out of range — see the recommendations`)
-        : (r.okN === r.knownN ? 'Все известные показатели в эталоне' : `${r.knownN - r.okN} вне нормы — смотрите рекомендации`);
-    } else {
-      const nSalts = [r.mKNO3, r.mCaNO3, r.mUrea, r.mKH2PO4, r.mK2SO4, r.mMgSO4, r.mCSM].filter(v => v > 0.001).length;
-      big = LANG==='en'
-        ? (nSalts ? `${nSalts} ${nSalts===1?'salt':'salts'} in the recipe` : 'Nothing to add')
-        : (nSalts ? `${nSalts} ${pl(nSalts,'соль','соли','солей')} в рецепте` : 'Ничего вносить не нужно');
-      const d = [];
-      if(r.dN > 0.01) d.push(`NO₃ +${f1(r.dN)}`);
-      if(r.dP > 0.01) d.push(`PO₄ +${f1(r.dP)}`);
-      sub = d.length ? d.join(' · ') + (LANG==='en' ? ' to target' : ' до цели') : (LANG==='en' ? 'Everything is on target' : 'Всё на цели');
-    }
-    const bad = r.TPAR.filter(v => v[1] != null && (v[1] < v[2] || v[1] > v[3]));
+  } else if(sec === 'fert'){
+    const ev = M.fertRes.ev;
+    const tolOf = r => (AquaCore.META[r.key] && AquaCore.META[r.key].tol) || 0;
+    const goalRows = ev.rows.filter(r => r.goal != null && r.value != null);
+    const hit = goalRows.filter(r => Math.abs(r.value - r.goal) <= tolOf(r) + 1e-9).length;
+    big = ev.counts.known <= 1 ? L('нет тестов', 'no tests')
+      : (goalRows.length
+        ? `${hit} ${L('из', 'of')} ${goalRows.length} ${plural(goalRows.length, 'цели', 'целей', 'целей', 'target', 'targets')}`
+        : `${ev.counts.ok} ${L('из', 'of')} ${ev.counts.known} ${L('в норме', 'in range')}`);
+    sub = ev.counts.known <= 1 ? L('заполните поля', 'fill in the fields')
+      : `${ev.counts.ok} ${L('из', 'of')} ${ev.counts.known} ${L('в норме', 'in range')}`;
+    const bad = ev.rows.filter(v => {
+      if (v.value == null) return false;
+      if (v.goal != null) return Math.abs(v.value - v.goal) > tolOf(v) + 1e-9;
+      return v.status !== 'ok';
+    });
     dots = bad.length
-      ? bad.slice(0,6).map(([n,v,lo,hi]) => `<span class="dot ${v < lo ? 'warn' : 'bad'}"><i></i>${tstr(n.replace(' (расчёт)',''))}</span>`).join('')
-      : `<span class="dot ok"><i></i>${LANG==='en' ? 'all in range' : 'всё в норме'}</span>`;
+      ? bad.slice(0, 6).map(v => `<span class="dot ${v.severity === 'bad' ? 'bad' : 'warn'}"><i></i>${TX(v.label)}</span>`).join('')
+      : `<span class="dot ok"><i></i>${L('всё в норме', 'all in range')}</span>`;
+    if (ev.counts.known <= 1) dots = '';
   }
   $('#cardNow').innerHTML = `<div class="nk">${sec === 'tank' ? tstr('Объём') : t("now_lbl")}</div><div class="big">${big}</div>${sub ? `<div class="sub">${sub}</div>` : ''}${dots ? `<div class="dots">${dots}</div>` : ''}`;
 }
@@ -3600,7 +3508,6 @@ function renderNow(M){
 function setSection(sec){
   state.section = sec;
   $('#segs').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.s===sec));
-  /* на узком экране прокручиваем ленту разделов к активной вкладке */
   const segsEl = $('#segs');
   const segOn = segsEl.querySelector('button.on');
   if(segOn && segsEl.scrollWidth > segsEl.clientWidth + 1){
@@ -3614,37 +3521,10 @@ function setSection(sec){
   $('#secGear').classList.toggle('hide', sec!=='gear');
   $('#secBio').classList.toggle('hide', sec!=='bio');
   $('#secFert').classList.toggle('hide', sec!=='fert');
-  $('#secUdo').classList.toggle('hide', sec!=='udo');
-  /* ввод стоит перед результатом на «Тестах» и «Удо» */
-  const udoBox = $('#udoInputs');
-  const mainEl = document.querySelector('.main');
-  const onIn = (sec === 'fert' || sec === 'udo');
-  if(sec === 'fert'){
-    const ref = $('#secFert');
-    if(udoBox.nextElementSibling !== ref) mainEl.insertBefore(udoBox, ref);
-  } else if(sec === 'udo'){
-    const ref = $('#secUdo');
-    if(udoBox.nextElementSibling !== ref) mainEl.insertBefore(udoBox, ref);
-  }
-  udoBox.classList.toggle('hide', !onIn);
-  udoBox.classList.toggle('three', onIn);
-  udoBox.classList.toggle('udo', sec === 'udo');
-  if(onIn){
-    const col1 = $('#udoCol1'), col2 = $('#udoCol2');
-    ['cardWater','cardNP','cardMin'].forEach(id => {
-      const el = document.getElementById(id);
-      if(el && el.parentElement !== col1) col1.appendChild(el);
-    });
-    const goalEl = document.getElementById('cardGoal');
-    if(goalEl && goalEl.parentElement !== col2) col2.appendChild(goalEl);
-    udoBox.querySelectorAll('.f-extra').forEach(el => el.classList.toggle('hide', sec !== 'fert'));
-  }
-  $('#cardWater').classList.toggle('hide', sec !== 'fert');
-  $('#cardNP').classList.toggle('hide', !onIn);
-  $('#cardMin').classList.toggle('hide', !onIn);
-  $('#cardGoal').classList.toggle('hide', sec !== 'udo');
-  $('#cardTank').classList.toggle('hide', sec==='fert');
-  $('#kpis').classList.toggle('hide', sec==='fert' || sec==='udo');
+  const onIn = (sec === 'fert');
+  $('#udoInputs').classList.toggle('hide', !onIn);
+  $('#cardTank').classList.toggle('hide', onIn);
+  $('#kpis').classList.toggle('hide', onIn);
   $('#sideSpec').classList.toggle('hide', sec!=='stand');
   $('#cardStand').classList.toggle('hide', sec!=='stand');
   $('#soilField').classList.toggle('hide', sec === 'stand');
@@ -3654,12 +3534,12 @@ function setSection(sec){
   if(MODEL){ renderKpis(MODEL); renderNow(MODEL); }
 }
 
-const SAVE_IDS = ['inL','inD','inH','inSoil','inHS','inBoard','inThick','inEdgeBody','inEdgeDoor','inBuild','inModDoors','inSheet','inMedia','inMV','inTemp','inProt','inRate','inFish',
+const SAVE_IDS = ['inL','inD','inH','inSoil','inHS','inBoard','inThick','inEdgeBody','inEdgeDoor','inBuild','inModDoors','inComp','inSheet','inMedia','inMV','inTemp','inProt','inRate','inFish',
   'inNO3','inPO4','inK','inCa','inMg','inFe','inPH','inKH','inGH','inNH3','inNO2','inCu','inTDS','inEC',
-  'inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe','inDoors'];
+  'inGPH','inGKH','inGGH','inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe','inDoors'];
 function saveState(){
   try{
-    const o = { __color: state.color };
+    const o = { __color: state.color, __profile: state.profile };
     SAVE_IDS.forEach(id => { const el = document.getElementById(id); if(el) o[id] = el.value; });
     localStorage.setItem('aqua-calc', JSON.stringify(o));
   }catch(e){}
@@ -3674,7 +3554,23 @@ function loadState(){
       state.color = o.__color;
       document.querySelectorAll('#colors .sw').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.c === state.color)));
     }
+    if(o.__profile === 'hi' || o.__profile === 'low' || o.__profile === 'fish') state.profile = o.__profile;
   }catch(e){}
+}
+
+function fillSample(){
+  const S = { inPH: 6.8, inKH: 4, inGH: 7, inTDS: 180, inEC: 300, inNH3: 0.02, inNO2: 0, inNO3: 5, inPO4: 1, inK: 12, inCa: 30, inMg: 8, inFe: 0.05, inCu: 0 };
+  Object.keys(S).forEach(id => { const el = document.getElementById(id); if(el) el.value = String(S[id]); });
+  const g = AquaCore.PROFILES[state.profile || 'hi'].goals;
+  const map = { ph: 'inGPH', kh: 'inGKH', gh: 'inGGH', no3: 'inGNO3', po4: 'inGPO4', k: 'inGK', ca: 'inGCa', mg: 'inGMg', fe: 'inGFe' };
+  Object.keys(map).forEach(k => { const el = document.getElementById(map[k]); if(el) el.value = String(g[k]); });
+  renderAll();
+}
+function clearTests(){
+  ['inPH','inKH','inGH','inTDS','inEC','inNH3','inNO2','inNO3','inPO4','inK','inCa','inMg','inFe','inCu'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  renderAll();
 }
 
 function renderAll(){
@@ -3692,7 +3588,7 @@ function renderAll(){
   const buildType = $('#inBuild').value === 'modular' ? 'modular' : 'solid';
   const modDoors = clamp(+$('#inModDoors').value || 1, 1, 3);
   const backWorks = true;
-  const compTop = true;                      /* крышка всегда считается склеенной */
+  const compTop = $('#inComp').value === '1';
   const [SW, SH] = $('#inSheet').value.split(',').map(Number);
   const bio = {
     media: $('#inMedia').value,
@@ -3705,16 +3601,20 @@ function renderAll(){
   const numIn = id => { const el = document.getElementById(id); return (el && el.value !== '') ? +el.value : null; };
   const fert = {
     no3: numIn('inNO3'), po4: numIn('inPO4'), k: numIn('inK'), ca: numIn('inCa'), mg: numIn('inMg'), fe: numIn('inFe'),
-    ph: numIn('inPH'), kh: numIn('inKH'), gh: numIn('inGH'), nh3: numIn('inNH3'), no2: numIn('inNO2'),
+    ph: numIn('inPH'), kh: numIn('inKH'), gh: numIn('inGH'), tan: numIn('inNH3'), no2: numIn('inNO2'),
     cu: numIn('inCu'), tds: numIn('inTDS'), ec: numIn('inEC')
   };
+  const gIn = (id, max) => { const el = document.getElementById(id); if(!el || el.value === '') return null; return clamp(+el.value, 0, max); };
   const goal = {
-    no3: clamp(+$('#inGNO3').value || 0, 0, 200),
-    po4: clamp(+$('#inGPO4').value || 0, 0, 50),
-    k:   clamp(+$('#inGK').value || 0, 0, 200),
-    ca:  clamp(+$('#inGCa').value || 0, 0, 200),
-    mg:  clamp(+$('#inGMg').value || 0, 0, 100),
-    fe:  clamp(+$('#inGFe').value || 0, 0, 2)
+    ph:  (() => { const v = gIn('inGPH', 10); return v == null ? null : clamp(v, 4, 10); })(),
+    kh:  gIn('inGKH', 30),
+    gh:  gIn('inGGH', 40),
+    no3: gIn('inGNO3', 200),
+    po4: gIn('inGPO4', 50),
+    k:   gIn('inGK', 200),
+    ca:  gIn('inGCa', 200),
+    mg:  gIn('inGMg', 100),
+    fe:  gIn('inGFe', 2)
   };
   const selD = $('#inDoors');
   const doorWant = +selD.value || 0;
@@ -3757,12 +3657,7 @@ function renderAll(){
       if(ok) modChoiceCount++;
     });
   }
-  /* селектор числа дверей нужен только если вариантов больше одного */
-  const doorChoices = MODEL.dMax - MODEL.dMin;
-  const hideDoors = L < 800 || doorChoices <= 0;
-  if(hideDoors) selD.value = '0';
-  $('#doorField').classList.toggle('hide', hideDoors);
-  $('#doorField').style.display = hideDoors ? 'none' : '';
+  $('#doorField').classList.toggle('hide', L < 800);
   $('#edgeField').classList.toggle('hide', boardKey !== 'ldsp');
   $('#edgeField').style.display = boardKey === 'ldsp' ? '' : 'none';
   $('#edgeDoorField').classList.toggle('hide', boardKey !== 'ldsp');
@@ -3807,6 +3702,7 @@ $('#presets').querySelectorAll('button').forEach(b=>b.onclick=()=>{
 });
 
 /* ---------- ввод ---------- */
+buildUdoGrid();
 let tmr=null;
 ['inL','inD','inH'].forEach(id=>{
   document.getElementById(id).addEventListener('input', ()=>{
@@ -3822,8 +3718,9 @@ $('#inEdgeBody').addEventListener('change', renderAll);
 $('#inEdgeDoor').addEventListener('change', renderAll);
 $('#inBuild').addEventListener('change', renderAll);
 $('#inModDoors').addEventListener('change', renderAll);
+$('#inComp').addEventListener('change', renderAll);
 $('#inDoors').addEventListener('change', renderAll);
-['inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe'].forEach(id=>{
+['inGPH','inGKH','inGGH','inGNO3','inGPO4','inGK','inGCa','inGMg','inGFe'].forEach(id=>{
   document.getElementById(id).addEventListener('input', ()=>{ clearTimeout(tmr); tmr = setTimeout(renderAll, 130); });
 });
 ['inNO3','inPO4','inK','inCa','inMg','inFe','inPH','inKH','inGH','inNH3','inNO2','inCu','inTDS','inEC'].forEach(id=>{
@@ -3844,7 +3741,9 @@ const hashTab = location.hash.replace('#','');
 if(['tumba','frame','front','side','detail'].includes(hashTab)){
   state.tab = hashTab;
   state.section = 'stand';
-} else if(['tank','stand','gear','bio','fert','udo'].includes(hashTab)){
+} else if(hashTab === 'udo'){
+  state.section = 'fert';
+} else if(['tank','stand','gear','bio','fert'].includes(hashTab)){
   state.section = hashTab;
 }
 
@@ -3873,6 +3772,7 @@ try{
   if(qp.get('edgedoor')) $('#inEdgeDoor').value = qp.get('edgedoor');
   if(qp.get('build')) $('#inBuild').value = qp.get('build');
   if(qp.get('moddoors')) $('#inModDoors').value = qp.get('moddoors');
+  if(qp.get('comp')) $('#inComp').value = qp.get('comp');
   if(qp.get('sheet')) $('#inSheet').value = qp.get('sheet');
   if(qp.get('color')==='black'){ state.color='black'; $('#colors').querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.c==='black'))); }
 }catch(e){}
@@ -3881,7 +3781,16 @@ try {
   const qpL = new URLSearchParams(location.search).get('lang');
   if(qpL === 'en' || qpL === 'ru'){ LANG = qpL; localStorage.setItem('aqua-lang', LANG); }
 } catch(e){}
+['inTemp','inTempW'].forEach(id => {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('change', () => {
+    ['inTemp','inTempW'].forEach(x => { const e2 = document.getElementById(x); if(e2) e2.value = el.value; });
+    renderAll();
+  });
+});
 loadState();
+const _tw = document.getElementById('inTempW'); if(_tw) _tw.value = document.getElementById('inTemp').value;
 applyLang();
 renderAll();
 </script>

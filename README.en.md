@@ -94,27 +94,26 @@ Pick a preset in one click, then change length, depth, height and substrate laye
 
 ## Tests
 
-**Inputs.** Water parameters: pH, KH, GH, NH₃/NH₄, NO₂, NO₃, PO₄, K, Ca, Mg, Fe, Cu, TDS and EC; targets for NO₃, PO₄, K, Ca, Mg and Fe.
+One tab: parameters, targets, recommendations and the recipe. Input is a “Parameters & targets” card with two columns, Actual and Target: pH, KH, GH, TDS, EC, TAN, NO₂, NO₃, PO₄, K, Ca, Mg, Fe, Cu and temperature on the left; pH, KH, GH, NO₃, PO₄, K, Ca, Mg, Fe on the right. An empty field means “no test”.
 
-**Outputs.**
+**Indicators.** A dot next to each parameter: green (in range or within target tolerance), amber (deviation), red (critical). The range and target are in the tooltip; the range is shown next to the name.
 
-- Deviation from the planted-tank reference and threshold-based recommendations.
-- CO₂ from pH and KH.
-- Water changes to the norm and to your target; K and Ca are handled separately even when the general norm is not exceeded.
-- Targets that are then used on the Fertilizers tab.
+**Tolerance.** Test kits are rarely precise, so a target counts as reached within a tolerance: pH ±0.2; KH ±0.5; GH ±1; NO₃ ±2; PO₄ ±0.2; K ±2; Ca ±5; Mg ±2; Fe ±0.02. Within the same limits the recipe does not prescribe a dose.
 
-## Fertilizers
+**Profile.** Three reference sets: planted with CO₂, planted without CO₂, community tank. The switch sits above the card and is saved.
 
-**Inputs.** Current tests and targets. On this tab they are arranged in two columns: “Nitrogen and phosphorus” + “Minerals” on the left, “Targets” on the right; the “Recipe” is full width below them.
+**What to do and water changes.** One action per deviation from the target (or from the range when no target is set), plus Ca : Mg, K : Ca and N : P ratios. “Water changes” gives the share of the volume to the range or target for dissolved substances only; pH and KH are not fixed by changes.
 
-**Outputs.**
+**Recipe.** Below, on the same tab:
 
-- Salt recipe in grams: KNO₃, Ca(NO₃)₂, urea, KH₂PO₄, K₂SO₄, MgSO₄, CSM.
-- Ready-solution doses in ml next to the grams.
-- Fixed stock solutions: 0.5 l; 50 g of macro salts, 40 g K₂SO₄, 5 g micro; 100 / 80 / 10 g/l.
-- Side substances: K, Ca and SO₄; for urea — NH₃, NH₄⁺ and TAN with a pH/temperature split.
-- Potassium and calcium: nitrates are added only up to the target; if K or Ca is already above it, nitrogen goes in as urea and a water change is suggested.
-- Stock shelf life.
+- salts in grams: KNO₃, Ca(NO₃)₂, urea, KH₂PO₄, K₂SO₄, MgSO₄·7H₂O, CaCl₂·2H₂O, NaHCO₃, CSM+B;
+- KH is raised with baking soda: about 3.0 g NaHCO₃ per 100 l per 1 °dKH; lowering requires a water change or RO;
+- GH is raised with a GH booster (CaCl₂ + MgSO₄, 2 : 1) when Ca and Mg targets are not set; if they are set they define GH and any mismatch is reported;
+- pH is not changed by salts: for a pH target the calculator shows the CO₂ needed at the current KH in a “pH and CO₂” card;
+- stock doses (0.5 l) in ml and the number of bottles; “After dosing”: now → becomes → target;
+- warnings: no test, target outside the range, K/Ca/GH above target, batch larger than a bottle, NH₃ from urea, GH conflict with Ca/Mg.
+
+**Logic.** Nitrogen: KNO₃ up to the potassium target → Ca(NO₃)₂ up to the calcium target → the rest as urea. If K or Ca is already above target, no nitrate is used. Calcium with enough nitrogen is covered by CaCl₂. Without a test for an element the dose is not calculated.
 
 ## General principles
 
@@ -122,7 +121,8 @@ Pick a preset in one click, then change length, depth, height and substrate laye
 - **Language.** On first open RU or EN follows the browser/device language; a manual choice with **RU | EN** is remembered. `?lang=ru` or `?lang=en` forces it.
 - **Saving.** Inputs are stored in the browser's `localStorage`.
 - **Mobile layout.** Compact spacing, scrollable tabs, one-column tables and cutting plans, iPhone safe areas.
-- **Connections.** Dimensions and substrate update all tabs; the fish cart updates the filter fields; tests feed the fertilizer targets.
+- **Connections.** Dimensions and substrate update all tabs; the fish cart updates the filter fields; tests and targets feed the fertilizer recipe.
+- **Core.** Pure functions in the `<script id="aqua-core">` block: ranges, evaluation, recipe, water changes. No DOM access, covered by tests.
 
 ## Limitations
 
@@ -132,7 +132,9 @@ Pick a preset in one click, then change length, depth, height and substrate laye
 - Top-50 weights and feeding percentages are guides; clownfish is marine and shown for reference only.
 - Filter specifications are typical datasheet values; real flow depends on media, hose and head height.
 - Stock shelf life depends on water and storage conditions.
-- Ammonia and ammonium from urea are a hydrolysis potential, not a toxicity model.
+- Ranges cover three freshwater profiles; marine tanks are not supported.
+- A pH target is a CO₂ reference, not a salt dose; pH and KH are not fixed by water changes.
+- TAN and free NH₃ from urea are a one-off dose estimate, not hydrolysis kinetics.
 - The 0.55 back-panel and 0.35 composite-top factors are engineering estimates of composite action, not a glued-joint calculation.
 - Internal partitions are not modelled; plants and denitrification are not included.
 
@@ -151,7 +153,7 @@ https://timnurz.github.io/aquarium-stand/?l=1500&d=500&h=600&H=900&soil=50#fert
 - `soil=50` — substrate layer, mm: 0 / 30 / 50 / 70
 - `sheet=2440,1220` — board sheet size
 - `color=black` — black finish
-- after `#` — tab: `tank`, `stand`, `gear`, `bio`, `fert`, `udo`
+- after `#` — tab: `tank`, `stand`, `gear`, `bio`, `fert` (`#udo` opens Tests)
 - stand sub-tabs: `#tumba`, `#frame`, `#front`, `#side`, `#detail`
 - `lang=ru` or `lang=en` — force the language
 
@@ -166,3 +168,13 @@ Personal and commercial use is allowed. A link to the source is appreciated but 
 The source is `aquarium-stand.html`. To publish, run `publish.ps1`; it copies the file to `site/index.html`. Upload the contents of `site/` — `index.html`, `README.md`, `README.en.md`, `screenshot.png` and the planted-aquariums image — to the repository root. GitHub Pages updates automatically after the commit.
 
 For a local check, open `index.html` in a browser.
+
+The current version lives in `site/index.html`. If you publish through `publish.ps1`, sync `aquarium-stand.html` first, otherwise the script will overwrite the site with an older version.
+
+Core tests:
+
+```bash
+node --test --test-isolation=none tests/core.test.mjs
+```
+
+`--test-isolation=none` keeps the tests in one process where child processes are not allowed.
