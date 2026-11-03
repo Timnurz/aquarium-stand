@@ -28,6 +28,8 @@ body{
   font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   -webkit-font-smoothing:antialiased;
 }
+/* no accidental browser italics from em/i/address/cite */
+em,i,address,cite,dfn,var,blockquote{font-style:normal}
 .wrap{max-width:1560px;margin:0 auto;padding:22px 26px 72px}
 
 /* ---------- шапка ---------- */
@@ -1158,7 +1160,7 @@ const EN_MAP = {
   'Дверца':'Door','Накладка стыка крышки':'Top splice plate',
   'стойки стоят на нём':'uprights stand on it','сдвоенная 36 мм':'double 36 mm',
   'вкладная, −36 от дна':'inset, −36 from the bottom','из частей':'in parts','в каркасе':'inside the frame',
-  'на полкодержателях':'on shelf pins','на конфирматах/шкантах в торец':'fixed on confirmats/dowels','снизу, на клей':'underneath, glued',
+  'левое':'left','правое':'right','среднее':'middle','одно':'single','на полкодержателях':'on shelf pins','Сводка присадок':'Drilling summary','Торец':'End','Пласть':'Face','Кол-во':'Qty','на 1 деталь':'per part','конфирмат':'confirmat','шкант':'dowel','чашка Ø35':'Ø35 cup','полкодержатель':'shelf pin','под стойки':'under uprights','стороны':'sides','на конфирматах/шкантах в торец':'fixed on confirmats/dowels','снизу, на клей':'underneath, glued',
   'крышка накладная':'overlay top','крышка вкладная':'inset top','боковина':'side panel','стойка':'upright',
   'дно':'bottom','задняя стенка':'back panel','полка':'shelf',
   'Корпус':'Carcass','Опоры':'Feet','Просвет':'Clearance','На опору':'Per foot','Размеры':'Dimensions',
@@ -1463,8 +1465,11 @@ function build(L, D, Ht, H, SW, SH, bio, fert, goal, doorWant, soilD, boardKey, 
       const outerL = modules.length === 1 || mi === 0;
       const outerR = modules.length === 1 || mi === modules.length-1;
       const bottomEdge = outerL && outerR ? 'front_lr' : (outerL ? 'front_l' : (outerR ? 'front_r' : 'front'));
+      const bottomNote = eB > 0 ? (outerL && outerR ? (LANG==='en' ? 'single' : 'одно')
+        : (outerL ? (LANG==='en' ? 'left' : 'левое')
+          : (outerR ? (LANG==='en' ? 'right' : 'правое') : (LANG==='en' ? 'middle' : 'среднее')))) : '';
       add('Боковина', Hu, C, 2, 'side', (LANG==='en' ? `module ${mi+1}` : `модуль ${mi+1}`), 'front');
-      add('Дно', m.w, C, 1, 'bottom', (LANG==='en' ? `module ${mi+1}` : `модуль ${mi+1}`), bottomEdge);
+      add('Дно', m.w, C, 1, 'bottom', bottomNote, bottomEdge);
       add('Задняя стенка', m.w-2*T, Hu, 1, 'back', '', 'none');
       const mInner = m.w - 2*T;
       const mK = mInner > useL ? Math.ceil(mInner/useL) : 1;
@@ -2408,13 +2413,67 @@ function drillCard(p,M){
   }
   return `<div style="width:100%;margin:0 0 26px">
     <div style="font:700 15px/1.2 inherit;color:var(--tx);margin-bottom:3px">${p.id}. ${tstr(p.name)}</div>
-    <div style="font:400 12.5px/1.3 inherit;color:var(--tx3);margin-bottom:6px">${p.qty} ${pcs} · ${p.edge ? (LANG==='en'?'with edge':'с кромкой') : (LANG==='en'?'finished size':'чистовой размер')} ${f0(p.w)} × ${f0(p.h)}${p.edge ? ' · ' + tstr('Кромка') + ' ' + f1(p.edge) + (edgeSides(p.edgeMode)>1?' × '+edgeSides(p.edgeMode):'') : ''}</div>
+    <div style="font:400 12.5px/1.3 inherit;color:var(--tx3);margin-bottom:6px">${p.qty} ${pcs}${p.note ? ' · ' + tstr(p.note) : ''} · ${p.edge ? (LANG==='en'?'with edge':'с кромкой') : (LANG==='en'?'finished size':'чистовой размер')} ${f0(p.w)} × ${f0(p.h)}${p.edge ? ' · ' + tstr('Кромка') + ' ' + f1(p.edge) + (edgeSides(p.edgeMode)>1?' × '+edgeSides(p.edgeMode):'') : ''}</div>
     <svg viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg">${out}</svg>
   </div>`;
 }
 
 function drillPartsHtml(M){
   return `<div style="display:flex;flex-direction:column;gap:0;padding:10px 2px 0">${M.parts.map(p=>drillCard(p,M)).join('')}</div>`;
+}
+
+function drillSummaryHtml(M){
+  const seqCount = L => {
+    let c=0, d=0;
+    for(let x=32; x<=L/2; x+=352){ c+=2; d+=2; }
+    return {c,d};
+  };
+  const parts = M.uprights.filter(u=>u.kind!=='side').length;
+  const rows = M.parts.map(p=>{
+    const hh=seqCount(p.h), ww=seqCount(p.w);
+    let endC=0,endD=0,faceC=0,faceD=0,faceExtra=[],endExtra=[];
+    if(p.role==='bottom'){
+      faceC = 2*hh.c + ww.c + (M.modular ? 0 : parts*hh.c);
+      faceD = 2*hh.d + ww.d + (M.modular ? 0 : parts*hh.d);
+    } else if(p.role==='side'){
+      endC=hh.c; endD=hh.d;
+      faceC=hh.c+ww.c; faceD=hh.d+ww.d;
+    } else if(p.role==='part'){
+      endC=2*hh.c+ww.c; endD=2*hh.d+ww.d;
+    } else if(p.role==='back'){
+      endC=ww.c+2*hh.c; endD=ww.d+2*hh.d;
+      faceC=ww.c; faceD=ww.d;
+      faceExtra.push(`${tstr('под стойки')} ×${M.modular?2:M.uprights.length}`);
+    } else if(p.role==='intop'){
+      endC=2*hh.c+ww.c; endD=2*hh.d+ww.d;
+      if(!M.modular && parts) faceExtra.push(`${tstr('под стойки')} ×${2*parts}`);
+    } else if(p.role==='door'){
+      faceExtra.push(`${tstr('чашка Ø35')} ×2`);
+    } else if(p.role==='shelf'){
+      faceExtra.push(`${tstr('полкодержатель')} ×4`);
+    }
+    const endTxt=[];
+    if(endC) endTxt.push(`${tstr('конфирмат')} ×${endC}`);
+    if(endD) endTxt.push(`${tstr('шкант')} ×${endD}`);
+    if(endExtra.length) endTxt.push(...endExtra);
+    const faceTxt=[];
+    if(faceC) faceTxt.push(`${tstr('конфирмат')} ×${faceC}`);
+    if(faceD) faceTxt.push(`${tstr('шкант')} ×${faceD}`);
+    if(faceExtra.length) faceTxt.push(...faceExtra);
+    return `<tr>
+      <td class="num" style="color:${PAL[(p.id-1)%PAL.length]}">${p.id}</td>
+      <td>${tstr(p.name)}${p.note?' <span class="mut">· '+tstr(p.note)+'</span>':''}</td>
+      <td class="num">${p.qty}</td>
+      <td>${endTxt.join(', ')||'—'}</td>
+      <td>${faceTxt.join(', ')||'—'}</td>
+      <td class="num">${p.edge ? edgeSides(p.edgeMode) : '—'}</td>
+    </tr>`;
+  }).join('');
+  return `<div style="overflow-x:auto;margin:10px 0 16px">
+    <table class="tbl">
+      <thead><tr><th>№</th><th>${tstr('Деталь')}</th><th>${tstr('Кол-во')}</th><th>${tstr('Торец')}</th><th>${tstr('Пласть')}</th><th>${tstr('Кромка')}</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
 }
 
 function renderCut(M){
@@ -2452,8 +2511,10 @@ function renderCut(M){
       </tbody>
     </table></div>
     <div class="sheets">${M.sheets.map((sh,i)=>`<div class="sheet"><h4>${LANG==='en' ? 'Sheet' : 'Лист'} ${i+1} <span>${Math.round(100*sh.items.reduce((s,it)=>s+it.w*it.h,0)/(M.SW*M.SH))} %</span></h4>${sheetSVG(M,sh,i)}</div>`).join('')}</div>
-    <div class="legend">${M.parts.map(p=>`<span><i style="background:${PAL[(p.id-1)%PAL.length]}"></i>${p.id} — ${tstr(p.name)}</span>`).join('')}</div>
+    <div class="legend">${M.parts.map(p=>`<span><i style="background:${PAL[(p.id-1)%PAL.length]}"></i>${p.id} — ${tstr(p.name)}${p.note ? ' · ' + tstr(p.note) : ''}</span>`).join('')}</div>
     <h2 class="ct" style="margin-top:26px">${tstr('Схемы присадок')} <span class="hint">${LANG==='en' ? 'orange wavy line = edge banding · 32 mm system' : 'оранжевая волнистая линия — кромка · система 32'}</span></h2>
+    <h3 class="ct" style="margin-top:18px">${tstr('Сводка присадок')} <span class="hint">${tstr('на 1 деталь')}</span></h3>
+    ${drillSummaryHtml(M)}
     ${drillPartsHtml(M)}
     <p class="note">${LANG==='en' ? 'long dash — confirmat in the end, short dash — dowel in the end, ○ — hole in the face. 32 mm from the edge, +32 mm dowel, +352 mm next confirmat; from both ends to mid-length. Shorter than 600 mm — one pair per side. Doors: Ø35 cup, 22 mm from the edge. Edge banding as a wavy line.' : 'длинная чёрточка — конфирмат в торце, короткая — шкант в торце, ○ — отверстие в пласти. 32 мм от края, +32 мм шкант, +352 мм следующий конфирмат; с двух сторон до середины. Короче 600 мм — одна пара с каждой стороны. Двери: Ø35, 22 мм от кромки. Кромка — волнистой.'}</p>
     <p class="note">${LANG==='en' ? `Kerf ${K.KERF} mm is included. Cut sizes are core sizes; edge banding is added on visible edges. Grain runs along the long side.` : `Пропил ${K.KERF} мм учтён. Размер заготовки — без кромки; кромка добавляется на видимые кромки. Текстура — вдоль длинной стороны.`}</p>`;

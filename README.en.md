@@ -45,7 +45,7 @@ Pick a preset in one click, then change length, depth, height and substrate laye
 - Cutting plan per sheet: cut size excludes edge banding; banding is added to visible edges only.
 - Solid or modular carcass: modules of 1–3 doors, the overlay top is always one piece. A warning appears if the top does not fit the sheet.
 - Identical parts from different modules are grouped into one row, without “module 1 / module 2”.
-- The bottom is banded on three sides in a solid stand; in a modular one the outer modules get front + outer side, the middle modules front only.
+- The bottom is banded on three sides in a solid stand; in a modular one the outer modules get front + outer side, the middle modules front only. Left and right modular bottoms are mirror parts, marked “left/right” in the cutting plan and drilling schemes.
 - The inset top is banded on the front edge only; the other three sides are drilled in the end. A solid carcass also gets face holes under the uprights.
 - The side is drilled in the end at the bottom (onto the overlay bottom) and in the face at the top (under the inset top).
 - Internal uprights: both ends plus the rear end for the inset back panel.
