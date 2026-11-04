@@ -2339,8 +2339,10 @@ function buildBox(M, box) {
     const sp = SPEC[o.spec];
     const P = add(o.run.o, mul(o.run.axis, o.t));
     const E = add(o.entry, sub(P, o.run.o));           /* точка входа */
+    /* шкант сидит на 12 мм в каждой детали, а не проходит насквозь */
+    const thA = (sp.op === 'dowel') ? sp.dB : o.th;
     const hA = {
-      part: o.A, p0: E, dir: o.dir, depth: o.th, dia: sp.dia, cb: sp.cb,
+      part: o.A, p0: E, dir: o.dir, depth: thA, dia: sp.dia, cb: sp.cb,
       op: sp.op, side: o.sideA || 'out', jid: ++id, role: 'A'
     };
     const hB = o.B ? {
@@ -2729,7 +2731,7 @@ function render(p, M, data, opts) {
   const LANG = opts.lang || 'ru';
   const T = M.T;
   const pcs = LANG === 'en' ? 'pcs' : 'шт';
-  const variant = opts.variant || null;      /* 'L' | 'R' — сторона навески дверцы */
+  const variant = opts.variant || null;
   const qty = opts.qty != null ? opts.qty : p.qty;
 
   const HF = holesFor(p, M, data, variant);
@@ -2747,8 +2749,7 @@ function render(p, M, data, opts) {
     : 'без кромки';
   const noteAdd = p.note ? ' · ' + tstr(p.note) : '';
   const head = '<h2 class="ct" style="margin:26px 0 8px">' + p.id + '. ' + tstr(p.name) + noteAdd + titleAdd +
-    ' <span class="hint">' + qty + ' ' + pcs + ' · ' + f0(p.w) + ' × ' + f0(p.h) + ' × ' + T + ' мм · ' +
-    edgeTxt + '</span></h2>';
+    ' <span class="hint">' + qty + ' ' + pcs + ' · ' + f0(p.w) + ' × ' + f0(p.h) + ' × ' + T + ' мм · ' + edgeTxt + '</span></h2>';
 
   if (!F || !list.length) {
     return '<div style="width:100%;margin:0 0 26px">' + head +
@@ -2758,17 +2759,27 @@ function render(p, M, data, opts) {
       (LANG === 'en' ? 'no drilling' : 'без присадки') + '</text></svg></div>';
   }
 
-  /* ---- раскладка чертежа ---- */
-  const maxW = 800, maxH = 220, dOx = 56, dOy = 46;
-  const sc = Math.min(maxW / Math.max(F.w, 1), maxH / Math.max(F.h, 1));
+  list.forEach((it, i) => { it.no = i + 1; });
+  list.sort((a, b) => (a.l.v - b.l.v) || (a.l.u - b.l.u));
+
+  /* ---------- лист ---------- */
+  const padL = 104, padR = 104, padT = 64, padB = 40;
+  const iw = 900 - padL - padR, ih = 356;
+  const sc = Math.min(iw / Math.max(F.w, 1), ih / Math.max(F.h, 1));
   const rw = F.w * sc, rh = F.h * sc;
-  const ox = dOx + (maxW - rw) / 2, oy = dOy + (maxH - rh) / 2;
+  const ox = padL + (iw - rw) / 2, oy = padT + (ih - rh) / 2;
   const X = u => ox + u * sc;
   const Yv = v => F.flip ? (oy + rh - v * sc) : (oy + v * sc);
 
+  const num = v => String(Math.round(v * 10) / 10);
+  const line = (x1, y1, x2, y2, w, c) =>
+    '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) +
+    '" stroke="' + (c || '#3d3a35') + '" stroke-width="' + (w || 1) + '"/>';
+
   let s = '';
   s += '<rect x="' + ox.toFixed(1) + '" y="' + oy.toFixed(1) + '" width="' + rw.toFixed(1) + '" height="' + rh.toFixed(1) + '" fill="#f8f4ec" stroke="#7d6a50" stroke-width="1.2" rx="2"/>';
-  /* кромкование: оранжевая полоса + волнистая линия, как в исходной отрисовке */
+
+  /* кромкование: полоса + волнистая линия */
   if (p.edge && p.edgeMode) {
     const bandLine = (x1, y1, x2, y2) => {
       let o = '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) +
@@ -2790,18 +2801,7 @@ function render(p, M, data, opts) {
     }
   }
 
-  /* база: левый нижний угол */
-  const bx = ox, by = oy + rh;
-  s += '<path d="M' + (bx - 16) + ',' + (by + 16) + ' L' + bx + ',' + by + ' L' + (bx - 16) + ',' + by + ' Z" fill="#4d6bfe"/>';
-  s += '<text x="' + (bx - 18) + '" y="' + (by + 13) + '" font-size="10.5" font-family="Consolas" fill="#3a55df" text-anchor="end">0,0</text>';
-
-  /* оси */
-  s += '<text x="' + (ox + rw / 2).toFixed(1) + '" y="' + (oy - 14).toFixed(1) + '" text-anchor="middle" font-size="11" font-family="Segoe UI" fill="#8b919b">' + F.uName + ' ' + f0(F.w) + ' мм →</text>';
-  s += '<text transform="rotate(-90 ' + (ox + rw + 22).toFixed(1) + ' ' + (oy + rh / 2).toFixed(1) + ')" x="' + (ox + rw + 22).toFixed(1) + '" y="' + (oy + rh / 2).toFixed(1) + '" text-anchor="middle" font-size="11" font-family="Segoe UI" fill="#8b919b">' + F.vName + ' ' + f0(F.h) + ' мм →</text>';
-
-  /* нумерация и отрисовка */
-  list.forEach((it, i) => { it.no = i + 1; });
-
+  /* ---------- отверстия ---------- */
   list.forEach(it => {
     const h = it.h, l = it.l;
     if (!l.faceHole) return;
@@ -2817,10 +2817,7 @@ function render(p, M, data, opts) {
     const h = it.h, l = it.l;
     if (l.faceHole) return;
     const L = h.dia <= 5 ? 9 : 12;
-    let x1, y1, x2, y2, tx, ty;
-    /* ребро вдоль u (левый/правый торец) — горизонтальная чёрточка на вертикальном ребре,
-       ребро вдоль v (перед/зад) — вертикальная чёрточка на горизонтальном ребре */
-    let anchor = 'start';
+    let x1, y1, x2, y2, tx, ty, anchor = 'start';
     if (l.edgeAxis === 'u') {
       const xx = X(l.edgeLow ? 0 : F.w);
       const right = xx > ox + rw / 2;
@@ -2838,56 +2835,152 @@ function render(p, M, data, opts) {
     s += '<text x="' + tx.toFixed(1) + '" y="' + ty.toFixed(1) + '" font-size="9" font-family="Consolas" fill="#7d6a50" text-anchor="' + anchor + '">' + it.no + '</text>';
   });
 
-  /* ---- таблица ---- */
-  const rows = list.map(it => {
-    const h = it.h, l = it.l;
-    return {
-      no: it.no,
-      x: l.faceHole ? l.u : l.pos,
-      y: l.faceHole ? l.v : null,
-      dia: h.dia, cb: h.cb, depth: h.depth, op: h.op, through: h.through ? 1 : 0,
-      place: l.faceHole ? (h.side === 'in' ? 'внутр.' : 'наруж.') : 'торец ' + l.edge,
-      faceHole: l.faceHole
-    };
-  });
+  /* ---------- размеры: цепочка от ближайшего края ---------- */
+  const DIM = 30, OFF2 = 26;
+  function sideOf(l) {
+    if (l.edgeAxis === 'u') return l.edgeLow ? 'left' : 'right';
+    const lowTop = Yv(0) < Yv(F.h);
+    return (l.edgeLow === lowTop) ? 'top' : 'bottom';
+  }
+  const bySide = { left: [], right: [], top: [], bottom: [] };
+  list.forEach(it => { if (it.l.faceHole === false) bySide[sideOf(it.l)].push(it.l.pos); });
 
-  const rowH = 18.5, tblTop = 316;
-  const cols = [0, 50, 112, 158, 204, 252, 356];
-  const header = ['№', 'X', 'Y', 'Ø', 'глуб.', 'пласть', 'операция'];
+  function chain(side) {
+    const pts0 = bySide[side];
+    if (!pts0.length) return '';
+    const horizontal = (side === 'top' || side === 'bottom');
+    const len = horizontal ? F.w : F.h;
+    const pts = pts0.slice().sort((a, b) => a - b).filter((v, i, a) => i === 0 || v - a[i - 1] > 0.6);
+    const all = [0].concat(pts).concat([len]);
+    let o = '';
+    if (side === 'left' || side === 'right') {
+      const xd = side === 'left' ? ox - DIM : ox + rw + DIM;
+      const dirIn = side === 'left' ? 1 : -1;
+      all.forEach(t => { o += line(xd - dirIn * 4, Yv(t), ox + (side === 'left' ? 0 : rw), Yv(t), 0.6, '#b9b3a8'); });
+      o += line(xd, Yv(0), xd, Yv(len), 0.9);
+      for (let i = 0; i < all.length; i++) {
+        const y = Yv(all[i]);
+        o += line(xd - 3, y + 3, xd + 3, y - 3, 1.1);
+        if (i < all.length - 1) {
+          const d = all[i + 1] - all[i];
+          if (d < 0.5) continue;
+          const ym = (Yv(all[i]) + Yv(all[i + 1])) / 2;
+          o += '<text transform="rotate(-90 ' + xd.toFixed(1) + ' ' + ym.toFixed(1) + ')" x="' + xd.toFixed(1) + '" y="' + (ym - 3).toFixed(1) +
+            '" text-anchor="middle" font-size="10.5" font-family="Consolas" fill="#3d3a35">' + num(d) + '</text>';
+        }
+      }
+    } else {
+      const yd = side === 'top' ? oy - DIM : oy + rh + DIM;
+      const dirIn = side === 'top' ? 1 : -1;
+      all.forEach(t => { o += line(X(t), yd - dirIn * 4, X(t), oy + (side === 'top' ? 0 : rh), 0.6, '#b9b3a8'); });
+      o += line(X(0), yd, X(len), yd, 0.9);
+      for (let i = 0; i < all.length; i++) {
+        const x = X(all[i]);
+        o += line(x - 3, yd + 3, x + 3, yd - 3, 1.1);
+        if (i < all.length - 1) {
+          const d = all[i + 1] - all[i];
+          if (d < 0.5) continue;
+          const xm = (X(all[i]) + X(all[i + 1])) / 2;
+          o += '<text x="' + xm.toFixed(1) + '" y="' + (yd - 4).toFixed(1) + '" text-anchor="middle" font-size="10.5" font-family="Consolas" fill="#3d3a35">' + num(d) + '</text>';
+        }
+      }
+    }
+    return o;
+  }
+
+  const hasTop = bySide.top.length > 0, hasLeft = bySide.left.length > 0;
+  s += chain('top') + chain('bottom') + chain('left') + chain('right');
+
+  /* габаритные размеры */
+  const yTotal = oy - DIM - (hasTop ? OFF2 : 0);
+  s += line(X(0), yTotal, X(F.w), yTotal, 0.9);
+  s += line(X(0), yTotal - 4, X(0), oy - 2, 0.6, '#b9b3a8') + line(X(F.w), yTotal - 4, X(F.w), oy - 2, 0.6, '#b9b3a8');
+  s += '<path d="M' + X(0) + ',' + yTotal + ' l6,-2.6 l0,5.2 z" fill="#3d3a35"/>';
+  s += '<path d="M' + X(F.w) + ',' + yTotal + ' l-6,-2.6 l0,5.2 z" fill="#3d3a35"/>';
+  s += '<text x="' + ((X(0) + X(F.w)) / 2).toFixed(1) + '" y="' + (yTotal - 4).toFixed(1) + '" text-anchor="middle" font-size="11" font-family="Consolas" fill="#3d3a35">' + f0(F.w) + '</text>';
+
+  const xTotal = ox - DIM - (hasLeft ? OFF2 : 0);
+  s += line(xTotal, Yv(0), xTotal, Yv(F.h), 0.9);
+  s += line(xTotal - 4, Yv(0), ox - 2, Yv(0), 0.6, '#b9b3a8') + line(xTotal - 4, Yv(F.h), ox - 2, Yv(F.h), 0.6, '#b9b3a8');
+  s += '<path d="M' + xTotal + ',' + Yv(0) + ' l-2.6,6 l5.2,0 z" fill="#3d3a35"/>';
+  s += '<path d="M' + xTotal + ',' + Yv(F.h) + ' l-2.6,-6 l5.2,0 z" fill="#3d3a35"/>';
+  s += '<text transform="rotate(-90 ' + xTotal.toFixed(1) + ' ' + ((Yv(0) + Yv(F.h)) / 2).toFixed(1) + ')" x="' + xTotal.toFixed(1) + '" y="' + (((Yv(0) + Yv(F.h)) / 2) - 4).toFixed(1) +
+    '" text-anchor="middle" font-size="11" font-family="Consolas" fill="#3d3a35">' + f0(F.h) + '</text>';
+
+  /* база */
+  s += '<path d="M' + (ox - 12) + ',' + (oy + rh + 12) + ' L' + ox + ',' + (oy + rh) + ' L' + (ox - 12) + ',' + (oy + rh) + ' Z" fill="#4d6bfe" opacity=".85"/>';
+  s += '<text x="' + (ox - 15) + '" y="' + (oy + rh + 15) + '" font-size="9" font-family="Consolas" fill="#3a55df" text-anchor="end">0,0 — база</text>';
+
+  /* ---------- таблица в стиле Базиса ---------- */
+  const OP_TITLE = { confirmat: 'конфирмат', dowel: 'шкант', pin: 'полкодержатель', plate: 'планка петли', cup: 'чашка Ø35' };
+  const groups = [], gmap = {};
+  list.forEach(it => {
+    const h = it.h;
+    const key = h.op + '|' + h.dia + '|' + h.depth;
+    if (!gmap[key]) { gmap[key] = { op: h.op, dia: h.dia, depth: h.depth, items: [] }; groups.push(gmap[key]); }
+    gmap[key].items.push(it);
+  });
+  const gOrder = { confirmat: 0, dowel: 1, pin: 2, plate: 3, cup: 4 };
+  const gk = x => (gOrder[x.op] != null ? gOrder[x.op] : 9);
+  groups.sort((a, b) => gk(a) - gk(b) || a.dia - b.dia);
+
+  const edgeWord = (axisName, low) => edgeName(axisName, low);
+  function nearText(it) {
+    const l = it.l;
+    const out = [];
+    if (l.faceHole) {
+      const du = l.u, dr = F.w - l.u;
+      out.push(Math.round(du <= dr ? du : dr) + ' от ' + edgeWord(F.uName, du <= dr));
+      const dv = l.v, db = F.h - l.v;
+      out.push(Math.round(dv <= db ? dv : db) + ' от ' + edgeWord(F.vName, dv <= db));
+    } else {
+      const len = (l.axisName === F.uName) ? F.w : F.h;
+      const d = Math.min(l.pos, len - l.pos);
+      out.push(Math.round(d) + ' от ' + edgeWord(l.axisName, l.pos <= len - l.pos));
+    }
+    return out.join(', ');
+  }
+
+  const rowH = 18.5, tblTop = padT + ih + 52;
+  const cols = [0, 34, 70, 108, 152, 188, 218, 282];
+  const header = ['№', 'D', 'H', 'X', 'Y', 'Z', 'Тип', 'от края'];
   let table = '<g font-family="Consolas,monospace" font-size="11.5" fill="#3d3a35">';
   header.forEach((t, i) => {
-    table += '<text x="' + (10 + cols[i]) + '" y="' + (tblTop - 9) + '" font-family="Segoe UI" font-size="9.5" fill="#8b919b">' + t.toUpperCase() + '</text>';
+    table += '<text x="' + (10 + cols[i]) + '" y="' + (tblTop - 9) + '" font-family="Segoe UI" font-size="9.5" fill="#8b919b">' + t + '</text>';
   });
-  table += '<line x1="10" y1="' + (tblTop - 4) + '" x2="890" y2="' + (tblTop - 4) + '" stroke="#d8dae1" stroke-width="1"/>';
-  rows.forEach((r, i) => {
-    const y = tblTop + 12 + i * rowH;
-    table += '<text x="' + (10 + cols[0]) + '" y="' + y + '">' + r.no + '</text>';
-    table += '<text x="' + (10 + cols[1]) + '" y="' + y + '">' + (Math.round(r.x * 10) / 10) + '</text>';
-    table += '<text x="' + (10 + cols[2]) + '" y="' + y + '">' + (r.y === null ? '—' : Math.round(r.y * 10) / 10) + '</text>';
-    table += '<text x="' + (10 + cols[3]) + '" y="' + y + '">' + r.dia + (r.cb ? '/' + r.cb : '') + '</text>';
-    table += '<text x="' + (10 + cols[4]) + '" y="' + y + '">' + r.depth + '</text>';
-    table += '<text x="' + (10 + cols[5]) + '" y="' + y + '" font-family="Segoe UI" font-size="10" fill="#7a828d">' + r.place + '</text>';
-    table += '<text x="' + (10 + cols[6]) + '" y="' + y + '" font-family="Segoe UI" font-size="10.5">' + (OP_LABEL[r.op] || r.op) + (r.through ? ' сквозн.' : '') + '</text>';
+  table += line(10, tblTop - 4, 890, tblTop - 4, 1, '#d8dae1');
+  let y = tblTop + 12;
+  groups.forEach(g => {
+    const title = g.items.length + ' отв  Ø' + g.dia + '×' + g.depth + '  ' + (OP_TITLE[g.op] || g.op);
+    table += '<rect x="6" y="' + (y - 12) + '" width="884" height="17" fill="#eef1f7"/>';
+    table += '<text x="12" y="' + y + '" font-family="Segoe UI" font-size="10.5" fill="#3a55df">' + title + '</text>';
+    y += 18;
+    g.items.forEach(it => {
+      const h = it.h, l = it.l;
+      const x = l.faceHole ? l.u : l.pos;
+      const yy = l.faceHole ? l.v : null;
+      const z = l.faceHole ? '—' : Math.round(T / 2);
+      const typ = l.faceHole ? 'пласть' : 'торец';
+      table += '<text x="' + (10 + cols[0]) + '" y="' + y + '">' + it.no + '</text>';
+      table += '<text x="' + (10 + cols[1]) + '" y="' + y + '">' + h.dia + '</text>';
+      table += '<text x="' + (10 + cols[2]) + '" y="' + y + '">' + h.depth + '</text>';
+      table += '<text x="' + (10 + cols[3]) + '" y="' + y + '">' + num(x) + '</text>';
+      table += '<text x="' + (10 + cols[4]) + '" y="' + y + '">' + (yy === null ? '—' : num(yy)) + '</text>';
+      table += '<text x="' + (10 + cols[5]) + '" y="' + y + '">' + z + '</text>';
+      table += '<text x="' + (10 + cols[6]) + '" y="' + y + '" font-family="Segoe UI" font-size="10" fill="#7a828d">' + typ + '</text>';
+      table += '<text x="' + (10 + cols[7]) + '" y="' + y + '" font-family="Segoe UI" font-size="10.5">' + nearText(it) + (h.through ? ' · сквозн.' : '') + '</text>';
+      y += rowH;
+    });
   });
   table += '</g>';
+  const H = y + 26;
 
-  const H = tblTop + 20 + rows.length * rowH;
-  let extra = '';
-  if (p.role === 'door') {
-    extra = '<text x="10" y="' + (H + 31) + '" font-size="10.5" font-family="Segoe UI" fill="#8b919b">' +
-      'Чашки Ø35 — 22,5 мм от петлевой кромки. Планки петель — на боковине или стойке, 37 мм от переда корпуса.' +
-      (variant ? '' : ' Правая навеска — зеркально.') + '</text>';
-  } else if (p.role === 'side' || p.role === 'part') {
-    extra = '<text x="10" y="' + (H + 31) + '" font-size="10.5" font-family="Segoe UI" fill="#8b919b">' +
-      'Деталь симметрична: обе боковины (стойки) сверлятся по этой карте с внутренней стороны.</text>';
-  }
-  const note = '<text x="10" y="' + (H + 14) + '" font-size="10.5" font-family="Segoe UI" fill="#8b919b">' +
-    'X — по ' + F.uName + ' от базы, Y — по ' + F.vName + '. Зелёные — с внутренней пласти, коричневые — с наружной. ' +
-    'Торец: X — расстояние вдоль ребра.</text>';
+  const note = '<text x="10" y="' + (H - 8) + '" font-size="10" font-family="Segoe UI" fill="#8b919b">' +
+    'X/Y — от базы 0,0 (для станка); «от края» — размер до ближайшей кромки (для разметки вручную). ' +
+    'Зелёные отверстия — с внутренней пласти, коричневые — с наружной.</text>';
 
-  const boxH = H + (extra ? 42 : 24);
   return '<div style="width:100%;margin:0 0 30px">' + head +
-    '<svg viewBox="0 0 900 ' + boxH + '" width="100%" xmlns="http://www.w3.org/2000/svg">' + s + table + note + extra + '</svg></div>';
+    '<svg viewBox="0 0 900 ' + H + '" width="100%" xmlns="http://www.w3.org/2000/svg">' + s + table + note + '</svg></div>';
 }
 
 const API = { build, solve, countCollisions, collide, hingeZs, frame, localize, render, holesFor, stats, segDist, v3, add, mul };
