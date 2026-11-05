@@ -2323,7 +2323,7 @@ function drawDetail(M){
 /* =========================================================
    ИНТЕРФЕЙС
    ========================================================= */
-const state = { section:'tank', tab:'tumba', color:'beige', profile:'hi', loadPct:10, loadFloor:0 };
+const state = { section:'tank', tab:'tumba', color:'beige', profile:'hi', loadPct:10, loadFloor:0, loadArea:10 };
 const fishCart = {};
 let fishQuery = '';
 let MODEL = null;
@@ -3530,37 +3530,41 @@ const FLOORS = [
 ];
 
 function renderLoadPanel(M){
-  const pct = clamp(state.loadPct == null ? 10 : state.loadPct, 0, 50);
-  const fi  = clamp(state.loadFloor | 0, 0, FLOORS.length - 1);
+  const pct  = clamp(state.loadPct == null ? 10 : state.loadPct, 0, 50);
+  const room = clamp(state.loadArea == null ? 10 : state.loadArea, 1, 200);   // площадь помещения, м²
+  const fi   = clamp(state.loadFloor | 0, 0, FLOORS.length - 1);
   const floor = FLOORS[fi];
   const base  = M.wDesign + M.standW;              // аквариум с запасом + тумба
   const eq    = base * pct / 100;                  // оборудование и мелочь в тумбе
   const total = base + eq;
-  const area  = M.L * M.D / 1e6;                   // площадь опоры, м²
-  const load  = total / area;                      // кг/м²
+  const foot  = M.L * M.D / 1e6;                   // площадь опоры под тумбой, м²
+  const local = total / foot;                      // локальное давление, кг/м²
+  const avg   = total / room;                      // средняя нагрузка по помещению, кг/м²
   const perFoot = total / M.feetN;
-  const util  = load / floor.allow * 100;
-  const cls   = util <= 80 ? 'ok' : (util <= 100 ? 'warn' : 'bad');
+  const util  = avg / floor.allow * 100;
+  const cls   = util <= 50 ? 'ok' : (util <= 100 ? 'warn' : 'bad');
   const lb    = v => f0(v * 2.20462);
   const ft2   = v => f1(v * 10.7639);
   const psf   = v => f0(v * 0.204816);
   const KG    = L('кг', 'kg');
   const M2    = L('м²', 'm²');
   const KGM2  = L('кг/м²', 'kg/m²');
+  const imp   = UNITS === 'imperial';
+  const areaShown = imp ? f1(room * 10.7639) : f1(room);
+  const areaUnit  = imp ? 'ft²' : M2;
   const name  = LANG === 'en' ? floor.en : floor.ru;
-  const note  = LANG === 'en' ? floor.nen : floor.nru;
   const rows = FLOORS.map((f, i) => `<tr data-i="${i}" class="${i === fi ? 'sel' : ''}">
       <td><span class="reg">${f.reg}</span> ${LANG === 'en' ? f.en : f.ru}</td>
       <td class="num">${f0(f.allow)}</td><td class="num">${psf(f.allow)}</td>
       <td class="mut">${LANG === 'en' ? f.nen : f.nru}</td></tr>`).join('');
-  const verdict = util <= 80
-    ? L(`Нагрузка <b>${f0(load)} кг/м²</b> — ${f0(util)} % от ${f0(floor.allow)} кг/м². Запас ${f1(floor.allow / load)}×.`,
-        `Load <b>${f0(load)} kg/m²</b> — ${f0(util)} % of ${f0(floor.allow)} kg/m². Margin ${f1(floor.allow / load)}×.`)
+  const verdict = util <= 50
+    ? L(`Средняя нагрузка <b>${f0(avg)} ${KGM2}</b> — ${f0(util)} % от ${f0(floor.allow)} ${KGM2}. Запас ${f1(floor.allow / avg)}×.`,
+        `Average load <b>${f0(avg)} ${KGM2}</b> — ${f0(util)} % of ${f0(floor.allow)} ${KGM2}. Margin ${f1(floor.allow / avg)}×.`)
     : (util <= 100
-      ? L(`Нагрузка <b>${f0(load)} кг/м²</b> — ${f0(util)} % от ${f0(floor.allow)} кг/м². Запаса почти нет: распределите вес или выберите другую конструкцию.`,
-          `Load <b>${f0(load)} kg/m²</b> — ${f0(util)} % of ${f0(floor.allow)} kg/m². Almost no margin: spread the load or pick another structure.`)
-      : L(`Нагрузка <b>${f0(load)} ${KGM2}</b> — ${f0(util)} % от ${f0(floor.allow)} ${KGM2}. Превышение: нужна другая конструкция, распределяющая подкладка или меньше банка.`,
-          `Load <b>${f0(load)} ${KGM2}</b> — ${f0(util)} % of the ${f0(floor.allow)} ${KGM2} capacity. Over the limit: another structure, a load-spreading base, or a smaller tank.`));
+      ? L(`Средняя нагрузка <b>${f0(avg)} ${KGM2}</b> — ${f0(util)} % от ${f0(floor.allow)} ${KGM2}. Запаса почти нет: распределите вес или уменьшите оборудование.`,
+          `Average load <b>${f0(avg)} ${KGM2}</b> — ${f0(util)} % of ${f0(floor.allow)} ${KGM2}. Almost no margin: spread the weight or cut the equipment.`)
+      : L(`Средняя нагрузка <b>${f0(avg)} ${KGM2}</b> — ${f0(util)} % от ${f0(floor.allow)} ${KGM2}. Норма превышена: нужна другая конструкция, распределяющая подкладка или меньше банка.`,
+          `Average load <b>${f0(avg)} ${KGM2}</b> — ${f0(util)} % of ${f0(floor.allow)} ${KGM2}. Over the norm: another structure, a load-spreading base, or a smaller tank.`));
 
   $('#stage').innerHTML = `<div class="loadpanel" data-noconv>
     <h3>${L('Нагрузка на перекрытие','Floor load')}</h3>
@@ -3572,27 +3576,38 @@ function renderLoadPanel(M){
       <b>${f0(eq)} ${KG} · ${lb(eq)} lb</b>
     </div>
     <div class="loadrow total"><span class="k">${L('Итого на пол','Total on the floor')}</span><b>${f0(total)} ${KG} · ${lb(total)} lb</b></div>
-    <div class="loadrow"><span class="k">${L('Площадь опоры','Footprint')}</span><b>${f2(area)} ${M2} · ${ft2(area)} ft²</b></div>
-    <div class="loadrow big"><span class="k">${L('Нагрузка на перекрытие','Floor load')}</span><b>${f0(load)} ${KGM2} · ${psf(load)} psf</b></div>
+    <div class="loadrow"><span class="k">${L('Площадь опоры под тумбой','Footprint under the stand')}</span><b>${f2(foot)} ${M2} · ${ft2(foot)} ft²</b></div>
+    <div class="loadrow"><span class="k">${L('Локальное давление под тумбой','Local pressure under the stand')} <span class="mut">${L('(справочно)','(info)')}</span></span><b>${f0(local)} ${KGM2} · ${psf(local)} psf</b></div>
+    <div class="loadfield">
+      <label for="inLoadArea">${L('Площадь помещения','Room area')}</label>
+      <div class="inp"><input id="inLoadArea" type="number" min="1" max="200" step="0.5" value="${areaShown}"><em>${areaUnit}</em></div>
+    </div>
+    <div class="loadrow big"><span class="k">${L('Средняя нагрузка на помещение','Average load over the room')}</span><b>${f0(avg)} ${KGM2} · ${psf(avg)} psf</b></div>
     <div class="loadrow"><span class="k">${L('На опору','Per foot')}</span><b>${f0(perFoot)} ${KG} · ${lb(perFoot)} lb</b></div>
     <div class="loadverdict ${cls}">${verdict}</div>
-    <p class="note" style="margin:0 0 4px">${L('Считается как статическая нагрузка на площадь. Для деревянных перекрытий важны сечение и шаг балок, направление лаг и точка опоры — проверьте по проекту. Нормы дают полезную нагрузку; вес банки — постоянная, поэтому сравнение консервативное.',
-      'This is a static load over the footprint. For timber floors the joist size and spacing, joist direction and the point of support matter — check the project. Codes give a live load; the tank is permanent, so the comparison is conservative.')}</p>
+    <p class="note" style="margin:0 0 4px">${L(`Значение из таблицы (норма или несущая способность, ${f0(floor.allow)} кг/м² для выбранной строки) — распределённая нагрузка на площадь, поэтому с ней сравнивают среднюю нагрузку по помещению, а не локальное давление под тумбой. Давление ${f0(local)} кг/м² под пятном тумбы — нормальная ситуация: его воспринимают плита или лаги. Для дерева проверьте сечение и шаг лаг, для плиты — пролёт и армирование. Это ориентир, а не расчёт несущей способности.`,
+      `The value from the table (a norm or a capacity, ${f0(floor.allow)} kg/m² for the selected row) is a load distributed over an area, so it is compared with the average over the room, not with the local pressure under the stand. ${f0(local)} kg/m² under the footprint is normal: the slab or the joists carry it. For timber floors check joist size and spacing; for slabs check span and reinforcement. This is a guide, not a structural check.`)}</p>
     <h3>${L('Типовые несущие конструкции','Typical floor structures')}</h3>
     <div style="overflow-x:auto"><table class="tbl floors">
       <thead><tr><th>${L('Конструкция','Structure')}</th><th>${L('кг/м²','kg/m²')}</th><th>psf</th><th>${L('Примечание','Note')}</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>
-    <p class="note" style="margin:8px 0 0">${L('Нажмите строку, чтобы проверить нагрузку по этой конструкции. Значения типовые: фактические зависят от проекта, сечения балок, армирования и грунта.',
-      'Click a row to check the load against that structure. Values are typical: actual capacity depends on the project, joist size, reinforcement and soil.')}</p>
+    <p class="note" style="margin:8px 0 0">${L('Нажмите строку, чтобы пересчитать по этой конструкции. Значения типовые: норма — распределённая нагрузка, несущая способность плит — ориентир; фактические зависят от проекта, сечения балок, армирования и грунта.',
+      'Click a row to recalculate against that structure. Values are typical: the norm is a distributed load, slab capacity is a guide; actual values depend on the project, joist size, reinforcement and soil.')}</p>
   </div>`;
-  $('#vcap').innerHTML = L(`Итого ${f0(total)} ${KG} · нагрузка ${f0(load)} ${KGM2} · ${name}: ${f0(util)} %`,
-    `Total ${f0(total)} kg · floor load ${f0(load)} kg/m² · ${name}: ${f0(util)} %`);
+  $('#vcap').innerHTML = L(`Итого ${f0(total)} ${KG} · локально ${f0(local)} ${KGM2} · средняя ${f0(avg)} ${KGM2} — ${f0(util)} % от ${f0(floor.allow)}`,
+    `Total ${f0(total)} kg · local ${f0(local)} kg/m² · average ${f0(avg)} kg/m² — ${f0(util)} % of ${f0(floor.allow)}`);
   $('#vcap').style.display = '';
   $('#vcap').setAttribute('data-noconv', '');
 
   const inp = document.getElementById('inLoadPct');
   if(inp) inp.onchange = () => { state.loadPct = clamp(+inp.value || 0, 0, 50); renderView(MODEL); };
+  const areaInp = document.getElementById('inLoadArea');
+  if(areaInp) areaInp.onchange = () => {
+    const v = uParse(areaInp.value);
+    if(Number.isFinite(v) && v > 0) state.loadArea = clamp(UNITS === 'imperial' ? v / 10.7639 : v, 1, 200);
+    renderView(MODEL);
+  };
   document.querySelectorAll('#stage .floors tr[data-i]').forEach(tr => {
     tr.onclick = () => { state.loadFloor = +tr.dataset.i; renderView(MODEL); };
   });
