@@ -71,7 +71,7 @@ To publish, run `publish.ps1`. It copies `aquarium-stand.html` to `site/index.ht
 - CO2 is calculated without other buffers. Water changes assume the replacement water does not contain the same substance.
 - The fish table is an upper nitrogen limit, not compatibility advice.
 - Plants and denitrification are not modelled.
-- Filter figures are typical datasheet values. Real flow depends on media, hose and lift height.
+- Filter figures are typical datasheet values. Media volume comes from the replacement sponge dimensions (internal filters) or the basket/chamber volume (canisters and hang-on-back); ≈ marks an estimate from the housing dimensions where no size was found. Real flow depends on media, hose and lift height.
 - TAN and free NH3 from urea are a one-off dose estimate, not hydrolysis kinetics.
 - Internal partitions are not modelled.
 
