@@ -173,6 +173,28 @@ select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(77,107,254,.14);b
 .vcap{padding:10px 18px 16px;color:var(--tx2);font-size:12.5px;line-height:1.5;border-top:1px solid var(--line);margin-top:6px}
 .vcap b{color:var(--tx);font-weight:650}
 
+/* ---------- нагрузка на перекрытие ---------- */
+.loadpanel{max-width:820px;margin:0 auto;padding:8px 4px 14px}
+.loadpanel h3{font:650 15.5px/1.35 inherit;margin:8px 0 2px;color:var(--tx)}
+.loadpanel h3:first-child{margin-top:2px}
+.loadrow{display:flex;justify-content:space-between;gap:14px;align-items:baseline;padding:7px 11px;background:#fff;border:1px solid var(--line);border-radius:10px;font-size:13px;margin:5px 0}
+.loadrow .k{color:var(--tx2)}
+.loadrow b{font-weight:650;white-space:nowrap}
+.loadrow.total{background:var(--soft);border-color:var(--line2)}
+.loadrow.big b{font-size:15px;color:var(--acc-dk)}
+.loadverdict{padding:11px 13px;border-radius:12px;font-size:13px;line-height:1.5;margin:9px 0}
+.loadverdict.ok{background:#edf8f0;border:1px solid #cfe9d6}
+.loadverdict.warn{background:#fff8e8;border:1px solid #f0dfb6}
+.loadverdict.bad{background:#fdeeee;border:1px solid #f2cccc}
+.loadverdict b{font-weight:700}
+.floors tr[data-i]{cursor:pointer}
+.floors tr.sel td{background:#eef2ff}
+.floors tr:hover td{background:#f6f8ff}
+.floors .reg{display:inline-block;min-width:26px;color:var(--tx3);font-size:11px;font-weight:650;letter-spacing:.02em}
+.loadfield{display:flex;align-items:center;gap:10px;margin:8px 0 6px;font-size:13px}
+.loadfield label{color:var(--tx2)}
+.loadfield .inp{width:110px}
+
 /* ---------- svg-подписи ---------- */
 .dim .dl{stroke:#b3b9c4;stroke-width:1}
 .dim .ext{stroke:#ccd1da;stroke-width:.8;stroke-dasharray:2 3}
@@ -404,6 +426,8 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
       </button>
       <button data-l="ru">RU</button>
       <button data-l="en">EN</button>
+      <button data-u="metric" class="on" type="button" title="Метрические единицы" aria-label="Метрические единицы">мм</button>
+      <button data-u="imperial" type="button" title="Имперские единицы" aria-label="Имперские единицы">in</button>
     </div>
   </header>
 
@@ -586,7 +610,7 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
         </div>
       </section>
 
-      <section class="card" id="sideSpec"></section>
+      <section class="card" id="sideSpec" data-noconv></section>
     </aside>
 
     <main class="main">
@@ -601,7 +625,7 @@ text.sub{fill:#8b919b;font:500 11.5px/1 -apple-system,"Segoe UI",sans-serif}
       <div class="kpis" id="kpis"></div>
       <p class="note" id="kpiNote" style="margin:-4px 0 14px"></p>
       <div id="secTank"></div>
-      <div id="secStand">
+      <div id="secStand" data-noconv>
         <section class="card viewer">
           <div class="vtabs" id="vtabs"></div>
           <div class="stage" id="stage"></div>
@@ -1060,10 +1084,183 @@ const _nfc = {
 const f0 = v => _nfc[LANG].n0.format(Math.round(v));
 const f1 = v => _nfc[LANG].n1.format(v);
 const f2 = v => _nfc[LANG].n2.format(v);
+const dimNum = v => UNITS === 'imperial' ? f1(v / 25.4) : f0(v);
+const dimU = () => UNITS === 'imperial' ? 'in' : (LANG === 'en' ? 'mm' : 'мм');
 const f3 = v => (LANG === 'en' ? v.toFixed(3) : v.toFixed(3).replace('.', ','));
 const trimZ = s => s.replace(/([.,]\d*?)0+$/, '$1').replace(/[.,]$/, '');
 const fmtD = (v, d) => v == null ? '—' : trimZ(d === 0 ? f0(v) : d === 1 ? f1(v) : d === 2 ? f2(v) : f3(v));
 const L = (ru, en) => (LANG === 'en' ? en : ru);
+
+/* ---------- единицы: метрика / имперские ---------- */
+let UNITS = 'metric';
+try { if(localStorage.getItem('aqua-units') === 'imperial') UNITS = 'imperial'; } catch(e){}
+const UNIT_NUM = {
+  inL:  { k:25.4,    met:{min:300,max:4200,step:10},  imp:{min:12,max:165,step:0.5},   metU:'мм', impU:'in' },
+  inD:  { k:25.4,    met:{min:250,max:1200,step:10},  imp:{min:10,max:47,step:0.5},    metU:'мм', impU:'in' },
+  inH:  { k:25.4,    met:{min:200,max:1200,step:10},  imp:{min:8,max:47,step:0.5},     metU:'мм', impU:'in' },
+  inVol:{ k:3.78541, met:{min:1,max:100000,step:1},   imp:{min:0.3,max:26417,step:1},  metU:'л',  impU:'gal' }
+};
+const U_LABELS = {
+  inL:['мм','mm','in'], inD:['мм','mm','in'], inH:['мм','mm','in'],
+  inRim:['см','cm','in'], inSoil:['см','cm','in'], inVol:['л','l','gal'], inTemp:['°C','°C','°F']
+};
+const ufmt = (v, d) => new Intl.NumberFormat(LANG==='en'?'en-US':'ru-RU', {minimumFractionDigits:0, maximumFractionDigits:d}).format(v);
+const uRound = (v, d) => Math.round(v * Math.pow(10, d)) / Math.pow(10, d);
+
+function syncUnitLabels(){
+  const imp = UNITS === 'imperial';
+  Object.entries(U_LABELS).forEach(([id,[ru, en, impU]])=>{
+    const field = document.querySelector(`label[for="${id}"]`)?.closest('.field');
+    if(!field) return;
+    field.querySelectorAll('b, em').forEach(x=>{
+      const t = x.textContent.trim();
+      if(t === ru || t === en || t === impU) x.textContent = imp ? impU : (LANG==='en' ? en : ru);
+    });
+  });
+  const setOpts = (id, fn) => {
+    const el = document.getElementById(id); if(!el) return;
+    el.querySelectorAll('option').forEach(o=>{
+      const v = +o.value;
+      if(Number.isFinite(v)){ o.setAttribute('value', String(v)); o.textContent = fn(v); }
+    });
+  };
+  setOpts('inRim',  v => imp ? ufmt(v/25.4, 2) : ufmt(v/10, 1));
+  setOpts('inSoil', v => imp ? ufmt(v/25.4, 1) : ufmt(v/10, 0));
+  setOpts('inTemp', v => imp ? ufmt(v*9/5+32, 0) : String(v));
+  document.querySelectorAll('#presets button').forEach(b=>{
+    const [a,c,d] = b.dataset.p.split(',').map(Number);
+    b.textContent = imp ? `${ufmt(a/25.4,1)}×${ufmt(c/25.4,1)}×${ufmt(d/25.4,1)}` : `${a/10}×${c/10}×${d/10}`;
+  });
+}
+
+/* текст: «1200 мм», «124–207 л/ч», «1200×500×500 мм» → имперские */
+const U_CONV = {
+  'кг/м²':[0.204816,0,'psf'], 'kg/m²':[0.204816,0,'psf'],
+  'л/нед':[0.264172,1,'gal/wk'], 'l/week':[0.264172,1,'gal/wk'],
+  'л/мин':[0.264172,2,'gpm'], 'l/min':[0.264172,2,'gpm'],
+  'л/ч':[0.264172,0,'gph'], 'l/h':[0.264172,0,'gph'],
+  'м²':[10.7639,1,'ft²'], 'm²':[10.7639,1,'ft²'],
+  'м³':[35.3147,1,'ft³'], 'm³':[35.3147,1,'ft³'],
+  'см':[1/2.54,1,'in'], 'cm':[1/2.54,1,'in'],
+  'мм':[1/25.4,1,'in'], 'mm':[1/25.4,1,'in'],
+  'кг':[2.20462,0,'lb'], 'kg':[2.20462,0,'lb'],
+  'л':[0.264172,2,'gal'], 'l':[0.264172,2,'gal'],
+  '°C':[9/5,0,'°F']
+};
+const U_KEYS = Object.keys(U_CONV).sort((a,b)=>b.length-a.length);
+const uEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const U_ALT = U_KEYS.map(uEsc).join('|');
+const U_NUM = '-?\\d+(?:[ \\u00a0\\u202f]\\d{3})*(?:[.,]\\d+)?';
+const U_END = '(?![a-zа-яё0-9])';
+const uParse = s => +String(s).replace(/[ \u00a0\u202f]/g,'').replace(',','.');
+function uVal(s, unit){
+  const [k, d] = U_CONV[unit];
+  let v = uParse(s);
+  if(unit === '°C') v = v * 9/5 + 32;
+  else v = v * k;
+  return ufmt(v, d);
+}
+function convText(s){
+  if(!s || !/[0-9]/.test(s)) return s;
+  const re3 = new RegExp(`(${U_NUM})\\s*[×x]\\s*(${U_NUM})\\s*[×x]\\s*(${U_NUM})\\s*(мм|см|mm|cm)${U_END}`, 'gi');
+  const re2 = new RegExp(`(${U_NUM})\\s*[×x]\\s*(${U_NUM})\\s*(мм|см|mm|cm)${U_END}`, 'gi');
+  const reR = new RegExp(`(${U_NUM})\\s*[–-]\\s*(${U_NUM})\\s*(${U_ALT})${U_END}`, 'gi');
+  const re1 = new RegExp(`(${U_NUM})\\s*(${U_ALT})${U_END}`, 'gi');
+  return s
+    .replace(re3, (m,a,b,c,u)=>`${uVal(a,u)} × ${uVal(b,u)} × ${uVal(c,u)} in`)
+    .replace(re2, (m,a,b,u)=>`${uVal(a,u)} × ${uVal(b,u)} in`)
+    .replace(reR, (m,a,b,u)=>`${uVal(a,u)}–${uVal(b,u)} ${U_CONV[u][2]}`)
+    .replace(re1, (m,a,u)=>`${uVal(a,u)} ${U_CONV[u][2]}`);
+}
+function convNums(s, u){
+  return s.replace(new RegExp(U_NUM, 'g'), m => uVal(m, u));
+}
+function headerUnit(t){
+  for(const u of U_KEYS){
+    if(new RegExp('(^|[\\s,(])' + uEsc(u) + '(?=$|[\\s,).])').test(t)) return u;
+  }
+  return null;
+}
+function fixTables(root){
+  root.querySelectorAll('table').forEach(tbl=>{
+    if(tbl.dataset.u === '1' || tbl.closest('[data-noconv]')) return;
+    const heads = [...tbl.querySelectorAll('thead th')];
+    if(!heads.length) return;
+    const cols = heads.map(th => headerUnit(th.textContent));
+    if(!cols.some(Boolean)) return;
+    heads.forEach((th,i)=>{ if(cols[i]) th.textContent = th.textContent.replace(cols[i], U_CONV[cols[i]][2]); });
+    tbl.querySelectorAll('tbody tr').forEach(tr=>{
+      [...tr.children].forEach((td,i)=>{
+        const u = cols[i]; if(!u) return;
+        if(U_KEYS.some(k => td.textContent.includes(k))) return;
+        td.textContent = convNums(td.textContent, u);
+      });
+    });
+    tbl.dataset.u = '1';
+  });
+}
+function fixSplitUnits(root){
+  root.querySelectorAll('small, b, em').forEach(el=>{
+    if(el.closest('[data-noconv]') || el.closest('svg')) return;
+    const u = el.textContent.trim();
+    if(!U_CONV[u]) return;
+    let prev = el.previousSibling;
+    while(prev && prev.nodeType === 3 && !/\d/.test(prev.nodeValue)) prev = prev.previousSibling;
+    if(!prev || prev.nodeType !== 3 || !/\d/.test(prev.nodeValue)) return;
+    if(/\b(in|ft|gal|lb|gph|gpm|psf|°F)\b/.test(prev.nodeValue)) return;
+    prev.nodeValue = convNums(prev.nodeValue, u);
+    el.textContent = U_CONV[u][2];
+  });
+}
+function applyUnits(root){
+  if(UNITS !== 'imperial' || !root) return;
+  fixTables(root);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(n){
+      const p = n.parentElement;
+      if(!p) return NodeFilter.FILTER_REJECT;
+      const tag = p.tagName;
+      if(tag === 'INPUT' || tag === 'SELECT' || tag === 'OPTION' || tag === 'TEXTAREA' || tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+      if(p.closest('[data-noconv]') || p.closest('svg')) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes = []; let n;
+  while((n = walker.nextNode())) nodes.push(n);
+  nodes.forEach(node => { const t = convText(node.nodeValue); if(t !== node.nodeValue) node.nodeValue = t; });
+  fixSplitUnits(root);
+}
+function setUnits(mode){
+  if(mode !== 'imperial' && mode !== 'metric') return;
+  if(mode === UNITS) return;
+  const toImp = mode === 'imperial';
+  Object.entries(UNIT_NUM).forEach(([id,u])=>{
+    const el = document.getElementById(id); if(!el) return;
+    if(String(el.value).trim() === '') return;
+    const v = uParse(el.value);
+    if(Number.isFinite(v)) el.value = String(uRound(toImp ? v/u.k : v*u.k, toImp ? 2 : 0));
+    const b = toImp ? u.imp : u.met;
+    el.min = b.min; el.max = b.max; el.step = b.step;
+  });
+  UNITS = mode;
+  try { localStorage.setItem('aqua-units', mode); } catch(e){}
+  syncUnitLabels();
+  document.querySelectorAll('#lang button[data-u]').forEach(b=>b.classList.toggle('on', b.dataset.u === UNITS));
+  renderAll();
+}
+function initUnitsUI(){
+  if(UNITS === 'imperial'){
+    Object.entries(UNIT_NUM).forEach(([id,u])=>{
+      const el = document.getElementById(id); if(!el) return;
+      if(String(el.value).trim() === '') return;
+      const v = uParse(el.value);
+      if(Number.isFinite(v)) el.value = String(uRound(v/u.k, 2));
+      const b = u.imp; el.min = b.min; el.max = b.max; el.step = b.step;
+    });
+  }
+  syncUnitLabels();
+  document.querySelectorAll('#lang button[data-u]').forEach(b=>b.classList.toggle('on', b.dataset.u === UNITS));
+}
 const TX = o => (o ? (LANG === 'en' ? o.en : o.ru) : '');
 const plural = (n, one, few, many, enOne, enMany) => LANG === 'en' ? (n === 1 ? enOne : enMany) : pl(n, one, few, many);
 const stLabel = s => s === 'ok' ? tstr('норма') : (s === 'low' ? tstr('низко') : (s === 'high' ? tstr('высоко') : tstr('нет данных')));
@@ -1117,7 +1314,7 @@ const I18N = {
     app_title:'Калькулятор аквариумиста', app_sub:'аквариум · тумба · техника · биология',
     tab_tank:'Аквариум', tab_stand:'Тумба', tab_gear:'Оборудование', tab_bio:'Биология', tab_test:'Тесты', tab_udo:'Удо',
     h_tank:'Стекло, грунт и вес по размерам аквариума.',
-    h_stand:'Корпус, раскрой фанеры и порядок сборки.',
+    h_stand:'Корпус, раскрой, сборка и нагрузка на перекрытие.',
     h_gear:'Фильтр, свет, аэрация и обогрев под объём воды.',
     h_bio:'Сколько азота перерабатывает фильтр и сколько рыбы это кормит.',
     h_test:'Показатели, цели и рецепт удобрений.',
@@ -1148,7 +1345,7 @@ const I18N = {
     app_title:'Aquarium Calculator', app_sub:'aquarium · stand · equipment · biology',
     tab_tank:'Aquarium', tab_stand:'Stand', tab_gear:'Equipment', tab_bio:'Biology', tab_test:'Tests', tab_udo:'Fertilizers',
     h_tank:'Glass, substrate and weight from the tank dimensions.',
-    h_stand:'Carcass, plywood cutting plan and assembly order.',
+    h_stand:'Carcass, cutting plan, assembly and floor load.',
     h_gear:'Filter, light, aeration and heating for the water volume.',
     h_bio:'How much nitrogen the filter processes and how much fish it feeds.',
     h_test:'Parameters, targets and the fertilizer recipe.',
@@ -1294,6 +1491,10 @@ function applyLang(){
   if(ogd) ogd.setAttribute('content', t('page_desc_short'));
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll('#lang button').forEach(b => { if(b.dataset.l) b.classList.toggle('on', b.dataset.l === LANG); });
+  const mu = document.querySelector('#lang button[data-u="metric"]');
+  const iu = document.querySelector('#lang button[data-u="imperial"]');
+  if(mu){ mu.textContent = LANG === 'en' ? 'mm' : 'мм'; mu.title = LANG === 'en' ? 'Metric units' : 'Метрические единицы'; }
+  if(iu){ iu.title = LANG === 'en' ? 'Imperial units (stand drawings stay in mm)' : 'Имперские единицы (чертежи тумбы — в мм)'; }
 }
 
 /* =========================================================
@@ -2122,7 +2323,7 @@ function drawDetail(M){
 /* =========================================================
    ИНТЕРФЕЙС
    ========================================================= */
-const state = { section:'tank', tab:'tumba', color:'beige', profile:'hi' };
+const state = { section:'tank', tab:'tumba', color:'beige', profile:'hi', loadPct:10, loadFloor:0 };
 const fishCart = {};
 let fishQuery = '';
 let MODEL = null;
@@ -3304,13 +3505,107 @@ function renderAsm(M){
     </div>`;
 }
 
+/* типовые несущие конструкции: RU — СП 20.13330 / серии плит, US — IRC R301.5 */
+const FLOORS = [
+  { reg:'RU', ru:'Деревянные балки, жилое помещение', en:'Wood joists, habitable', allow:150,
+    nru:'СП 20.13330: 1,5 кПа полезной нагрузки', nen:'SP 20.13330: 1.5 kPa live load' },
+  { reg:'RU', ru:'Деревянные балки, коридор или офис', en:'Wood joists, corridor or office', allow:200,
+    nru:'СП 20.13330: 2,0 кПа', nen:'SP 20.13330: 2.0 kPa' },
+  { reg:'RU', ru:'Железобетонная плита ПК / ПБ', en:'Precast RC hollow-core slab', allow:800,
+    nru:'типовая несущая способность серии', nen:'typical series capacity' },
+  { reg:'RU', ru:'Монолитная плита 200 мм', en:'Cast-in-place slab, 200 mm', allow:500,
+    nru:'ориентир, зависит от армирования', nen:'guide value, depends on reinforcement' },
+  { reg:'RU', ru:'Пол по грунту', en:'Slab on grade', allow:1000,
+    nru:'несёт грунт, плита распределяет', nen:'soil carries it, slab spreads it' },
+  { reg:'US', ru:'Деревянные балки, жилая комната', en:'Wood joists, habitable room', allow:195,
+    nru:'IRC R301.5: 40 psf временной', nen:'IRC R301.5: 40 psf live' },
+  { reg:'US', ru:'Деревянные балки, спальня', en:'Wood joists, sleeping room', allow:146,
+    nru:'IRC R301.5: 30 psf', nen:'IRC R301.5: 30 psf' },
+  { reg:'US', ru:'Терраса или балкон', en:'Deck or balcony', allow:195,
+    nru:'IRC R301.5: 40 psf', nen:'IRC R301.5: 40 psf' },
+  { reg:'US', ru:'Гараж', en:'Garage', allow:244,
+    nru:'IRC R301.5: 50 psf', nen:'IRC R301.5: 50 psf' },
+  { reg:'US', ru:'Плита по грунту', en:'Slab on grade', allow:1000,
+    nru:'по несущей способности грунта', nen:'by soil bearing capacity' }
+];
+
+function renderLoadPanel(M){
+  const pct = clamp(state.loadPct == null ? 10 : state.loadPct, 0, 50);
+  const fi  = clamp(state.loadFloor | 0, 0, FLOORS.length - 1);
+  const floor = FLOORS[fi];
+  const base  = M.wDesign + M.standW;              // аквариум с запасом + тумба
+  const eq    = base * pct / 100;                  // оборудование и мелочь в тумбе
+  const total = base + eq;
+  const area  = M.L * M.D / 1e6;                   // площадь опоры, м²
+  const load  = total / area;                      // кг/м²
+  const perFoot = total / M.feetN;
+  const util  = load / floor.allow * 100;
+  const cls   = util <= 80 ? 'ok' : (util <= 100 ? 'warn' : 'bad');
+  const lb    = v => f0(v * 2.20462);
+  const ft2   = v => f1(v * 10.7639);
+  const psf   = v => f0(v * 0.204816);
+  const KG    = L('кг', 'kg');
+  const M2    = L('м²', 'm²');
+  const KGM2  = L('кг/м²', 'kg/m²');
+  const name  = LANG === 'en' ? floor.en : floor.ru;
+  const note  = LANG === 'en' ? floor.nen : floor.nru;
+  const rows = FLOORS.map((f, i) => `<tr data-i="${i}" class="${i === fi ? 'sel' : ''}">
+      <td><span class="reg">${f.reg}</span> ${LANG === 'en' ? f.en : f.ru}</td>
+      <td class="num">${f0(f.allow)}</td><td class="num">${psf(f.allow)}</td>
+      <td class="mut">${LANG === 'en' ? f.nen : f.nru}</td></tr>`).join('');
+  const verdict = util <= 80
+    ? L(`Нагрузка <b>${f0(load)} кг/м²</b> — ${f0(util)} % от ${f0(floor.allow)} кг/м². Запас ${f1(floor.allow / load)}×.`,
+        `Load <b>${f0(load)} kg/m²</b> — ${f0(util)} % of ${f0(floor.allow)} kg/m². Margin ${f1(floor.allow / load)}×.`)
+    : (util <= 100
+      ? L(`Нагрузка <b>${f0(load)} кг/м²</b> — ${f0(util)} % от ${f0(floor.allow)} кг/м². Запаса почти нет: распределите вес или выберите другую конструкцию.`,
+          `Load <b>${f0(load)} kg/m²</b> — ${f0(util)} % of ${f0(floor.allow)} kg/m². Almost no margin: spread the load or pick another structure.`)
+      : L(`Нагрузка <b>${f0(load)} ${KGM2}</b> — ${f0(util)} % от ${f0(floor.allow)} ${KGM2}. Превышение: нужна другая конструкция, распределяющая подкладка или меньше банка.`,
+          `Load <b>${f0(load)} ${KGM2}</b> — ${f0(util)} % of the ${f0(floor.allow)} ${KGM2} capacity. Over the limit: another structure, a load-spreading base, or a smaller tank.`));
+
+  $('#stage').innerHTML = `<div class="loadpanel" data-noconv>
+    <h3>${L('Нагрузка на перекрытие','Floor load')}</h3>
+    <div class="loadrow"><span class="k">${L('Аквариум с запасом 10 % и 5 см грунта','Tank with 10 % margin and 5 cm substrate')}</span><b>${f0(M.wDesign)} ${KG} · ${lb(M.wDesign)} lb</b></div>
+    <div class="loadrow"><span class="k">${L('Тумба','Stand')}</span><b>${f0(M.standW)} ${KG} · ${lb(M.standW)} lb</b></div>
+    <div class="loadfield">
+      <label for="inLoadPct">${L('Оборудование в тумбе','Equipment in the stand')}</label>
+      <div class="inp"><input id="inLoadPct" type="number" min="0" max="50" step="1" value="${pct}"><em>%</em></div>
+      <b>${f0(eq)} ${KG} · ${lb(eq)} lb</b>
+    </div>
+    <div class="loadrow total"><span class="k">${L('Итого на пол','Total on the floor')}</span><b>${f0(total)} ${KG} · ${lb(total)} lb</b></div>
+    <div class="loadrow"><span class="k">${L('Площадь опоры','Footprint')}</span><b>${f2(area)} ${M2} · ${ft2(area)} ft²</b></div>
+    <div class="loadrow big"><span class="k">${L('Нагрузка на перекрытие','Floor load')}</span><b>${f0(load)} ${KGM2} · ${psf(load)} psf</b></div>
+    <div class="loadrow"><span class="k">${L('На опору','Per foot')}</span><b>${f0(perFoot)} ${KG} · ${lb(perFoot)} lb</b></div>
+    <div class="loadverdict ${cls}">${verdict}</div>
+    <p class="note" style="margin:0 0 4px">${L('Считается как статическая нагрузка на площадь. Для деревянных перекрытий важны сечение и шаг балок, направление лаг и точка опоры — проверьте по проекту. Нормы дают полезную нагрузку; вес банки — постоянная, поэтому сравнение консервативное.',
+      'This is a static load over the footprint. For timber floors the joist size and spacing, joist direction and the point of support matter — check the project. Codes give a live load; the tank is permanent, so the comparison is conservative.')}</p>
+    <h3>${L('Типовые несущие конструкции','Typical floor structures')}</h3>
+    <div style="overflow-x:auto"><table class="tbl floors">
+      <thead><tr><th>${L('Конструкция','Structure')}</th><th>${L('кг/м²','kg/m²')}</th><th>psf</th><th>${L('Примечание','Note')}</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <p class="note" style="margin:8px 0 0">${L('Нажмите строку, чтобы проверить нагрузку по этой конструкции. Значения типовые: фактические зависят от проекта, сечения балок, армирования и грунта.',
+      'Click a row to check the load against that structure. Values are typical: actual capacity depends on the project, joist size, reinforcement and soil.')}</p>
+  </div>`;
+  $('#vcap').innerHTML = L(`Итого ${f0(total)} ${KG} · нагрузка ${f0(load)} ${KGM2} · ${name}: ${f0(util)} %`,
+    `Total ${f0(total)} kg · floor load ${f0(load)} kg/m² · ${name}: ${f0(util)} %`);
+  $('#vcap').style.display = '';
+  $('#vcap').setAttribute('data-noconv', '');
+
+  const inp = document.getElementById('inLoadPct');
+  if(inp) inp.onchange = () => { state.loadPct = clamp(+inp.value || 0, 0, 50); renderView(MODEL); };
+  document.querySelectorAll('#stage .floors tr[data-i]').forEach(tr => {
+    tr.onclick = () => { state.loadFloor = +tr.dataset.i; renderView(MODEL); };
+  });
+}
+
 function renderView(M){
   const tabs = [
     ['tumba', LANG==='en' ? 'Stand' : 'Тумба'],
     ['frame', LANG==='en' ? 'Frame' : 'Каркас'],
     ['front', LANG==='en' ? 'Front' : 'Спереди'],
     ['side', LANG==='en' ? 'Side' : 'Сбоку'],
-    ['detail', LANG==='en' ? 'Shelf detail' : 'Узел полки']
+    ['detail', LANG==='en' ? 'Shelf detail' : 'Узел полки'],
+    ['load', LANG==='en' ? 'Floor load' : 'Нагрузка']
   ];
   const I = M.idOf, leg = [];
   const addLeg = (n, t) => { if(n) leg.push([n, `${n} — ${t}`]); };
@@ -3346,8 +3641,11 @@ function renderView(M){
     renderView(MODEL);
   });
   const capTxt = caps[state.tab] || '';
+  $('#vcap').removeAttribute('data-noconv');
   $('#vcap').innerHTML = capTxt;
   $('#vcap').style.display = capTxt ? '' : 'none';
+
+  if(state.tab === 'load'){ renderLoadPanel(M); return; }
 
   let svg='';
   if(state.tab==='tumba')      svg = drawIso(M, {feet:true, plinth:true, doors:true, tank:true, dims:true, color:state.color});
@@ -3356,6 +3654,7 @@ function renderView(M){
   else if(state.tab==='side')  svg = drawSide(M, {color:state.color});
   else                         svg = drawDetail(M);
   $('#stage').innerHTML = svg;
+  applyUnits(document.querySelector('.main'));
 }
 
 /* =========================================================
@@ -3382,11 +3681,11 @@ function drawTank(M){
   }
   /* размеры */
   s += `<line x1="${X(0)}" y1="${Y(0)+30}" x2="${X(M.L)}" y2="${Y(0)+30}" stroke="#b3b9c4"/>`;
-  s += `<text x="${(X(0)+X(M.L))/2}" y="${Y(0)+44}" class="lbl" text-anchor="middle">${f0(M.L)}</text>`;
+  s += `<text x="${(X(0)+X(M.L))/2}" y="${Y(0)+44}" class="lbl" text-anchor="middle">${dimNum(M.L)}</text>`;
   s += `<line x1="${X(0)-34}" y1="${Y(0)}" x2="${X(0)-34}" y2="${Y(M.Ht)}" stroke="#b3b9c4"/>`;
-  s += `<text x="${X(0)-40}" y="${(Y(0)+Y(M.Ht))/2}" class="lbl" text-anchor="end">${f0(M.Ht)}</text>`;
+  s += `<text x="${X(0)-40}" y="${(Y(0)+Y(M.Ht))/2}" class="lbl" text-anchor="end">${dimNum(M.Ht)}</text>`;
   /* выноски */
-  s += `<text x="${X(M.L)-4}" y="${Y(M.hw)-8}" class="lbl2" text-anchor="end">${LANG==='en' ? 'water' : 'вода'} ${f0(M.hw)}</text>`;
+  s += `<text x="${X(M.L)-4}" y="${Y(M.hw)-8}" class="lbl2" text-anchor="end">${LANG==='en' ? 'water' : 'вода'} ${dimNum(M.hw)}</text>`;
 
   /* ---- план ---- */
   const px=650, py=90, pw=300, ph=250;
@@ -3402,9 +3701,9 @@ function drawTank(M){
       s += `<line x1="${PX(x).toFixed(1)}" y1="${PZ(0).toFixed(1)}" x2="${PX(x).toFixed(1)}" y2="${PZ(M.D).toFixed(1)}" stroke="#5b6068" stroke-width="2.5"/>`;
     }
   }
-  s += `<text x="${PX(M.L/2)}" y="${PZ(M.D)+22}" class="lbl" text-anchor="middle">${f0(M.L)}</text>`;
-  s += `<text x="${PX(M.L)+10}" y="${PZ(M.D/2)}" class="lbl">${f0(M.D)}</text>`;
-  s += `<text x="${px}" y="${py+ph+48}" class="lbl2">${LANG==='en' ? `glass ${g.w} mm, bottom ${g.b} mm${g.braces ? ', braces '+g.braces : ''}` : `стекло ${g.w} мм, дно ${g.b} мм${g.braces ? ', стяжек '+g.braces : ''}`}</text>`;
+  s += `<text x="${PX(M.L/2)}" y="${PZ(M.D)+22}" class="lbl" text-anchor="middle">${dimNum(M.L)}</text>`;
+  s += `<text x="${PX(M.L)+10}" y="${PZ(M.D/2)}" class="lbl">${dimNum(M.D)}</text>`;
+  s += `<text x="${px}" y="${py+ph+48}" class="lbl2">${LANG==='en' ? `glass ${dimNum(g.w)} ${dimU()}, bottom ${dimNum(g.b)} ${dimU()}${g.braces ? ', braces '+g.braces : ''}` : `стекло ${dimNum(g.w)} ${dimU()}, дно ${dimNum(g.b)} ${dimU()}${g.braces ? ', стяжек '+g.braces : ''}`}</text>`;
   return svgWrap(W,Hh,s);
 }
 
@@ -3457,21 +3756,21 @@ function drawGlass(M){
   s += tck(dL,Y(0),dL,Y(M.Ht));
   s += tck(dL-4,Y(0),dL+4,Y(0));
   s += tck(dL-4,Y(M.Ht),dL+4,Y(M.Ht));
-  s += `<text transform="rotate(-90 ${(dL-10).toFixed(1)} ${midY.toFixed(1)})" x="${(dL-10).toFixed(1)}" y="${midY.toFixed(1)}" class="lbl" text-anchor="middle">Ht ${f0(M.Ht)}</text>`;
+  s += `<text transform="rotate(-90 ${(dL-10).toFixed(1)} ${midY.toFixed(1)})" x="${(dL-10).toFixed(1)}" y="${midY.toFixed(1)}" class="lbl" text-anchor="middle">Ht ${dimNum(M.Ht)}</text>`;
 
   /* высота стенки */
   const dR=X(M.L)+46, midW=(Y(tB)+Y(M.Ht))/2;
   s += tck(dR,Y(tB),dR,Y(M.Ht));
   s += tck(dR-4,Y(tB),dR+4,Y(tB));
   s += tck(dR-4,Y(M.Ht),dR+4,Y(M.Ht));
-  s += `<text x="${(dR+8).toFixed(1)}" y="${midW.toFixed(1)}" class="lbl" text-anchor="start" dominant-baseline="central">Ht−tB ${f0(P.wallH)}</text>`;
+  s += `<text x="${(dR+8).toFixed(1)}" y="${midW.toFixed(1)}" class="lbl" text-anchor="start" dominant-baseline="central">Ht−tB ${dimNum(P.wallH)}</text>`;
 
   /* длина передней/задней детали */
   const dy=Y(0)+32, xa=X(tW+sn), xb=X(M.L-tW-sn);
   s += tck(xa,dy,xb,dy);
   s += tck(xa,dy-4,xa,dy+4);
   s += tck(xb,dy-4,xb,dy+4);
-  s += `<text x="${((xa+xb)/2).toFixed(1)}" y="${(dy+15).toFixed(1)}" class="lbl" text-anchor="middle">L−2tW−2g ${f0(P.frontW)}</text>`;
+  s += `<text x="${((xa+xb)/2).toFixed(1)}" y="${(dy+15).toFixed(1)}" class="lbl" text-anchor="middle">L−2tW−2g ${dimNum(P.frontW)}</text>`;
 
   /* ---- вид сверху ---- */
   const px=96, pw=430, py=430, ph=160;
@@ -3495,14 +3794,14 @@ function drawGlass(M){
   s += tck(dX,dY0,dX,dY1);
   s += tck(dX-4,dY0,dX+4,dY0);
   s += tck(dX-4,dY1,dX+4,dY1);
-  s += `<text x="${(dX+8).toFixed(1)}" y="${((dY0+dY1)/2).toFixed(1)}" class="lbl" text-anchor="start" dominant-baseline="central">D ${f0(M.D)}</text>`;
+  s += `<text x="${(dX+8).toFixed(1)}" y="${((dY0+dY1)/2).toFixed(1)}" class="lbl" text-anchor="start" dominant-baseline="central">D ${dimNum(M.D)}</text>`;
 
   /* длина */
   const yL=PZ(M.D)+26;
   s += tck(PX(0),yL,PX(M.L),yL);
   s += tck(PX(0),yL-4,PX(0),yL+4);
   s += tck(PX(M.L),yL-4,PX(M.L),yL+4);
-  s += `<text x="${((PX(0)+PX(M.L))/2).toFixed(1)}" y="${(yL+15).toFixed(1)}" class="lbl" text-anchor="middle">L ${f0(M.L)}</text>`;
+  s += `<text x="${((PX(0)+PX(M.L))/2).toFixed(1)}" y="${(yL+15).toFixed(1)}" class="lbl" text-anchor="middle">L ${dimNum(M.L)}</text>`;
 
   /* условные обозначения */
   const lx=640;
@@ -4303,6 +4602,11 @@ function setSection(sec){
   $('#cardBio').classList.toggle('hide', sec!=='bio');
   $('#seghint').textContent = t('h_' + (sec === 'fert' ? 'test' : sec));
   if(MODEL){ renderKpis(MODEL); renderNow(MODEL); }
+  const standSec = sec === 'stand';
+  $('#kpis').toggleAttribute('data-noconv', standSec);
+  $('#cardNow').toggleAttribute('data-noconv', standSec);
+  applyUnits(document.querySelector('.main'));
+  applyUnits(document.querySelector('.side'));
 }
 
 const SAVE_IDS = ['inL','inD','inH','inRim','inVol','inSoil','inHS','inBoard','inThick','inEdgeBody','inEdgeDoor','inBuild','inModDoors','inSheet','inMedia','inMV','inTemp','inProt','inRate','inFish',
@@ -4311,7 +4615,15 @@ const SAVE_IDS = ['inL','inD','inH','inRim','inVol','inSoil','inHS','inBoard','i
 function saveState(){
   try{
     const o = { __color: state.color, __profile: state.profile };
-    SAVE_IDS.forEach(id => { const el = document.getElementById(id); if(el) o[id] = el.value; });
+    SAVE_IDS.forEach(id => {
+      const el = document.getElementById(id); if(!el) return;
+      let v = el.value;
+      if(UNITS === 'imperial' && UNIT_NUM[id] && v !== ''){
+        const n = uParse(v);
+        if(Number.isFinite(n)) v = String(uRound(n * UNIT_NUM[id].k, 3));
+      }
+      o[id] = v;
+    });
     localStorage.setItem('aqua-calc', JSON.stringify(o));
   }catch(e){}
 }
@@ -4345,9 +4657,12 @@ function clearTests(){
 }
 
 function renderAll(){
-  const L  = clamp(+$('#inL').value || 1200, 300, 4200);
-  const D  = clamp(+$('#inD').value || 500, 300, 1200);
-  const Ht = clamp(+$('#inH').value || 500, 200, 1200);
+  const imp = UNITS === 'imperial';
+  const fL = imp ? 25.4 : 1, fV = imp ? 3.78541 : 1;
+  const numOr = (id, def) => { const v = +$(id).value; return Number.isFinite(v) && v > 0 ? v : def; };
+  const L  = clamp(numOr('#inL',  1200/fL) * fL, 300, 4200);
+  const D  = clamp(numOr('#inD',  500/fL)  * fL, 300, 1200);
+  const Ht = clamp(numOr('#inH',  500/fL)  * fL, 200, 1200);
   const H  = +$('#inHS').value || 900;
   const soilEl = $('#inSoil');
   const soilVal = soilEl ? +soilEl.value : 50;
@@ -4361,7 +4676,7 @@ function renderAll(){
   WATER_CFG.rim = rimVal;
   const volEl = $('#inVol');
   const volRaw = volEl ? String(volEl.value).trim() : '';
-  const volVal = volRaw === '' ? NaN : +volRaw;
+  const volVal = volRaw === '' ? NaN : uParse(volRaw) * fV;
   WATER_CFG.volume = Number.isFinite(volVal) && volVal > 0 ? clamp(volVal, 1, 100000) : null;
   const boardKey = $('#inBoard').value === 'ldsp' ? 'ldsp' : ($('#inBoard').value === 'mdf' ? 'mdf' : 'plywood');
   const thick = +$('#inThick').value === 16 ? 16 : 18;
@@ -4473,6 +4788,9 @@ function renderAll(){
   setSection(state.section);
   translateDom(document.querySelector('.main'));
   translateDom(document.querySelector('.side'));
+  syncUnitLabels();
+  applyUnits(document.querySelector('.main'));
+  applyUnits(document.querySelector('.side'));
   saveState();
 }
 
@@ -4484,7 +4802,8 @@ const PRESETS = [
 $('#presets').innerHTML = PRESETS.map(([L,D,Ht])=>`<button data-p="${L},${D},${Ht}">${L/10}×${D/10}×${Ht/10}</button>`).join('');
 $('#presets').querySelectorAll('button').forEach(b=>b.onclick=()=>{
   const [L,D,Ht] = b.dataset.p.split(',').map(Number);
-  $('#inL').value=L; $('#inD').value=D; $('#inH').value=Ht;
+  const f = UNITS === 'imperial' ? 25.4 : 1;
+  $('#inL').value=uRound(L/f,2); $('#inD').value=uRound(D/f,2); $('#inH').value=uRound(Ht/f,2);
   renderAll();
 });
 
@@ -4524,7 +4843,7 @@ $('#colors').querySelectorAll('.sw').forEach(b=>b.onclick=()=>{
 });
 
 const hashTab = location.hash.replace('#','');
-if(['tumba','frame','front','side','detail'].includes(hashTab)){
+if(['tumba','frame','front','side','detail','load'].includes(hashTab)){
   state.tab = hashTab;
   state.section = 'stand';
 } else if(hashTab === 'udo'){
@@ -4541,6 +4860,9 @@ document.querySelectorAll('#lang button').forEach(b=>{
     applyLang();
     renderAll();
   };
+});
+document.querySelectorAll('#lang button[data-u]').forEach(b=>{
+  b.onclick = () => setUnits(b.dataset.u);
 });
 
 $('#segs').querySelectorAll('button').forEach(b=>b.onclick=()=>{
@@ -4580,6 +4902,7 @@ try {
 loadState();
 const _tw = document.getElementById('inTempW'); if(_tw) _tw.value = document.getElementById('inTemp').value;
 applyLang();
+initUnitsUI();
 renderAll();
 
 /* ---------- обучение ---------- */
@@ -4759,6 +5082,7 @@ renderAll();
     pop.querySelector('.tour-kicker').textContent = (st.part ? st.part + ' · ' : '') + (idx + 1) + '/' + list.length;
     pop.querySelector('h3').textContent = st.title;
     pop.querySelector('p').textContent = st.text;
+    applyUnits(pop);
     pop.querySelector('.tour-dots').innerHTML = list.map((_, j) => `<i class="${j === idx ? 'on' : ''}"></i>`).join('');
     pop.querySelector('.tour-back').textContent = tr('Назад','Back');
     pop.querySelector('.tour-back').disabled = idx <= 0;

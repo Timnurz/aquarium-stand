@@ -28,6 +28,8 @@ Glass thickness uses water height and wall length. The calculation includes a sa
 
 The top panel is checked as a beam: load, span, plywood stiffness, a 3 mm deflection limit and allowable stress. A double upright or an extra support often helps more than a thicker sheet. The cutting plan is guillotine, with kerf and waste per sheet. Cutting and drilling are separate cards. Drilling schemes show the base point and the face to drill from. Hardware uses confirmats; tools are not listed. Assembly starts with pre-drilling, then the carcass, back panel, tops, shelves and doors.
 
+The stand views include a Floor load tab: tank weight with margin, stand weight, a percentage for equipment inside the stand, footprint, load in kg/m² and psf, and the margin against the selected structure. Below is a reference table of typical floor structures for Russia (SP 20.13330, PK/PB slabs, cast-in-place, slab on grade) and the USA (IRC R301.5). The check is static and conservative: the code live load is compared with the permanent tank weight; for timber floors the joist size and spacing matter.
+
 ## Equipment
 
 Filter flow is 3–5 water volumes per hour; that figure already allows for the performance drop, so flow stays a reference in the equipment table. The filter itself is chosen by its rated tank volume: a model must be rated from the current volume up to 2.5× more. The reference has an 'Aquarium, l' column plus rated and real flow, with suitable models highlighted in soft green. Tanks above 600 l get sets of two filters — one is not enough. Lighting is shown as LED watts. Aeration and heating scale with water volume.
@@ -43,6 +45,8 @@ An empty test field means no data, not zero. CO2 is calculated from pH and KH. T
 ## Language and saved data
 
 English is the default. The RU and EN buttons save the choice in `aqua-lang`. Inputs are saved in `aqua-calc`. `?lang=ru` or `?lang=en` forces a language.
+
+The mm and in buttons next to the language switch change units (saved in `aqua-units`): the aquarium, equipment and floor-load calculation switch to inches, gallons, pounds, gph and psf. Stand drawings, cutting and drilling stay in millimetres as working documentation; sheet and edge sizes stay metric.
 
 ## URL parameters
 
