@@ -30,7 +30,7 @@ The top panel is checked as a beam: load, span, plywood stiffness, a 3 mm deflec
 
 ## Equipment
 
-Filter flow is based on 3 to 5 water volumes per hour. The equipment table has one Filter row with rated flow and the loss allowance. The filter reference is sorted by flow; suitable rows are highlighted in soft green. Lighting is shown as LED watts. Aeration and heating scale with water volume.
+Filter flow is 3–5 water volumes per hour; that figure already allows for the performance drop, so flow stays a reference in the equipment table. The filter itself is chosen by its rated tank volume: a model must be rated from the current volume up to 2.5× more. The reference has an 'Aquarium, l' column plus rated and real flow, with suitable models highlighted in soft green. Tanks above 600 l get sets of two filters — one is not enough. Lighting is shown as LED watts. Aeration and heating scale with water volume.
 
 ## Biology
 
